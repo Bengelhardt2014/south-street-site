@@ -1,0 +1,30 @@
+# Source materials — keep raw research files out of the repo
+source-files/
+
+# Claude Code local settings (personal, per-user state)
+.claude/
+
+# Dependencies
+node_modules/
+
+# Build output
+dist/
+.astro/
+
+# Environment files
+.env
+.env.*
+!.env.example
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Editor / OS
+.DS_Store
+.vscode/
+.idea/
+Thumbs.db
+*.swp
