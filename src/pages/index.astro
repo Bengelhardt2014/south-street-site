@@ -2,16 +2,374 @@
 import Layout from '../layouts/Layout.astro';
 ---
 
-<Layout title="Map — Saving South Street">
-  <section>
-    <h1 class="text-3xl font-semibold tracking-tight text-stone-900">South Street &amp; East Passyunk Avenue</h1>
-    <p class="mt-3 max-w-2xl text-stone-700">
-      An interactive map of the two study corridors, with filterable dots representing parcels and businesses.
-      Use the map to compare land use, occupancy, and business mix across the two corridors.
-    </p>
+<Layout title="Map — Saving South Street" fullBleed>
+  <link
+    rel="stylesheet"
+    href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+    crossorigin=""
+  />
 
-    <div class="mt-8 flex h-[28rem] items-center justify-center rounded-lg border border-dashed border-stone-300 bg-white text-stone-500">
-      Interactive map will go here.
-    </div>
-  </section>
+  <div class="map-layout flex flex-col md:flex-row">
+    <aside class="map-sidebar border-b border-stone-200 p-6 md:w-[300px] md:shrink-0 md:border-b-0 md:overflow-y-auto">
+      <h2 class="text-[1.1rem] font-bold text-stone-900">Saving South Street: Parcel Map</h2>
+      <p class="mt-2 text-[0.9rem] leading-relaxed text-stone-600">
+        519 parcels along South Street and East Passyunk Avenue, color-coded by commercial vacancy state. Click any dot for details.
+      </p>
+      <h3 class="mt-6 text-base font-semibold tracking-tight text-stone-900">Filters</h3>
+      <p class="mt-2 text-sm italic text-stone-500">Filter controls coming in the next build.</p>
+    </aside>
+
+    <div id="map" class="map-canvas h-[70vh] flex-1 md:h-auto md:border-l md:border-stone-300"></div>
+  </div>
+
+  <style is:global>
+    /* Map layout fills the viewport below the site header. Header is approx 61px;
+       fall back to subtracting a fixed value but allow CSS calc on dvh for mobile UI bars. */
+    :root {
+      --site-header-h: 61px;
+    }
+
+    .map-layout {
+      min-height: calc(100dvh - var(--site-header-h));
+    }
+
+    @media (min-width: 768px) {
+      .map-layout {
+        height: calc(100dvh - var(--site-header-h));
+        min-height: 0;
+      }
+    }
+
+    .map-sidebar {
+      background-color: #f5f3ef;
+    }
+
+    .map-canvas {
+      background-color: #eaeaea;
+    }
+
+    /* Popup styling */
+    .leaflet-popup-content-wrapper {
+      border-radius: 6px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.12);
+    }
+    .leaflet-popup-content {
+      margin: 12px 14px;
+      font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+      font-size: 12.5px;
+      line-height: 1.3;
+      color: #1c1917;
+      min-width: 200px;
+      max-width: 260px;
+    }
+    .popup-address {
+      font-weight: 600;
+      font-size: 14px;
+      letter-spacing: -0.005em;
+      margin: 0;
+      color: #1c1917;
+    }
+    .popup-subheader {
+      font-size: 11.5px;
+      font-weight: 400;
+      color: #78716c;
+      margin: 1px 0 0 0;
+    }
+    .popup-pill-row {
+      margin: 4px 0;
+    }
+    .popup-pill {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 999px;
+      font-size: 11px;
+      font-weight: 500;
+      letter-spacing: 0.01em;
+    }
+    .popup-pill--short_term {
+      background-color: #c8632c;
+      color: #ffffff;
+    }
+    .popup-pill--long_term {
+      background-color: #8b1a1a;
+      color: #ffffff;
+    }
+    .popup-pill--under_renovation {
+      background-color: #e0b020;
+      color: #1c1917;
+    }
+    .popup-section {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+      margin-top: 10px;
+    }
+    .popup-section-title {
+      font-size: 10px;
+      text-transform: uppercase;
+      color: #a8a29e;
+      font-weight: 500;
+      letter-spacing: 0.5px;
+      margin: 0 0 1px 0;
+    }
+    /* Defeat Leaflet's default .leaflet-popup-content p { margin: 18px 0 } */
+    .leaflet-popup-content .popup-section p {
+      margin: 0 !important;
+      padding: 0 !important;
+    }
+    .popup-label {
+      font-weight: 600;
+      color: #1c1917;
+    }
+  </style>
+
+  <script>
+    import L from 'leaflet';
+
+    const VACANCY_COLORS: Record<string, string> = {
+      active: '#4a7c2e',
+      under_renovation: '#e0b020',
+      short_term: '#c8632c',
+      long_term: '#8b1a1a',
+      non_commercial: '#a8a29e',
+    };
+
+    const STREET_STYLES: Record<string, { color: string; weight: number }> = {
+      south_street: { color: '#7B3F99', weight: 7 },
+      east_passyunk: { color: '#E67E22', weight: 7 },
+    };
+
+    function escapeHtml(value: unknown): string {
+      if (value === null || value === undefined) return '';
+      return String(value)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+    }
+
+    function formatPrice(v: unknown): string {
+      const n = Number(v);
+      if (!Number.isFinite(n)) return escapeHtml(v);
+      if (n === 1) return '$1';
+      return '$' + n.toLocaleString('en-US');
+    }
+
+    type ParcelProps = {
+      address: string | null;
+      corridor: string | null;
+      vacancy_state: string;
+      vacant: string | null;
+      vacancy_type: string | null;
+      business_category: string | null;
+      business_segment: string | null;
+      operator_type: string | null;
+      outdoor_footprint: string | null;
+      cultural_tenant: string | null;
+      cultural_status: string | null;
+      year_built: number | string | null;
+      zone_type: string | null;
+      building_footprint: number | null;
+      building_height: number | null;
+      open_violations: number | null;
+      last_sale_year: number | null;
+      last_sale_price: number | string | null;
+      owner: string | null;
+      opa_property_use: string | null;
+      out_of_area_owner: string | null;
+      corporate_owner: string | null;
+    };
+
+    function line(label: string, value: string | number): string {
+      return `<p><span class="popup-label">${label}:</span> ${value}</p>`;
+    }
+
+    function buildPopup(p: ParcelProps): string {
+      const isNonCommercial = p.vacancy_state === 'non_commercial';
+      const isVacant =
+        p.vacancy_state === 'short_term' ||
+        p.vacancy_state === 'long_term' ||
+        p.vacancy_state === 'under_renovation';
+
+      // ---------- Header block ----------
+      const header: string[] = [];
+      header.push(`<h3 class="popup-address">${escapeHtml(p.address)}</h3>`);
+
+      if (p.cultural_tenant && p.cultural_status) {
+        const label =
+          p.cultural_status === 'Active'
+            ? 'Active Cultural Anchor'
+            : `${escapeHtml(p.cultural_status)} Cultural Anchor`;
+        header.push(
+          `<p class="popup-subheader">${escapeHtml(p.cultural_tenant)} (${label})</p>`,
+        );
+      }
+
+      if (isVacant && p.vacancy_type) {
+        const pillClass = `popup-pill popup-pill--${p.vacancy_state}`;
+        header.push(
+          `<div class="popup-pill-row"><span class="${pillClass}">${escapeHtml(p.vacancy_type)}</span></div>`,
+        );
+      }
+
+      // ---------- BUSINESS INFO section ----------
+      const businessInfo: string[] = [];
+      if (isVacant) {
+        if (p.vacancy_type) businessInfo.push(line('Vacancy', escapeHtml(p.vacancy_type)));
+        if (p.outdoor_footprint) businessInfo.push(line('Outdoor Footprint', escapeHtml(p.outdoor_footprint)));
+      } else if (!isNonCommercial) {
+        if (p.business_segment) businessInfo.push(line('Segment', escapeHtml(p.business_segment)));
+        if (p.business_category) businessInfo.push(line('Category', escapeHtml(p.business_category)));
+        if (p.operator_type && p.operator_type !== 'Vacant') {
+          businessInfo.push(line('Operator', escapeHtml(p.operator_type)));
+        }
+        if (p.outdoor_footprint) businessInfo.push(line('Outdoor Footprint', escapeHtml(p.outdoor_footprint)));
+      }
+
+      // ---------- BUILDING DETAILS section ----------
+      const buildingDetails: string[] = [];
+      if (p.owner) buildingDetails.push(line('Owner', escapeHtml(p.owner)));
+      if (isNonCommercial && p.opa_property_use) {
+        buildingDetails.push(line('Type', escapeHtml(p.opa_property_use)));
+      }
+      if (p.year_built) {
+        const yb = String(p.year_built);
+        buildingDetails.push(line('Year built', yb === '1900' ? 'pre-1900' : escapeHtml(yb)));
+      }
+      if (p.zone_type) buildingDetails.push(line('Zone', escapeHtml(p.zone_type)));
+      if (p.building_footprint && p.building_footprint > 0) {
+        buildingDetails.push(
+          line('Footprint', `${p.building_footprint.toLocaleString('en-US')} sqft`),
+        );
+      }
+      if (p.building_height && p.building_height > 0) {
+        buildingDetails.push(line('Height', `${p.building_height} ft`));
+      }
+      if (p.open_violations && p.open_violations > 0) {
+        buildingDetails.push(line('Open violations', `${p.open_violations}`));
+      }
+      if (
+        p.last_sale_year &&
+        p.last_sale_price !== null &&
+        p.last_sale_price !== undefined
+      ) {
+        buildingDetails.push(
+          line('Last sale', `${p.last_sale_year} for ${formatPrice(p.last_sale_price)}`),
+        );
+      }
+
+      // ---------- Assemble ----------
+      let html = header.join('');
+      if (businessInfo.length) {
+        html +=
+          `<div class="popup-section">` +
+          `<div class="popup-section-title">Business Info</div>` +
+          businessInfo.join('') +
+          `</div>`;
+      }
+      if (buildingDetails.length) {
+        html +=
+          `<div class="popup-section">` +
+          `<div class="popup-section-title">Building Details</div>` +
+          buildingDetails.join('') +
+          `</div>`;
+      }
+      return html;
+    }
+
+    async function initMap() {
+      const map = L.map('map', {
+        center: [39.938, -75.155],
+        zoom: 16,
+        maxZoom: 19,
+        zoomControl: true,
+      });
+
+      L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+        attribution:
+          '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
+        subdomains: 'abcd',
+        maxZoom: 19,
+      }).addTo(map);
+
+      // Streets layer — render below parcels
+      try {
+        const streetsResp = await fetch('/data/streets.geojson');
+        const streetsGj = await streetsResp.json();
+        L.geoJSON(streetsGj, {
+          style: (feature) => {
+            const key = feature?.properties?.corridor as string | undefined;
+            const base = (key && STREET_STYLES[key]) || { color: '#888', weight: 3 };
+            return { color: base.color, weight: base.weight, opacity: 0.4 };
+          },
+        }).addTo(map);
+      } catch (err) {
+        console.error('Failed to load streets.geojson', err);
+      }
+
+      // Parcels layer — split so non-commercial dots can be toggled by zoom
+      try {
+        const parcelsResp = await fetch('/data/parcels.geojson');
+        const parcelsGj = await parcelsResp.json();
+
+        const bindPopupTo = (feature: GeoJSON.Feature, layer: L.Layer) => {
+          layer.bindPopup(buildPopup(feature.properties as ParcelProps), {
+            maxWidth: 280,
+          });
+        };
+
+        // Commercial + vacant dots: always visible at full opacity
+        L.geoJSON(parcelsGj, {
+          filter: (feature) =>
+            feature.properties?.vacancy_state !== 'non_commercial',
+          pointToLayer: (feature, latlng) => {
+            const state = feature.properties?.vacancy_state as string;
+            return L.circleMarker(latlng, {
+              radius: 7,
+              fillColor: VACANCY_COLORS[state] || '#888',
+              color: '#ffffff',
+              weight: 1,
+              opacity: 1,
+              fillOpacity: 0.9,
+            });
+          },
+          onEachFeature: bindPopupTo,
+        }).addTo(map);
+
+        // Non-commercial dots: hidden below zoom 18, faded at/above
+        const nonCommercialLayer = L.geoJSON(parcelsGj, {
+          filter: (feature) =>
+            feature.properties?.vacancy_state === 'non_commercial',
+          pointToLayer: (_feature, latlng) =>
+            L.circleMarker(latlng, {
+              radius: 7,
+              fillColor: VACANCY_COLORS.non_commercial,
+              color: '#ffffff',
+              weight: 1,
+              opacity: 0.4,
+              fillOpacity: 0.35,
+            }),
+          onEachFeature: bindPopupTo,
+        });
+
+        const NON_COMMERCIAL_MIN_ZOOM = 18;
+        const updateNonCommercialVisibility = () => {
+          const visible = map.getZoom() >= NON_COMMERCIAL_MIN_ZOOM;
+          if (visible && !map.hasLayer(nonCommercialLayer)) {
+            nonCommercialLayer.addTo(map);
+          } else if (!visible && map.hasLayer(nonCommercialLayer)) {
+            map.removeLayer(nonCommercialLayer);
+          }
+        };
+        map.on('zoomend', updateNonCommercialVisibility);
+        updateNonCommercialVisibility();
+      } catch (err) {
+        console.error('Failed to load parcels.geojson', err);
+      }
+    }
+
+    initMap();
+  </script>
 </Layout>

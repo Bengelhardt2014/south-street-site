@@ -3,9 +3,10 @@ import '../styles/global.css';
 
 interface Props {
   title?: string;
+  fullBleed?: boolean;
 }
 
-const { title = 'Saving South Street' } = Astro.props;
+const { title = 'Saving South Street', fullBleed = false } = Astro.props;
 
 const navLinks = [
   { href: '/', label: 'Map' },
@@ -24,26 +25,35 @@ const currentPath = Astro.url.pathname.replace(/\/$/, '') || '/';
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Anton&display=swap"
+      rel="stylesheet"
+    />
     <title>{title}</title>
   </head>
   <body class="bg-stone-50 text-stone-900 antialiased">
-    <header class="border-b border-stone-200 bg-white">
-      <div class="mx-auto flex max-w-6xl flex-col gap-3 px-6 py-4 sm:flex-row sm:items-center sm:justify-between">
-        <a href="/" class="text-lg font-semibold tracking-tight text-stone-900 hover:text-stone-700">
+    <header id="site-header" class="bg-stone-900 text-stone-50">
+      <div class="flex flex-col gap-3 px-6 py-3 sm:flex-row sm:items-center sm:justify-between">
+        <a
+          href="/"
+          class="wordmark text-[1.5rem] text-stone-50 hover:text-stone-50"
+        >
           Saving South Street
         </a>
         <nav>
-          <ul class="flex flex-wrap gap-x-5 gap-y-1 text-sm">
+          <ul class="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm">
             {navLinks.map(({ href, label }) => {
               const isActive = currentPath === href;
               return (
                 <li>
                   <a
                     href={href}
-                    class={`transition-colors ${
+                    class={`block rounded px-3 py-1.5 transition-colors ${
                       isActive
-                        ? 'font-medium text-stone-900 underline underline-offset-4'
-                        : 'text-stone-600 hover:text-stone-900'
+                        ? 'bg-stone-800 font-medium text-stone-50'
+                        : 'text-stone-300 hover:text-stone-50'
                     }`}
                   >
                     {label}
@@ -54,16 +64,23 @@ const currentPath = Astro.url.pathname.replace(/\/$/, '') || '/';
           </ul>
         </nav>
       </div>
+      <div class="h-0.5 w-full bg-[#8b1a1a]"></div>
     </header>
 
-    <main class="mx-auto max-w-6xl px-6 py-10">
+    {fullBleed ? (
       <slot />
-    </main>
+    ) : (
+      <>
+        <main class="mx-auto max-w-6xl px-6 py-10">
+          <slot />
+        </main>
 
-    <footer class="mt-16 border-t border-stone-200 bg-white">
-      <div class="mx-auto max-w-6xl px-6 py-6 text-xs text-stone-500">
-        Saving South Street &middot; An urban planning thesis project
-      </div>
-    </footer>
+        <footer class="mt-16 border-t border-stone-200 bg-white">
+          <div class="mx-auto max-w-6xl px-6 py-6 text-xs text-stone-500">
+            Saving South Street &middot; An urban planning thesis project
+          </div>
+        </footer>
+      </>
+    )}
   </body>
 </html>
