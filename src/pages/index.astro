@@ -11,16 +11,195 @@ import Layout from '../layouts/Layout.astro';
   />
 
   <div class="map-layout flex flex-col md:flex-row">
-    <aside class="map-sidebar border-b border-stone-200 p-6 md:w-[300px] md:shrink-0 md:border-b-0 md:overflow-y-auto">
-      <h2 class="text-[1.1rem] font-bold text-stone-900">Saving South Street: Parcel Map</h2>
-      <p class="mt-2 text-[0.9rem] leading-relaxed text-stone-600">
-        519 parcels along South Street and East Passyunk Avenue, color-coded by commercial vacancy state. Click any dot for details.
-      </p>
-      <h3 class="mt-6 text-base font-semibold tracking-tight text-stone-900">Filters</h3>
-      <p class="mt-2 text-sm italic text-stone-500">Filter controls coming in the next build.</p>
+    <aside class="map-sidebar border-b border-stone-200 md:w-[360px] md:shrink-0 md:border-b-0 md:overflow-y-auto">
+      <div class="sidebar-intro">
+        <h2 class="text-[1.1rem] font-bold text-stone-900">Saving South Street: Parcel Map</h2>
+        <p class="mt-2 text-[0.9rem] leading-relaxed text-stone-600">
+          519 parcels along South Street and East Passyunk Avenue, color-coded by commercial vacancy state. Click any dot for details.
+        </p>
+      </div>
+
+      <div class="sticky-sentinel" aria-hidden="true"></div>
+
+      <section class="filter-section" data-section="corridor">
+        <header class="filter-section-header">
+          <h3>Corridor</h3>
+          <div class="filter-section-meta">
+            <span class="filter-section-badge" hidden></span>
+            <button
+              class="filter-section-reset"
+              type="button"
+              data-reset="corridor"
+              hidden
+            >Reset</button>
+          </div>
+        </header>
+        <div class="filter-section-body">
+          <div class="corridor-segmented" role="radiogroup" aria-label="Corridor filter">
+            <button
+              type="button"
+              class="corridor-segment"
+              data-value="all"
+              aria-pressed="true"
+              role="radio"
+            >All Corridors</button>
+            <button
+              type="button"
+              class="corridor-segment"
+              data-value="south-street"
+              aria-pressed="false"
+              role="radio"
+            >South Street</button>
+            <button
+              type="button"
+              class="corridor-segment"
+              data-value="east-passyunk"
+              aria-pressed="false"
+              role="radio"
+            >East Passyunk</button>
+          </div>
+          <p class="corridor-counter" id="corridor-counter"></p>
+        </div>
+      </section>
+
+      <section class="filter-section" data-section="business-mix">
+        <header class="filter-section-header">
+          <h3>Business mix</h3>
+          <div class="filter-section-meta">
+            <span class="filter-section-badge" hidden></span>
+            <button
+              class="filter-section-reset"
+              type="button"
+              data-reset="business-mix"
+              hidden
+            >Reset</button>
+          </div>
+        </header>
+        <div class="filter-section-body">
+          <div class="filter-group" data-filter-group="vacancy">
+            <h4 class="filter-group-label">Vacancy state</h4>
+            <div class="filter-vacancy-list"></div>
+          </div>
+
+          <div class="filter-group" data-filter-group="segment">
+            <h4 class="filter-group-label">Business segment</h4>
+            <div id="segment-list"></div>
+          </div>
+
+          <div class="filter-group" data-filter-group="operator">
+            <h4 class="filter-group-label">Operator type</h4>
+            <div class="chip-row" data-chip-group="operator"></div>
+          </div>
+
+          <div class="filter-group" data-filter-group="peak">
+            <h4 class="filter-group-label">Peak activation period</h4>
+            <div class="chip-row" data-chip-group="peak"></div>
+          </div>
+
+          <div class="filter-group" data-filter-group="price">
+            <h4 class="filter-group-label">Consumer price level</h4>
+            <div class="chip-row" data-chip-group="price"></div>
+          </div>
+
+          <div class="filter-group" data-filter-group="outdoor">
+            <label class="filter-toggle">
+              <input type="checkbox" id="filter-outdoor" />
+              <span>Show only parcels with outdoor footprint</span>
+            </label>
+          </div>
+
+          <div class="filter-group lens-block" data-filter-group="lens">
+            <label class="filter-toggle">
+              <input type="checkbox" id="filter-lens" />
+              <span>Cultural anchor lens</span>
+            </label>
+            <p class="lens-caption">arts, entertainment, museum, etc</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="filter-section" data-section="building-mix">
+        <header class="filter-section-header">
+          <h3>Building mix</h3>
+          <div class="filter-section-meta">
+            <span class="filter-section-badge" hidden></span>
+            <button class="filter-section-reset" type="button" hidden>Reset</button>
+          </div>
+        </header>
+        <div class="filter-section-body">
+          <p class="filter-coming-soon">Coming soon</p>
+        </div>
+      </section>
+
+      <section class="filter-section" data-section="map-overlays">
+        <header class="filter-section-header">
+          <h3>Map overlays</h3>
+          <div class="filter-section-meta">
+            <span class="filter-section-badge" hidden></span>
+            <button class="filter-section-reset" type="button" hidden>Reset</button>
+          </div>
+        </header>
+        <div class="filter-section-body">
+          <p class="filter-coming-soon">Coming soon</p>
+        </div>
+      </section>
+
+      <section class="filter-section" data-section="demographic-background">
+        <header class="filter-section-header">
+          <h3>Demographic background</h3>
+          <div class="filter-section-meta">
+            <span class="filter-section-badge" hidden></span>
+            <button class="filter-section-reset" type="button" hidden>Reset</button>
+          </div>
+        </header>
+        <div class="filter-section-body">
+          <p class="filter-coming-soon">Coming soon</p>
+        </div>
+      </section>
     </aside>
 
-    <div id="map" class="map-canvas h-[70vh] flex-1 md:h-auto md:border-l md:border-stone-300"></div>
+    <div class="map-column flex-1 md:border-l md:border-stone-300">
+      <div id="map" class="map-canvas"></div>
+      <div class="block-ribbon-wrapper" id="block-ribbon-wrapper">
+        <button
+          class="ribbon-toggle"
+          type="button"
+          id="ribbon-toggle"
+          aria-label="Collapse ribbon"
+          aria-expanded="true"
+        >
+          <svg class="ribbon-toggle-chevron" viewBox="0 0 12 8" fill="none" aria-hidden="true">
+            <path d="M1.5 1.5l4.5 4 4.5-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </button>
+        <div class="block-ribbon" id="block-ribbon">
+          <div class="ribbon-header">
+            <h3 class="ribbon-title">Block-level view</h3>
+            <select class="ribbon-metric-select" id="ribbon-metric-select" aria-label="Block metric">
+              <option value="vacancy_rate">Vacancy rate (%)</option>
+              <option value="outdoor_rate">Outdoor footprint (%)</option>
+              <option value="quick_service_rate">Quick service (%)</option>
+              <option value="nuisance_count">Nuisance retail (count)</option>
+              <option value="local_chain_count">Local chains (count)</option>
+            </select>
+          </div>
+          <div class="ribbon-corridor-row" data-corridor-row="south_street">
+            <div class="ribbon-corridor-label">SOUTH STREET</div>
+            <div class="ribbon-blocks" data-blocks-for="South Street"></div>
+          </div>
+          <div class="ribbon-corridor-row" data-corridor-row="east_passyunk">
+            <div class="ribbon-corridor-label">EAST PASSYUNK</div>
+            <div class="ribbon-blocks" data-blocks-for="East Passyunk"></div>
+          </div>
+          <div class="ribbon-legend">
+            <span class="ribbon-legend-label">Low</span>
+            <div class="ribbon-legend-bar" id="ribbon-legend-bar"></div>
+            <span class="ribbon-legend-label">High</span>
+          </div>
+        </div>
+        <div class="ribbon-tooltip" id="ribbon-tooltip" hidden></div>
+      </div>
+    </div>
   </div>
 
   <style is:global>
@@ -47,6 +226,562 @@ import Layout from '../layouts/Layout.astro';
 
     .map-canvas {
       background-color: #eaeaea;
+    }
+
+    /* Map column: stacks the map above the block-level ribbon. */
+    .map-column {
+      display: flex;
+      flex-direction: column;
+    }
+    .map-column #map {
+      height: 70vh;          /* mobile default */
+    }
+    @media (min-width: 768px) {
+      .map-column #map {
+        height: auto;
+        flex: 1;
+        min-height: 0;       /* enable flex-shrink for nested flex */
+      }
+    }
+
+    /* Block-level heat ribbon below the map.
+       Wrapper holds the absolute-positioned toggle "tab" plus the ribbon body. */
+    .block-ribbon-wrapper {
+      position: relative;
+      flex-shrink: 0;
+    }
+    .ribbon-toggle {
+      position: absolute;
+      top: -11px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 44px;
+      height: 22px;
+      background: #ffffff;
+      border: 1px solid #d6d3d1;
+      border-bottom-color: #ffffff;  /* mask the part overlapping the ribbon top border */
+      border-radius: 6px 6px 0 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      color: #1a1a1a;
+      padding: 0;
+      /* Must be > Leaflet's popup-pane (700) so the protruding tab isn't
+         covered by tile-pane (200) or any other Leaflet pane. */
+      z-index: 1000;
+      transition: opacity 0.1s ease;
+    }
+    .ribbon-toggle:hover {
+      opacity: 0.7;
+    }
+    .ribbon-toggle-chevron {
+      width: 14px;
+      height: 14px;
+      transition: transform 0.25s ease;
+    }
+    .block-ribbon-wrapper.is-collapsed .ribbon-toggle-chevron {
+      transform: rotate(180deg);
+    }
+    .block-ribbon {
+      background: #ffffff;
+      border-top: 1px solid #d6d3d1;
+      padding: 14px 16px 12px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      font-size: 12px;
+      color: #1c1917;
+      overflow: hidden;
+      max-height: 600px;
+      transition: max-height 0.25s ease,
+                  padding-top 0.25s ease,
+                  padding-bottom 0.25s ease;
+    }
+    .block-ribbon-wrapper.is-collapsed .block-ribbon {
+      max-height: 14px;   /* thin strip under the tab so collapsed total ~25-28px */
+      padding-top: 0;
+      padding-bottom: 0;
+    }
+    .ribbon-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .ribbon-title {
+      margin: 0;
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: -0.005em;
+      color: #1c1917;
+    }
+    .ribbon-metric-select {
+      font-size: 12px;
+      padding: 3px 6px;
+      border: 1px solid #d6d3d1;
+      border-radius: 3px;
+      background: #ffffff;
+      color: #1c1917;
+      cursor: pointer;
+    }
+    .ribbon-corridor-row {
+      display: grid;
+      grid-template-columns: 110px 1fr;
+      gap: 10px;
+      align-items: center;
+      opacity: 1;
+      transition: opacity 0.3s ease;
+    }
+    .ribbon-corridor-row.is-dimmed {
+      opacity: 0.5;
+    }
+    .ribbon-corridor-label {
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: #78716c;
+    }
+    .ribbon-blocks {
+      display: grid;
+      gap: 2px;
+    }
+    .ribbon-blocks[data-block-count="11"] { grid-template-columns: repeat(11, 1fr); }
+    .ribbon-blocks[data-block-count="8"]  { grid-template-columns: repeat(8,  1fr); }
+    .ribbon-block {
+      position: relative;
+      padding: 4px 2px;
+      border-radius: 3px;
+      text-align: center;
+      cursor: pointer;
+      user-select: none;
+      overflow: hidden;
+      transition: transform 0.15s ease, box-shadow 0.2s ease;
+    }
+    .ribbon-block:hover:not(.is-selected) {
+      transform: translateY(-1px);
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+    }
+    .ribbon-block.is-selected {
+      box-shadow: inset 0 0 0 3px #1a1a1a, 0 4px 12px rgba(26, 26, 26, 0.25);
+      transform: scale(1.04);
+      z-index: 5;
+    }
+    .ribbon-block-num {
+      font-size: 11px;
+      font-weight: 500;
+      line-height: 1.2;
+      position: relative;
+      z-index: 1;
+    }
+    .ribbon-block-val {
+      font-size: 10px;
+      line-height: 1.2;
+      position: relative;
+      z-index: 1;
+    }
+    /* Low-confidence diagonal striping overlay (denominator < 5 on % metrics) */
+    .ribbon-block.is-low-conf::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      background: repeating-linear-gradient(
+        45deg,
+        transparent 0 4px,
+        rgba(255, 255, 255, 0.5) 4px 5px
+      );
+    }
+    .ribbon-legend {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 2px;
+    }
+    .ribbon-legend-label {
+      font-size: 10px;
+      color: #78716c;
+    }
+    .ribbon-legend-bar {
+      flex: 1;
+      height: 6px;
+      border-radius: 3px;
+    }
+
+    /* Block hover tooltip */
+    .ribbon-tooltip {
+      position: fixed;
+      z-index: 1100;
+      background: #ffffff;
+      border: 1px solid #d6d3d1;
+      border-radius: 6px;
+      padding: 8px 10px;
+      font-size: 12px;
+      color: #1c1917;
+      line-height: 1.4;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+      pointer-events: none;
+      max-width: 280px;
+    }
+    .ribbon-tooltip[hidden] {
+      display: none;
+    }
+    .ribbon-tooltip-header {
+      font-weight: 600;
+      color: #1c1917;
+      margin-bottom: 4px;
+    }
+    .ribbon-tooltip-body {
+      color: #57534e;
+    }
+    .ribbon-tooltip-body + .ribbon-tooltip-body {
+      margin-top: 2px;
+      font-size: 11px;
+    }
+    /* Arrow — double-border trick so it has a 1px border line */
+    .ribbon-tooltip[data-arrow="down"]::before,
+    .ribbon-tooltip[data-arrow="down"]::after {
+      content: '';
+      position: absolute;
+      top: 100%;
+      left: 50%;
+      width: 0;
+      height: 0;
+      border: 6px solid transparent;
+      pointer-events: none;
+    }
+    .ribbon-tooltip[data-arrow="down"]::before {
+      transform: translateX(-50%);
+      border-top-color: #d6d3d1;
+      border-bottom-width: 0;
+    }
+    .ribbon-tooltip[data-arrow="down"]::after {
+      transform: translateX(-50%) translateY(-1px);
+      border-top-color: #ffffff;
+      border-bottom-width: 0;
+    }
+    .ribbon-tooltip[data-arrow="up"]::before,
+    .ribbon-tooltip[data-arrow="up"]::after {
+      content: '';
+      position: absolute;
+      bottom: 100%;
+      left: 50%;
+      width: 0;
+      height: 0;
+      border: 6px solid transparent;
+      pointer-events: none;
+    }
+    .ribbon-tooltip[data-arrow="up"]::before {
+      transform: translateX(-50%);
+      border-bottom-color: #d6d3d1;
+      border-top-width: 0;
+    }
+    .ribbon-tooltip[data-arrow="up"]::after {
+      transform: translateX(-50%) translateY(1px);
+      border-bottom-color: #ffffff;
+      border-top-width: 0;
+    }
+
+    /* Sidebar — intro block */
+    .sidebar-intro {
+      padding: 24px;
+    }
+
+    /* Sidebar — filter sections */
+    .filter-section {
+      padding: 14px 24px 16px 24px;
+      border-top: 1px solid #e7e5e4;
+    }
+    .filter-section-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 8px;
+    }
+    .filter-section-header h3 {
+      margin: 0;
+      font-size: 15px;
+      font-weight: 500;
+      letter-spacing: -0.005em;
+      color: #1c1917;
+    }
+    .filter-section-meta {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .filter-section-badge {
+      background-color: #e7e5e4;
+      color: #57534e;
+      border-radius: 999px;
+      padding: 1px 8px;
+      font-size: 11px;
+      font-weight: 500;
+      letter-spacing: 0.01em;
+    }
+    .filter-section-reset {
+      background: none;
+      border: none;
+      padding: 0;
+      font-size: 12px;
+      color: #57534e;
+      text-decoration: underline;
+      cursor: pointer;
+    }
+    .filter-section-reset:hover {
+      color: #1c1917;
+    }
+    .filter-section-body {
+      font-size: 13px;
+      color: #57534e;
+    }
+    .filter-coming-soon {
+      margin: 0;
+      color: #a8a29e;
+      font-style: italic;
+    }
+
+    /* Filter group spacing within a section */
+    .filter-group {
+      margin-top: 16px;
+    }
+    .filter-group:first-child {
+      margin-top: 0;
+    }
+    .filter-group-label {
+      margin: 0 0 6px 0;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: #78716c;
+    }
+
+    /* Checkbox rows (vacancy, category checkboxes) */
+    .filter-check {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 2px 0;
+      font-size: 13px;
+      color: #1c1917;
+      cursor: pointer;
+      line-height: 1.3;
+    }
+    .filter-check input[type="checkbox"] {
+      accent-color: #1c1917;
+      margin: 0;
+    }
+    .filter-swatch {
+      display: inline-block;
+      width: 11px;
+      height: 11px;
+      border-radius: 50%;
+      border: 1px solid rgba(0, 0, 0, 0.12);
+      flex-shrink: 0;
+    }
+    .filter-check-label {
+      flex: 1;
+    }
+    .count {
+      color: #a8a29e;
+      font-size: 12px;
+      font-variant-numeric: tabular-nums;
+    }
+
+    /* Segment drill-down */
+    .segment {
+      margin: 2px 0;
+    }
+    .segment-header {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 2px 0;
+    }
+    .segment-chevron {
+      width: 16px;
+      height: 16px;
+      padding: 0;
+      background: none;
+      border: none;
+      color: #78716c;
+      font-size: 10px;
+      line-height: 1;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      transition: transform 0.12s ease;
+    }
+    .segment-chevron[aria-expanded="true"] {
+      transform: rotate(90deg);
+    }
+    .segment-parent {
+      accent-color: #1c1917;
+      margin: 0;
+    }
+    .segment-label {
+      flex: 1;
+      padding: 0;
+      background: none;
+      border: none;
+      color: #1c1917;
+      font-size: 13px;
+      text-align: left;
+      cursor: pointer;
+      line-height: 1.3;
+    }
+    .segment-children {
+      padding-left: 28px;
+      margin: 2px 0 6px 0;
+    }
+    .segment-children .filter-check {
+      font-size: 12.5px;
+      padding: 1px 0;
+    }
+
+    /* Chips */
+    .chip-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 5px;
+    }
+    .chip {
+      padding: 3px 10px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 500;
+      background: #e7e5e4;
+      color: #57534e;
+      border: 1px solid transparent;
+      cursor: pointer;
+      transition: background 0.1s, color 0.1s;
+    }
+    .chip[aria-pressed="true"] {
+      background: #1c1917;
+      color: #fafaf9;
+    }
+    .chip:hover {
+      border-color: #a8a29e;
+    }
+    .chip[aria-pressed="true"]:hover {
+      border-color: #1c1917;
+    }
+
+    /* Corridor centerline lines (rendered as SVG paths). Smooth fade between
+       full and dimmed opacity when the user switches corridor selection. */
+    .corridor-line {
+      transition: stroke-opacity 300ms ease;
+    }
+
+    /* Sticky sentinel — 1px element just above the Corridor section. The
+       IntersectionObserver watches this; when it leaves the sidebar viewport
+       (i.e., user scrolled past the intro), we set .is-stuck on the Corridor
+       section so its shadow appears. The -1px margin collapses the visual
+       gap so the sentinel is invisible. */
+    .sticky-sentinel {
+      height: 1px;
+      margin: 0 0 -1px 0;
+    }
+
+    /* Corridor section sticks to the top of the sidebar scroll container.
+       Background must match the sidebar so scrolling content doesn't show
+       through behind it. */
+    .filter-section[data-section="corridor"] {
+      position: sticky;
+      top: 0;
+      background-color: #f5f3ef;
+      z-index: 5;
+      transition: box-shadow 0.18s ease;
+    }
+    .filter-section[data-section="corridor"].is-stuck {
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
+    }
+
+    /* Corridor segmented control — 3 pill buttons spanning sidebar width */
+    .corridor-segmented {
+      display: flex;
+      gap: 4px;
+    }
+    .corridor-segment {
+      flex: 1;
+      padding: 6px 6px;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 500;
+      color: #57534e;
+      background: #ffffff;
+      border: 1px solid #d6d3d1;
+      cursor: pointer;
+      text-align: center;
+      white-space: nowrap;
+      transition: background 0.1s, color 0.1s, border-color 0.1s;
+    }
+    .corridor-segment:hover {
+      border-color: #a8a29e;
+    }
+    .corridor-segment[aria-pressed="true"] {
+      background: #1c1917;
+      color: #fafaf9;
+      border-color: #1c1917;
+    }
+    .corridor-counter {
+      margin: 8px 0 0 0;
+      font-size: 12px;
+      color: #78716c;
+      font-variant-numeric: tabular-nums;
+    }
+
+    /* Outdoor toggle */
+    .filter-toggle {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 13px;
+      color: #1c1917;
+      cursor: pointer;
+    }
+    .filter-toggle input[type="checkbox"] {
+      accent-color: #1c1917;
+      margin: 0;
+    }
+
+    /* Cultural anchor lens block — distinct affordance with purple left accent
+       and a warmer-than-sidebar background. */
+    .lens-block {
+      padding: 10px 12px;
+      background: #f5efe4;
+      border-left: 3px solid #534AB7;
+      border-radius: 3px;
+    }
+    .lens-block .filter-toggle {
+      font-weight: 500;
+    }
+    .lens-caption {
+      margin: 4px 0 8px 22px; /* indent past the checkbox */
+      font-size: 11px;
+      color: #78716c;
+      font-style: italic;
+    }
+    /* Cultural anchor labels (Leaflet permanent tooltips) */
+    .leaflet-tooltip.cultural-label {
+      background: rgba(255, 255, 255, 0.88);
+      border: 1px solid rgba(83, 74, 183, 0.3);
+      border-radius: 3px;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.08);
+      padding: 1px 6px;
+      font-size: 11px;
+      font-weight: 500;
+      color: #1c1917;
+      white-space: nowrap;
+    }
+    .leaflet-tooltip.cultural-label-faded {
+      opacity: 0.5;
+    }
+    .leaflet-tooltip.cultural-label:before {
+      display: none;  /* hide tooltip arrow */
     }
 
     /* Popup styling */
@@ -122,6 +857,17 @@ import Layout from '../layouts/Layout.astro';
       font-weight: 600;
       color: #1c1917;
     }
+    .popup-caveat {
+      margin: 0 !important;
+      padding: 0 !important;
+      font-size: 11px;
+      font-style: italic;
+      color: #a8a29e;
+    }
+    .popup-violations-high {
+      color: #A32D2D;
+      font-weight: 600;
+    }
   </style>
 
   <script>
@@ -136,8 +882,8 @@ import Layout from '../layouts/Layout.astro';
     };
 
     const STREET_STYLES: Record<string, { color: string; weight: number }> = {
-      south_street: { color: '#7B3F99', weight: 7 },
-      east_passyunk: { color: '#E67E22', weight: 7 },
+      south_street: { color: '#7B3F99', weight: 14 },
+      east_passyunk: { color: '#E67E22', weight: 14 },
     };
 
     function escapeHtml(value: unknown): string {
@@ -157,7 +903,28 @@ import Layout from '../layouts/Layout.astro';
       return '$' + n.toLocaleString('en-US');
     }
 
+    // Title-case OPA owner strings ("AXELROD MICHAEL TR" -> "Axelrod Michael TR").
+    // Acronyms and Roman numerals are preserved uppercase. Words spelled out
+    // (REVOCABLE / IRREVOCABLE / TRUST) are title-cased per the user's example.
+    const OWNER_PRESERVE_UPPER = new Set([
+      'TR', 'LLC', 'INC', 'LP', 'LTD', 'LTD.', 'CO', 'CO.',
+      'JR', 'JR.', 'SR', 'SR.',
+      'I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X',
+    ]);
+    function titleCaseOwner(s: string): string {
+      // Split keeping delimiters (whitespace, /, comma, hyphen) so we can
+      // recombine them as-is.
+      return s.split(/(\s+|\/|,|-)/g).map((tok) => {
+        if (/^\s+$/.test(tok) || /^[\/,-]$/.test(tok)) return tok;
+        const upper = tok.toUpperCase();
+        if (OWNER_PRESERVE_UPPER.has(upper)) return upper;
+        if (tok.length === 1) return upper;   // single-letter initial -> uppercase
+        return tok.charAt(0).toUpperCase() + tok.slice(1).toLowerCase();
+      }).join('');
+    }
+
     type ParcelProps = {
+      id: number;
       address: string | null;
       corridor: string | null;
       vacancy_state: string;
@@ -180,7 +947,1404 @@ import Layout from '../layouts/Layout.astro';
       opa_property_use: string | null;
       out_of_area_owner: string | null;
       corporate_owner: string | null;
+      // Augmented fields (Day 3, Phase 1)
+      block_number: number | null;
+      years_since_last_sale: number | null;
+      lot_area: number | null;
+      frontage: number | null;
+      storefront_condition: number | null;
+      structural_condition: number | null;
+      consumer_price_level: number | null;
+      peak_activation_period: number | null;
+      mailing_city_state: string | null;
+      last_sale_date: string | null;
     };
+
+    // -------------------- Business mix filter options --------------------
+    // 4 commercial vacancy states. The 5th internal value 'non_commercial'
+    // (135 residential/civic parcels) is not filterable — that layer is
+    // zoom-controlled (visible at zoom >= 18) and treated as background context.
+    const VACANCY_OPTIONS: { value: string; label: string; color: string }[] = [
+      { value: 'active',           label: 'Occupied',             color: '#4a7c2e' },
+      { value: 'short_term',       label: 'Short-term turnover',  color: '#c8632c' },
+      { value: 'under_renovation', label: 'Under renovation',     color: '#e0b020' },
+      { value: 'long_term',        label: 'Long-term vacant',     color: '#8b1a1a' },
+    ];
+
+    const PEAK_OPTIONS: { value: number; label: string }[] = [
+      { value: 1, label: 'Morning' },
+      { value: 2, label: 'Midday' },
+      { value: 3, label: 'Afternoon' },
+      { value: 4, label: 'Evening' },
+      { value: 5, label: 'Late night' },
+    ];
+
+    const OPERATOR_OPTIONS: string[] = [
+      'Independent', 'Metro-only Chain', 'Regional Chain', 'National Chain',
+    ];
+
+    const PRICE_OPTIONS: { value: number; label: string }[] = [
+      { value: 1, label: '$' },
+      { value: 2, label: '$$' },
+      { value: 3, label: '$$$' },
+      { value: 4, label: '$$$$' },
+    ];
+
+    // Segments excluded from the drill-down UI:
+    //   "Vacant" — redundant with vacancy_state filter
+    //   "Other" — 2-parcel catchall, not meaningful as a filter dimension
+    const EXCLUDED_SEGMENTS = new Set(['Vacant', 'Other']);
+
+    // -------------------- Filter state store --------------------
+    type CorridorChoice = 'all' | 'south-street' | 'east-passyunk';
+
+    type FilterState = {
+      corridor: CorridorChoice;    // single-select; default 'all'
+      vacancy: Set<string>;
+      category: Set<string>;       // selected business_category values (segment is implicit)
+      operator: Set<string>;
+      peak: Set<number>;
+      price: Set<number>;          // consumer_price_level values 1..4
+      outdoorOnly: boolean;
+      culturalLens: boolean;       // override: lens visualization overrides matchesAll
+      blockFilter: { corridor: string | null; block_number: number | null };
+      activeMetric: MetricKey;     // ribbon's active metric; drives metric-implied filter when block is selected
+    };
+
+    let allCategories: string[] = [];       // populated after parcels load
+    let segmentMap: Map<string, string[]> = new Map();
+    let categoryCount: Record<string, number> = {};
+    let segmentCount: Record<string, number> = {};
+    let vacancyCount: Record<string, number> = {};
+    let peakCount: Record<number, number> = {};
+    let operatorCount: Record<string, number> = {};
+    let priceCount: Record<number, number> = {};
+
+    // ADDITIVE paradigm: every filter group starts empty (nothing selected =
+    // group inactive = every parcel passes). User clicks to narrow.
+    const filterState: FilterState = {
+      corridor: 'all',
+      vacancy: new Set(),
+      category: new Set(),
+      operator: new Set(),
+      peak: new Set(),
+      price: new Set(),
+      outdoorOnly: false,
+      culturalLens: false,
+      blockFilter: { corridor: null, block_number: null },
+      activeMetric: 'vacancy_rate',
+    };
+
+    const subscribers = new Set<() => void>();
+
+    function subscribe(fn: () => void): () => void {
+      subscribers.add(fn);
+      return () => subscribers.delete(fn);
+    }
+
+    function setFilterState(updater: (s: FilterState) => void): void {
+      updater(filterState);
+      subscribers.forEach((fn) => fn());
+    }
+
+    // -------------------- Filter contract helpers --------------------
+    // ADDITIVE (discovery) paradigm: a filter group is *inactive* when
+    // nothing is selected (default). In that case every parcel passes,
+    // including nulls. Once the user selects any option, the group becomes
+    // active: only parcels whose value is in the selected set pass; nulls fail.
+    // Range sliders follow the same idea — inactive at full extent.
+
+    function passesFilter<T>(value: T | null, selectedSet: Set<T>): boolean {
+      if (selectedSet.size === 0) return true;
+      if (value === null) return false;
+      return selectedSet.has(value);
+    }
+
+    function passesRange(
+      value: number | null,
+      range: { min: number; max: number },
+      fullRange: { min: number; max: number },
+    ): boolean {
+      const isActive = range.min > fullRange.min || range.max < fullRange.max;
+      if (!isActive) return true;
+      if (value === null) return false;
+      return value >= range.min && value <= range.max;
+    }
+
+    // (passesOwnership stub deferred until Phase 3 when the three toggles
+    // are concretely defined alongside their UI controls.)
+
+    // Suppress 'unused' warnings — the helpers are exported for Phase 3 use.
+    void passesRange;
+
+    // -------------------- Metric-implied filter (block + ribbon metric) --------------------
+    // When a block is selected, the active ribbon metric narrows the visible
+    // parcels to the subset that contributed to that metric's numerator. This
+    // runs AND with the sidebar filters, so a parcel must pass both.
+    // No-op when no block is selected. Lens mode bypasses matchesAll entirely
+    // so this never runs in lens mode.
+    function passesMetricImpliedFilter(p: ParcelProps): boolean {
+      const bf = filterState.blockFilter;
+      if (bf.corridor === null || bf.block_number === null) return true;
+      switch (filterState.activeMetric) {
+        case 'vacancy_rate':
+          return (
+            p.vacancy_state === 'short_term' ||
+            p.vacancy_state === 'under_renovation' ||
+            p.vacancy_state === 'long_term'
+          );
+        case 'outdoor_rate':
+          return p.outdoor_footprint === 'Yes';
+        case 'quick_service_rate':
+          return (p.business_category || '').indexOf('Quick Service') !== -1;
+        case 'nuisance_count':
+          return p.business_category !== null && NUISANCE_CATEGORIES.has(p.business_category);
+        case 'local_chain_count':
+          return p.operator_type !== null && LOCAL_CHAIN_OPERATORS.has(p.operator_type);
+      }
+      return true;
+    }
+
+    // -------------------- matchesAll --------------------
+    function matchesAll(p: ParcelProps): boolean {
+      // Corridor — single-select, fast short-circuit.
+      if (filterState.corridor !== 'all') {
+        const expected = filterState.corridor === 'south-street' ? 'South Street' : 'East Passyunk';
+        if (p.corridor !== expected) return false;
+      }
+      // Block filter — when set, parcel must match both corridor and block.
+      const bf = filterState.blockFilter;
+      if (bf.corridor !== null && bf.block_number !== null) {
+        if (p.corridor !== bf.corridor || p.block_number !== bf.block_number) return false;
+      }
+      // Metric-implied filter — only when block is selected.
+      if (!passesMetricImpliedFilter(p)) return false;
+      // Business mix groups: inactive (empty Set) -> passes everything (incl. nulls).
+      // Active (any selection) -> only matching values pass; nulls fail.
+      if (!passesFilter(p.vacancy_state,           filterState.vacancy))  return false;
+      if (!passesFilter(p.business_category,       filterState.category)) return false;
+      if (!passesFilter(p.operator_type,           filterState.operator)) return false;
+      if (!passesFilter(p.peak_activation_period,  filterState.peak))     return false;
+      if (!passesFilter(p.consumer_price_level,    filterState.price))    return false;
+      if (filterState.outdoorOnly && p.outdoor_footprint !== 'Yes')       return false;
+      return true;
+    }
+
+    // -------------------- Section dirty-count helpers --------------------
+    // A group is dirty when at least one option is selected (or the toggle is on).
+    function businessMixDirtyCount(): number {
+      let n = 0;
+      if (filterState.vacancy.size  > 0) n++;
+      if (filterState.category.size > 0) n++;
+      if (filterState.operator.size > 0) n++;
+      if (filterState.peak.size     > 0) n++;
+      if (filterState.price.size    > 0) n++;
+      if (filterState.outdoorOnly)       n++;
+      if (filterState.culturalLens)      n++;
+      return n;
+    }
+    const BUSINESS_MIX_GROUP_COUNT = 7;
+
+    function resetBusinessMix(): void {
+      filterState.vacancy = new Set();
+      filterState.category = new Set();
+      filterState.operator = new Set();
+      filterState.peak = new Set();
+      filterState.price = new Set();
+      filterState.outdoorOnly = false;
+      filterState.culturalLens = false;
+      resyncBusinessMixUI();
+    }
+
+    // -------------------- Segment structure (corridor-independent) --------------------
+    // Builds segmentMap + allCategories once from the full dataset; segment ordering
+    // is fixed by global counts so it stays stable when corridor scope changes.
+    function buildSegmentMap(parcelsGj: GeoJSON.FeatureCollection): void {
+      const segCats = new Map<string, Set<string>>();
+      const segGlobal: Record<string, number> = {};
+      for (const f of parcelsGj.features) {
+        const p = f.properties as ParcelProps;
+        const seg = p.business_segment;
+        const cat = p.business_category;
+        if (!seg || EXCLUDED_SEGMENTS.has(seg)) continue;
+        segGlobal[seg] = (segGlobal[seg] || 0) + 1;
+        if (cat) {
+          if (!segCats.has(seg)) segCats.set(seg, new Set());
+          segCats.get(seg)!.add(cat);
+        }
+      }
+      const sortedSegs = Array.from(segCats.keys()).sort(
+        (a, b) => (segGlobal[b] || 0) - (segGlobal[a] || 0),
+      );
+      segmentMap = new Map();
+      for (const s of sortedSegs) {
+        const cats = Array.from(segCats.get(s)!).sort();
+        segmentMap.set(s, cats);
+      }
+      allCategories = sortedSegs.flatMap((s) => segmentMap.get(s) || []);
+    }
+
+    // -------------------- Per-corridor count tabulation --------------------
+    // Re-runs whenever the corridor scope changes. Counts are scoped by corridor
+    // only — Business mix selections do NOT affect these counts.
+    function recomputeCounts(parcelsGj: GeoJSON.FeatureCollection, scope: CorridorChoice): void {
+      const segC: Record<string, number> = {};
+      const catC: Record<string, number> = {};
+      const vacC: Record<string, number> = {};
+      const peakC: Record<number, number> = {};
+      const opC: Record<string, number> = {};
+      const priceC: Record<number, number> = {};
+      for (const f of parcelsGj.features) {
+        const p = f.properties as ParcelProps;
+        if (scope === 'south-street'  && p.corridor !== 'South Street')  continue;
+        if (scope === 'east-passyunk' && p.corridor !== 'East Passyunk') continue;
+        vacC[p.vacancy_state] = (vacC[p.vacancy_state] || 0) + 1;
+        if (typeof p.peak_activation_period === 'number') {
+          peakC[p.peak_activation_period] = (peakC[p.peak_activation_period] || 0) + 1;
+        }
+        if (typeof p.consumer_price_level === 'number') {
+          priceC[p.consumer_price_level] = (priceC[p.consumer_price_level] || 0) + 1;
+        }
+        if (p.operator_type && p.operator_type !== 'Vacant') {
+          opC[p.operator_type] = (opC[p.operator_type] || 0) + 1;
+        }
+        const seg = p.business_segment;
+        const cat = p.business_category;
+        if (!seg || EXCLUDED_SEGMENTS.has(seg)) continue;
+        segC[seg] = (segC[seg] || 0) + 1;
+        if (cat) catC[cat] = (catC[cat] || 0) + 1;
+      }
+      segmentCount = segC;
+      categoryCount = catC;
+      vacancyCount = vacC;
+      peakCount = peakC;
+      operatorCount = opC;
+      priceCount = priceC;
+    }
+
+    // -------------------- Sidebar count-span DOM updater --------------------
+    function updateAllCountSpans(): void {
+      document.querySelectorAll<HTMLElement>('[data-count-vacancy]').forEach((el) => {
+        const v = el.dataset.countVacancy!;
+        el.textContent = `(${vacancyCount[v] || 0})`;
+      });
+      document.querySelectorAll<HTMLElement>('[data-count-segment]').forEach((el) => {
+        const v = el.dataset.countSegment!;
+        el.textContent = `(${segmentCount[v] || 0})`;
+      });
+      document.querySelectorAll<HTMLElement>('[data-count-category]').forEach((el) => {
+        const v = el.dataset.countCategory!;
+        el.textContent = `(${categoryCount[v] || 0})`;
+      });
+      document.querySelectorAll<HTMLElement>('[data-count-operator]').forEach((el) => {
+        const v = el.dataset.countOperator!;
+        el.textContent = `(${operatorCount[v] || 0})`;
+      });
+      document.querySelectorAll<HTMLElement>('[data-count-peak]').forEach((el) => {
+        const v = Number(el.dataset.countPeak);
+        el.textContent = `(${peakCount[v] || 0})`;
+      });
+      document.querySelectorAll<HTMLElement>('[data-count-price]').forEach((el) => {
+        const v = Number(el.dataset.countPrice);
+        el.textContent = `(${priceCount[v] || 0})`;
+      });
+    }
+
+    // -------------------- Sidebar HTML rendering --------------------
+    function renderBusinessMixUI(): void {
+      // Vacancy checkboxes (default: unchecked)
+      const vacWrap = document.querySelector('.filter-vacancy-list') as HTMLElement | null;
+      if (vacWrap) {
+        vacWrap.innerHTML = VACANCY_OPTIONS.map((o) => `
+          <label class="filter-check">
+            <input type="checkbox" class="filter-vacancy" data-value="${o.value}" />
+            <span class="filter-swatch" style="background:${o.color}"></span>
+            <span class="filter-check-label">${escapeHtml(o.label)} <span class="count" data-count-vacancy="${o.value}">(${vacancyCount[o.value] || 0})</span></span>
+          </label>
+        `).join('');
+      }
+
+      // Segment drill-down (default: unchecked, collapsed)
+      const segWrap = document.getElementById('segment-list');
+      if (segWrap) {
+        const parts: string[] = [];
+        for (const [seg, cats] of segmentMap) {
+          parts.push(`
+            <div class="segment" data-segment="${escapeHtml(seg)}">
+              <div class="segment-header">
+                <button type="button" class="segment-chevron" aria-expanded="false" aria-label="Toggle ${escapeHtml(seg)}">▶</button>
+                <input type="checkbox" class="segment-parent" data-segment="${escapeHtml(seg)}" />
+                <button type="button" class="segment-label">${escapeHtml(seg)} <span class="count" data-count-segment="${escapeHtml(seg)}">(${segmentCount[seg] || 0})</span></button>
+              </div>
+              <div class="segment-children" hidden>
+                ${cats.map((c) => `
+                  <label class="filter-check">
+                    <input type="checkbox" class="filter-category" data-segment="${escapeHtml(seg)}" data-category="${escapeHtml(c)}" />
+                    <span class="filter-check-label">${escapeHtml(c)} <span class="count" data-count-category="${escapeHtml(c)}">(${categoryCount[c] || 0})</span></span>
+                  </label>
+                `).join('')}
+              </div>
+            </div>
+          `);
+        }
+        segWrap.innerHTML = parts.join('');
+      }
+
+      // Operator chips (default: unpressed)
+      const opWrap = document.querySelector('.chip-row[data-chip-group="operator"]') as HTMLElement | null;
+      if (opWrap) {
+        opWrap.innerHTML = OPERATOR_OPTIONS.map((o) => `
+          <button type="button" class="chip" data-value="${escapeHtml(o)}" aria-pressed="false">${escapeHtml(o)} <span class="count" data-count-operator="${escapeHtml(o)}">(${operatorCount[o] || 0})</span></button>
+        `).join('');
+      }
+
+      // Peak chips (default: unpressed)
+      const peakWrap = document.querySelector('.chip-row[data-chip-group="peak"]') as HTMLElement | null;
+      if (peakWrap) {
+        peakWrap.innerHTML = PEAK_OPTIONS.map((o) => `
+          <button type="button" class="chip" data-value="${o.value}" aria-pressed="false">${escapeHtml(o.label)} <span class="count" data-count-peak="${o.value}">(${peakCount[o.value] || 0})</span></button>
+        `).join('');
+      }
+
+      // Consumer price level chips (default: unpressed)
+      const priceWrap = document.querySelector('.chip-row[data-chip-group="price"]') as HTMLElement | null;
+      if (priceWrap) {
+        priceWrap.innerHTML = PRICE_OPTIONS.map((o) => `
+          <button type="button" class="chip" data-value="${o.value}" aria-pressed="false">${escapeHtml(o.label)} <span class="count" data-count-price="${o.value}">(${priceCount[o.value] || 0})</span></button>
+        `).join('');
+      }
+    }
+
+    function resyncBusinessMixUI(): void {
+      // Vacancy
+      document.querySelectorAll<HTMLInputElement>('.filter-vacancy').forEach((cb) => {
+        cb.checked = filterState.vacancy.has(cb.dataset.value || '');
+      });
+      // Categories + parent
+      document.querySelectorAll<HTMLInputElement>('.filter-category').forEach((cb) => {
+        cb.checked = filterState.category.has(cb.dataset.category || '');
+      });
+      for (const seg of segmentMap.keys()) syncSegmentParent(seg);
+      // Operator chips
+      document.querySelectorAll<HTMLButtonElement>('.chip-row[data-chip-group="operator"] .chip').forEach((b) => {
+        const v = b.dataset.value || '';
+        b.setAttribute('aria-pressed', filterState.operator.has(v) ? 'true' : 'false');
+      });
+      // Peak chips
+      document.querySelectorAll<HTMLButtonElement>('.chip-row[data-chip-group="peak"] .chip').forEach((b) => {
+        const v = Number(b.dataset.value);
+        b.setAttribute('aria-pressed', filterState.peak.has(v) ? 'true' : 'false');
+      });
+      // Price chips
+      document.querySelectorAll<HTMLButtonElement>('.chip-row[data-chip-group="price"] .chip').forEach((b) => {
+        const v = Number(b.dataset.value);
+        b.setAttribute('aria-pressed', filterState.price.has(v) ? 'true' : 'false');
+      });
+      // Outdoor
+      const outdoor = document.getElementById('filter-outdoor') as HTMLInputElement | null;
+      if (outdoor) outdoor.checked = filterState.outdoorOnly;
+      // Lens
+      const lens = document.getElementById('filter-lens') as HTMLInputElement | null;
+      if (lens) lens.checked = filterState.culturalLens;
+    }
+
+    function syncSegmentParent(seg: string): void {
+      const parent = document.querySelector<HTMLInputElement>(
+        `.segment-parent[data-segment="${CSS.escape(seg)}"]`,
+      );
+      if (!parent) return;
+      const cats = segmentMap.get(seg) || [];
+      const sel = cats.filter((c) => filterState.category.has(c)).length;
+      if (sel === 0) {
+        parent.checked = false;
+        parent.indeterminate = false;
+      } else if (sel === cats.length) {
+        parent.checked = true;
+        parent.indeterminate = false;
+      } else {
+        parent.checked = false;
+        parent.indeterminate = true;
+      }
+    }
+
+    function toggleSegmentExpand(segEl: Element): void {
+      const children = segEl.querySelector('.segment-children') as HTMLElement | null;
+      const chevron = segEl.querySelector('.segment-chevron');
+      if (!children || !chevron) return;
+      const collapsed = children.hasAttribute('hidden');
+      if (collapsed) {
+        children.removeAttribute('hidden');
+        chevron.setAttribute('aria-expanded', 'true');
+      } else {
+        children.setAttribute('hidden', '');
+        chevron.setAttribute('aria-expanded', 'false');
+      }
+    }
+
+    function updateSidebarChrome(): void {
+      // Business mix section
+      const dirty = businessMixDirtyCount();
+      const section = document.querySelector<HTMLElement>('[data-section="business-mix"]');
+      if (section) {
+        const badge = section.querySelector<HTMLElement>('.filter-section-badge');
+        const reset = section.querySelector<HTMLElement>('.filter-section-reset');
+        if (dirty > 0) {
+          if (badge) {
+            badge.textContent = `${dirty} of ${BUSINESS_MIX_GROUP_COUNT}`;
+            badge.removeAttribute('hidden');
+          }
+          reset?.removeAttribute('hidden');
+        } else {
+          badge?.setAttribute('hidden', '');
+          reset?.setAttribute('hidden', '');
+        }
+      }
+
+      // Corridor section — badge + Reset only when a block is selected
+      const corrSection = document.querySelector<HTMLElement>('[data-section="corridor"]');
+      if (corrSection) {
+        const badge = corrSection.querySelector<HTMLElement>('.filter-section-badge');
+        const reset = corrSection.querySelector<HTMLElement>('.filter-section-reset');
+        const bf = filterState.blockFilter;
+        const blockActive = bf.corridor !== null && bf.block_number !== null;
+        if (blockActive) {
+          if (badge) {
+            badge.textContent = `Block ${bf.block_number}`;
+            badge.removeAttribute('hidden');
+          }
+          reset?.removeAttribute('hidden');
+        } else {
+          badge?.setAttribute('hidden', '');
+          reset?.setAttribute('hidden', '');
+        }
+      }
+    }
+
+    // -------------------- Block-level metric aggregation --------------------
+    // Cached once at page load. Used by the block-level heat ribbon UI below
+    // the map. Aggregation is corridor + block_number, with five metrics per
+    // block. Sidebar filters do NOT affect these numbers — the ribbon is a
+    // stable "block character" view independent of parcel-level exploration.
+
+    type BlockStat = {
+      corridor: string;             // 'South Street' or 'East Passyunk'
+      block_number: number;         // e.g., 300, 1600
+      totals: { all: number; commercial: number; occupied: number };
+      metrics: {
+        vacancy_rate: number;       // 0-100 integer (vacant / commercial)
+        outdoor_rate: number;       // 0-100 integer (outdoor=Yes / occupied)
+        quick_service_rate: number; // 0-100 integer (quick service / occupied)
+        nuisance_count: number;     // raw count
+        local_chain_count: number;  // raw count
+      };
+      // Auxiliary detail for hover tooltips (Sub-phase C)
+      vacant_count: number;
+      outdoor_yes_count: number;
+      quick_service_count: number;
+      nuisance_addresses: string[];
+      local_chain_addresses: string[];
+      // Tooltip breakdowns
+      nuisance_categories: string[];      // category per nuisance parcel
+      local_chain_categories: string[];   // business_category per chain parcel
+    };
+
+    const NUISANCE_CATEGORIES = new Set<string>([
+      'Smoke Shop',
+      'Alternative Financial Services (AFS)',
+    ]);
+    const LOCAL_CHAIN_OPERATORS = new Set<string>([
+      'Metro-only Chain',
+      'Regional Chain',
+    ]);
+
+    let blockStats: BlockStat[] = [];
+
+    function buildBlockStats(parcelsGj: GeoJSON.FeatureCollection): void {
+      type Bucket = {
+        all: number; commercial: number; occupied: number;
+        vacant_count: number; outdoor_yes: number; quick_service: number;
+        nuisance_addresses: string[]; local_chain_addresses: string[];
+        nuisance_categories: string[]; local_chain_categories: string[];
+      };
+      const buckets = new Map<string, Bucket>();
+
+      for (const f of parcelsGj.features) {
+        const p = f.properties as ParcelProps;
+        const bn = p.block_number;
+        const corr = p.corridor;
+        if (bn === null || bn === undefined || !corr) continue;
+        const key = `${corr}|${bn}`;
+        let b = buckets.get(key);
+        if (!b) {
+          b = {
+            all: 0, commercial: 0, occupied: 0,
+            vacant_count: 0, outdoor_yes: 0, quick_service: 0,
+            nuisance_addresses: [], local_chain_addresses: [],
+            nuisance_categories: [], local_chain_categories: [],
+          };
+          buckets.set(key, b);
+        }
+        b.all++;
+        if (p.vacancy_state !== 'non_commercial') {
+          b.commercial++;
+          if (
+            p.vacancy_state === 'short_term' ||
+            p.vacancy_state === 'under_renovation' ||
+            p.vacancy_state === 'long_term'
+          ) {
+            b.vacant_count++;
+          }
+          if (p.vacancy_state === 'active') {
+            b.occupied++;
+            if (p.outdoor_footprint === 'Yes') b.outdoor_yes++;
+            const cat = p.business_category || '';
+            // Match 'Quick Service' substring — handles the en-dash that breaks
+            // exact-equality matches across encodings.
+            if (cat.indexOf('Quick Service') !== -1) b.quick_service++;
+          }
+        }
+        const cat = p.business_category;
+        if (cat && NUISANCE_CATEGORIES.has(cat)) {
+          b.nuisance_addresses.push(p.address || '');
+          b.nuisance_categories.push(cat);
+        }
+        if (p.operator_type && LOCAL_CHAIN_OPERATORS.has(p.operator_type)) {
+          b.local_chain_addresses.push(p.address || '');
+          b.local_chain_categories.push(cat || '');
+        }
+      }
+
+      const pct = (n: number, d: number): number =>
+        d > 0 ? Math.round((n / d) * 100) : 0;
+
+      blockStats = [];
+      for (const [key, b] of buckets) {
+        const [corr, bnStr] = key.split('|');
+        blockStats.push({
+          corridor: corr,
+          block_number: Number(bnStr),
+          totals: { all: b.all, commercial: b.commercial, occupied: b.occupied },
+          metrics: {
+            vacancy_rate: pct(b.vacant_count, b.commercial),
+            outdoor_rate: pct(b.outdoor_yes, b.occupied),
+            quick_service_rate: pct(b.quick_service, b.occupied),
+            nuisance_count: b.nuisance_addresses.length,
+            local_chain_count: b.local_chain_addresses.length,
+          },
+          vacant_count: b.vacant_count,
+          outdoor_yes_count: b.outdoor_yes,
+          quick_service_count: b.quick_service,
+          nuisance_addresses: b.nuisance_addresses,
+          local_chain_addresses: b.local_chain_addresses,
+          nuisance_categories: b.nuisance_categories,
+          local_chain_categories: b.local_chain_categories,
+        });
+      }
+      blockStats.sort(
+        (a, b) => a.corridor.localeCompare(b.corridor) || a.block_number - b.block_number,
+      );
+    }
+
+    // -------------------- Block-level ribbon: colors + render --------------------
+    type MetricKey =
+      | 'vacancy_rate' | 'outdoor_rate' | 'quick_service_rate'
+      | 'nuisance_count' | 'local_chain_count';
+
+    const RAMP_CORAL = ['#FAECE7', '#F5C4B3', '#F0997B', '#D85A30', '#993C1D'];
+    const RAMP_GREEN = ['#EAF3DE', '#C0DD97', '#97C459', '#639922', '#3B6D11'];
+    const RAMP_AMBER = ['#FAEEDA', '#FAC775', '#EF9F27', '#BA7517', '#854F0B'];
+
+    type MetricConfig = {
+      label: string;
+      ramp: string[];
+      isPercent: boolean;
+      // Returns the denominator value (or null for count metrics). Used for
+      // the low-confidence check on percentage metrics.
+      denominator: (s: BlockStat) => number | null;
+    };
+    const METRIC_CONFIGS: Record<MetricKey, MetricConfig> = {
+      vacancy_rate:       { label: 'Vacancy rate',       ramp: RAMP_CORAL, isPercent: true,  denominator: (s) => s.totals.commercial },
+      outdoor_rate:       { label: 'Outdoor footprint',  ramp: RAMP_GREEN, isPercent: true,  denominator: (s) => s.totals.occupied   },
+      quick_service_rate: { label: 'Quick service',      ramp: RAMP_AMBER, isPercent: true,  denominator: (s) => s.totals.occupied   },
+      nuisance_count:     { label: 'Nuisance retail',    ramp: RAMP_CORAL, isPercent: false, denominator: () => null                },
+      local_chain_count:  { label: 'Local chains',       ramp: RAMP_GREEN, isPercent: false, denominator: () => null                },
+    };
+    const LOW_CONFIDENCE_THRESHOLD = 5;
+
+    // Phrases used in the counter when a block is selected, appended in parens.
+    const METRIC_PHRASES: Record<MetricKey, string> = {
+      vacancy_rate: 'vacant',
+      outdoor_rate: 'with outdoor footprint',
+      quick_service_rate: 'quick service',
+      nuisance_count: 'nuisance retail',
+      local_chain_count: 'locally-grown chains',
+    };
+
+    function mixHexColors(a: string, b: string, t: number): string {
+      const parseHex = (h: string): [number, number, number] => [
+        parseInt(h.slice(1, 3), 16),
+        parseInt(h.slice(3, 5), 16),
+        parseInt(h.slice(5, 7), 16),
+      ];
+      const [ar, ag, ab] = parseHex(a);
+      const [br, bg, bb] = parseHex(b);
+      const r = Math.round(ar + (br - ar) * t);
+      const g = Math.round(ag + (bg - ag) * t);
+      const bl = Math.round(ab + (bb - ab) * t);
+      return `rgb(${r}, ${g}, ${bl})`;
+    }
+    function colorForValue(value: number, max: number, ramp: string[]): string {
+      // Zero = pure white (visually distinct "no presence" vs. tiny presence).
+      if (value <= 0) return '#FFFFFF';
+      if (max <= 1) return ramp[0];
+      // Interpolate from ramp[0] at value=1 to ramp[N-1] at value=max.
+      const ratio = (value - 1) / (max - 1);
+      const clamped = Math.max(0, Math.min(1, ratio));
+      const pos = clamped * (ramp.length - 1);
+      const lower = Math.floor(pos);
+      const upper = Math.min(ramp.length - 1, lower + 1);
+      return mixHexColors(ramp[lower], ramp[upper], pos - lower);
+    }
+    function textColorForValue(value: number, max: number, ramp: string[]): string {
+      // Zero cells use muted gray on white for readability.
+      if (value <= 0) return '#57534e';
+      if (max <= 1) return ramp[ramp.length - 1];
+      const ratio = (value - 1) / (max - 1);
+      // White text on the upper 40% of the ramp (where the cell is dark enough
+      // that the darkest-stop text would have poor contrast).
+      if (ratio >= 0.6) return '#FFFFFF';
+      return ramp[ramp.length - 1];
+    }
+    function maxForMetric(metric: MetricKey): number {
+      let m = 0;
+      for (const s of blockStats) {
+        const v = s.metrics[metric];
+        if (v > m) m = v;
+      }
+      return m;
+    }
+    function formatValue(metric: MetricKey, value: number, lowConfidence: boolean): string {
+      const cfg = METRIC_CONFIGS[metric];
+      const base = cfg.isPercent ? `${value}%` : `${value}`;
+      return lowConfidence ? base + '*' : base;
+    }
+    function isLowConfidenceForMetric(stat: BlockStat, metric: MetricKey): boolean {
+      const cfg = METRIC_CONFIGS[metric];
+      if (!cfg.isPercent) return false;
+      const denom = cfg.denominator(stat);
+      return denom !== null && denom < LOW_CONFIDENCE_THRESHOLD;
+    }
+
+    function renderRibbon(): void {
+      if (blockStats.length === 0) return;
+      const max = maxForMetric(filterState.activeMetric);
+      const cfg = METRIC_CONFIGS[filterState.activeMetric];
+
+      // Two corridor block lists, in fixed east->west order
+      for (const corr of ['South Street', 'East Passyunk']) {
+        const container = document.querySelector<HTMLElement>(
+          `.ribbon-blocks[data-blocks-for="${corr}"]`,
+        );
+        if (!container) continue;
+        const corrBlocks = blockStats
+          .filter((b) => b.corridor === corr)
+          .sort((a, b) => a.block_number - b.block_number);
+        container.setAttribute('data-block-count', String(corrBlocks.length));
+
+        const html: string[] = [];
+        const bf = filterState.blockFilter;
+        for (const stat of corrBlocks) {
+          const v = stat.metrics[filterState.activeMetric];
+          const bg = colorForValue(v, max, cfg.ramp);
+          const fg = textColorForValue(v, max, cfg.ramp);
+          const lowConf = isLowConfidenceForMetric(stat, filterState.activeMetric);
+          const lowConfClass = lowConf ? ' is-low-conf' : '';
+          const isSel =
+            bf.corridor === stat.corridor && bf.block_number === stat.block_number;
+          const selClass = isSel ? ' is-selected' : '';
+          const valStr = formatValue(filterState.activeMetric, v, lowConf);
+          html.push(
+            `<div class="ribbon-block${lowConfClass}${selClass}" ` +
+              `data-corridor="${escapeHtml(stat.corridor)}" ` +
+              `data-block="${stat.block_number}" ` +
+              `style="background:${bg}; color:${fg};">` +
+              `<div class="ribbon-block-num">${stat.block_number}</div>` +
+              `<div class="ribbon-block-val">${escapeHtml(valStr)}</div>` +
+              `</div>`,
+          );
+        }
+        container.innerHTML = html.join('');
+      }
+
+      // Legend gradient: full ramp left-to-right.
+      const legendBar = document.getElementById('ribbon-legend-bar');
+      if (legendBar) {
+        const stops = cfg.ramp
+          .map((c, i) => `${c} ${Math.round((i / (cfg.ramp.length - 1)) * 100)}%`)
+          .join(', ');
+        legendBar.style.background = `linear-gradient(90deg, ${stops})`;
+      }
+    }
+
+    function wireRibbonControls(): void {
+      const select = document.getElementById('ribbon-metric-select') as HTMLSelectElement | null;
+      if (select) {
+        select.addEventListener('change', () => {
+          const v = select.value as MetricKey;
+          if (METRIC_CONFIGS[v]) {
+            filterState.activeMetric = v;
+            renderRibbon();
+            // Metric-implied filter changes when metric changes (only matters if
+            // a block is selected, but always fire so the counter phrase updates).
+            subscribers.forEach((fn) => fn());
+          }
+        });
+      }
+      wireRibbonToggle();
+      wireRibbonBlockInteractions();
+    }
+
+    // -------------------- Ribbon: click + hover interactions --------------------
+    function statForCell(cell: HTMLElement): BlockStat | null {
+      const corridor = cell.dataset.corridor;
+      const block = Number(cell.dataset.block);
+      if (!corridor || !block) return null;
+      return blockStats.find((s) => s.corridor === corridor && s.block_number === block) || null;
+    }
+
+    function boundsForBlock(corridor: string, blockNumber: number): L.LatLngBounds | null {
+      if (!parcelsGjRef) return null;
+      const pts: L.LatLng[] = [];
+      for (const f of parcelsGjRef.features) {
+        const p = f.properties as ParcelProps;
+        if (p.corridor !== corridor || p.block_number !== blockNumber) continue;
+        const coords = f.geometry && (f.geometry as GeoJSON.Point).coordinates;
+        if (!coords) continue;
+        const [lng, lat] = coords as [number, number];
+        if (typeof lat === 'number' && typeof lng === 'number') {
+          pts.push(L.latLng(lat, lng));
+        }
+      }
+      return pts.length === 0 ? null : L.latLngBounds(pts);
+    }
+
+    function handleBlockClick(cell: HTMLElement): void {
+      const corridor = cell.dataset.corridor || '';
+      const block = Number(cell.dataset.block);
+      if (!corridor || !block) return;
+      const bf = filterState.blockFilter;
+      const alreadySelected = bf.corridor === corridor && bf.block_number === block;
+      if (alreadySelected) {
+        // Clear: fly back to current corridor scope
+        filterState.blockFilter = { corridor: null, block_number: null };
+        flyToCorridor(filterState.corridor);
+      } else {
+        filterState.blockFilter = { corridor, block_number: block };
+        const bounds = boundsForBlock(corridor, block);
+        if (bounds && bounds.isValid() && mapRef) {
+          mapRef.flyToBounds(bounds, { padding: [30, 30], duration: 0.9, maxZoom: 18 });
+        }
+      }
+      updateRibbonSelection();
+      subscribers.forEach((fn) => fn());
+    }
+
+    function updateRibbonSelection(): void {
+      // Strip is-selected from any previously selected segment.
+      document.querySelectorAll('.ribbon-block.is-selected').forEach((el) => {
+        el.classList.remove('is-selected');
+      });
+      const bf = filterState.blockFilter;
+      if (bf.corridor && bf.block_number !== null) {
+        const sel = document.querySelector(
+          `.ribbon-block[data-corridor="${CSS.escape(bf.corridor)}"][data-block="${bf.block_number}"]`,
+        );
+        if (sel) sel.classList.add('is-selected');
+      }
+    }
+
+    function updateRibbonCorridorDimming(): void {
+      const ssRow = document.querySelector('[data-corridor-row="south_street"]');
+      const epRow = document.querySelector('[data-corridor-row="east_passyunk"]');
+      if (!ssRow || !epRow) return;
+      const c = filterState.corridor;
+      ssRow.classList.toggle('is-dimmed', c === 'east-passyunk');
+      epRow.classList.toggle('is-dimmed', c === 'south-street');
+    }
+
+    // -------------------- Ribbon: hover tooltip --------------------
+    function buildTooltipHtml(stat: BlockStat, metric: MetricKey): string {
+      const header =
+        `<div class="ribbon-tooltip-header">${escapeHtml(stat.corridor)}, ${stat.block_number} block</div>`;
+      const bodies: string[] = [];
+      if (metric === 'vacancy_rate') {
+        const v = stat.vacant_count;
+        const c = stat.totals.commercial;
+        bodies.push(
+          `${v} of ${c} commercial parcel${c === 1 ? '' : 's'} vacant (${stat.metrics.vacancy_rate}%)`,
+        );
+        if (isLowConfidenceForMetric(stat, metric)) {
+          bodies.push(`Small sample size (n=${c})`);
+        }
+      } else if (metric === 'outdoor_rate') {
+        const o = stat.outdoor_yes_count;
+        const occ = stat.totals.occupied;
+        bodies.push(
+          `${o} of ${occ} occupied parcel${occ === 1 ? '' : 's'} have outdoor footprint (${stat.metrics.outdoor_rate}%)`,
+        );
+        if (isLowConfidenceForMetric(stat, metric)) {
+          bodies.push(`Small sample size (n=${occ})`);
+        }
+      } else if (metric === 'quick_service_rate') {
+        const q = stat.quick_service_count;
+        const occ = stat.totals.occupied;
+        bodies.push(
+          `${q} of ${occ} occupied parcel${occ === 1 ? '' : 's'} are quick service (${stat.metrics.quick_service_rate}%)`,
+        );
+        if (isLowConfidenceForMetric(stat, metric)) {
+          bodies.push(`Small sample size (n=${occ})`);
+        }
+      } else if (metric === 'nuisance_count') {
+        const n = stat.metrics.nuisance_count;
+        bodies.push(`${n} nuisance parcel${n === 1 ? '' : 's'}`);
+        if (n > 0) {
+          let smoke = 0, afs = 0;
+          for (const c of stat.nuisance_categories) {
+            if (c === 'Smoke Shop') smoke++;
+            else if (c === 'Alternative Financial Services (AFS)') afs++;
+          }
+          const parts: string[] = [];
+          if (smoke) parts.push(`${smoke} Smoke Shop${smoke === 1 ? '' : 's'}`);
+          if (afs) parts.push(`${afs} Alternative Financial Service${afs === 1 ? '' : 's'}`);
+          if (parts.length) bodies.push(parts.join(', '));
+        }
+      } else if (metric === 'local_chain_count') {
+        const n = stat.metrics.local_chain_count;
+        bodies.push(`${n} locally-grown chain${n === 1 ? '' : 's'}`);
+        if (n > 0 && n <= 3) {
+          const cats = stat.local_chain_categories.filter((c) => c && c.length > 0);
+          if (cats.length) bodies.push(cats.join(', '));
+        }
+      }
+      return (
+        header +
+        bodies.map((b) => `<div class="ribbon-tooltip-body">${escapeHtml(b)}</div>`).join('')
+      );
+    }
+
+    function showBlockTooltip(cell: HTMLElement): void {
+      const stat = statForCell(cell);
+      const tt = document.getElementById('ribbon-tooltip');
+      if (!stat || !tt) return;
+      tt.innerHTML = buildTooltipHtml(stat, filterState.activeMetric);
+      tt.hidden = false;
+      const cellRect = cell.getBoundingClientRect();
+      const ttRect = tt.getBoundingClientRect();
+      let arrow: 'down' | 'up' = 'down';
+      let top = cellRect.top - ttRect.height - 10;
+      if (top < 10) {
+        arrow = 'up';
+        top = cellRect.bottom + 10;
+      }
+      let left = cellRect.left + cellRect.width / 2 - ttRect.width / 2;
+      left = Math.max(8, Math.min(left, window.innerWidth - ttRect.width - 8));
+      tt.setAttribute('data-arrow', arrow);
+      tt.style.top = `${top}px`;
+      tt.style.left = `${left}px`;
+    }
+    function hideBlockTooltip(): void {
+      const tt = document.getElementById('ribbon-tooltip');
+      if (tt) tt.hidden = true;
+    }
+
+    function wireRibbonBlockInteractions(): void {
+      const ribbon = document.getElementById('block-ribbon');
+      if (!ribbon) return;
+      ribbon.addEventListener('click', (e) => {
+        const cell = (e.target as HTMLElement).closest<HTMLElement>('.ribbon-block');
+        if (cell) handleBlockClick(cell);
+      });
+      ribbon.addEventListener('mouseover', (e) => {
+        const cell = (e.target as HTMLElement).closest<HTMLElement>('.ribbon-block');
+        if (cell) showBlockTooltip(cell);
+      });
+      ribbon.addEventListener('mouseout', (e) => {
+        const cell = (e.target as HTMLElement).closest<HTMLElement>('.ribbon-block');
+        if (!cell) return;
+        const related = e.relatedTarget as HTMLElement | null;
+        if (related && cell.contains(related)) return;
+        hideBlockTooltip();
+      });
+    }
+
+    function wireRibbonToggle(): void {
+      const wrapper = document.getElementById('block-ribbon-wrapper');
+      const btn = document.getElementById('ribbon-toggle');
+      if (!wrapper || !btn) return;
+
+      const STORAGE_KEY = 'block-ribbon-collapsed';
+      const applyState = (collapsed: boolean): void => {
+        wrapper.classList.toggle('is-collapsed', collapsed);
+        btn.setAttribute('aria-expanded', collapsed ? 'false' : 'true');
+        btn.setAttribute('aria-label', collapsed ? 'Expand ribbon' : 'Collapse ribbon');
+      };
+
+      // Restore persisted state (default expanded on first visit).
+      let collapsed = false;
+      try {
+        collapsed = localStorage.getItem(STORAGE_KEY) === 'true';
+      } catch {
+        // localStorage may be unavailable (private mode); silent fall-through.
+      }
+      applyState(collapsed);
+
+      btn.addEventListener('click', () => {
+        collapsed = !collapsed;
+        try {
+          localStorage.setItem(STORAGE_KEY, String(collapsed));
+        } catch {
+          /* ignore */
+        }
+        applyState(collapsed);
+        // Let the 250ms CSS transition finish, then ask Leaflet to recompute
+        // its container size so tiles render at the new map height.
+        window.setTimeout(() => {
+          if (mapRef) mapRef.invalidateSize();
+        }, 280);
+      });
+    }
+
+    // -------------------- Cultural anchor lens --------------------
+    type LensState = 'active' | 'former' | 'policy' | 'other';
+
+    // Halos and tooltips owned by the lens. Cleaned up on every render to
+    // avoid stale visuals when corridor / sub-toggle changes mid-lens.
+    let lensHaloLayers: L.CircleMarker[] = [];
+
+    function classifyLens(p: ParcelProps): LensState {
+      if (p.cultural_status === 'Active') return 'active';
+      if (p.cultural_status === 'Former') return 'former';
+      if (
+        p.vacancy_state === 'long_term' &&
+        (p.zone_type || '').startsWith('CMX') &&
+        p.corridor === 'South Street'
+      ) {
+        return 'policy';
+      }
+      return 'other';
+    }
+
+    function cleanupLensVisuals(): void {
+      // Remove halos
+      for (const halo of lensHaloLayers) {
+        if (mapRef && mapRef.hasLayer(halo)) mapRef.removeLayer(halo);
+      }
+      lensHaloLayers = [];
+      // Unbind tooltips on parcel markers
+      for (const { layer } of markerIndex.values()) {
+        if (layer.getTooltip()) layer.unbindTooltip();
+      }
+    }
+
+    function applyNormalMarkerStyle(layer: L.CircleMarker, p: ParcelProps): void {
+      const vc = VACANCY_COLORS[p.vacancy_state] || '#888';
+      layer.setStyle({
+        radius: 7,
+        fillColor: vc,
+        color: '#ffffff',
+        weight: 1,
+        opacity: 1,
+        fillOpacity: 0.9,
+        dashArray: undefined,
+      });
+    }
+
+    function applyLensStyle(layer: L.CircleMarker, p: ParcelProps, state: LensState): void {
+      if (!mapRef) return;
+      const vc = VACANCY_COLORS[p.vacancy_state] || '#888';
+      if (state === 'active') {
+        layer.setStyle({
+          radius: 7,
+          fillColor: vc,
+          color: '#ffffff',
+          weight: 1,
+          opacity: 1,
+          fillOpacity: 0.9,
+          dashArray: undefined,
+        });
+        const halo = L.circleMarker(layer.getLatLng(), {
+          radius: 12, fill: false, color: '#534AB7',
+          weight: 2, opacity: 1, interactive: false,
+        });
+        halo.addTo(mapRef);
+        lensHaloLayers.push(halo);
+        if (p.cultural_tenant) {
+          layer.bindTooltip(p.cultural_tenant, {
+            permanent: true, direction: 'right', offset: [8, 0],
+            className: 'cultural-label',
+          });
+        }
+      } else if (state === 'former') {
+        layer.setStyle({
+          radius: 7,
+          fillColor: vc,
+          color: vc,
+          weight: 2,
+          opacity: 1,
+          fillOpacity: 0,           // hollow
+          dashArray: undefined,
+        });
+        const halo = L.circleMarker(layer.getLatLng(), {
+          radius: 12, fill: false, color: '#534AB7',
+          weight: 1.5, dashArray: '3,3', opacity: 1, interactive: false,
+        });
+        halo.addTo(mapRef);
+        lensHaloLayers.push(halo);
+        if (p.cultural_tenant) {
+          layer.bindTooltip(p.cultural_tenant, {
+            permanent: true, direction: 'right', offset: [8, 0],
+            className: 'cultural-label cultural-label-faded',
+          });
+        }
+      } else if (state === 'policy') {
+        layer.setStyle({
+          radius: 7,
+          fillColor: '#BA7517',
+          color: '#BA7517',
+          weight: 1.5,
+          opacity: 1,
+          fillOpacity: 0.2,
+          dashArray: '2,3',
+        });
+      } else {
+        // Other — dimmed
+        layer.setStyle({
+          radius: 7,
+          fillColor: vc,
+          color: '#ffffff',
+          weight: 1,
+          opacity: 0.25,
+          fillOpacity: 0.25,
+          dashArray: undefined,
+        });
+      }
+    }
+
+    function renderLensMode(): void {
+      if (!mapRef) return;
+      cleanupLensVisuals();
+      const choice = filterState.corridor;
+      const bf = filterState.blockFilter;
+      for (const { layer, props } of markerIndex.values()) {
+        const inCorridor =
+          choice === 'all' ||
+          (choice === 'south-street'  && props.corridor === 'South Street') ||
+          (choice === 'east-passyunk' && props.corridor === 'East Passyunk');
+        const inBlock =
+          bf.corridor === null || bf.block_number === null ||
+          (props.corridor === bf.corridor && props.block_number === bf.block_number);
+        if (!inCorridor || !inBlock) {
+          if (mapRef.hasLayer(layer)) mapRef.removeLayer(layer);
+          continue;
+        }
+        if (!mapRef.hasLayer(layer)) layer.addTo(mapRef);
+        applyLensStyle(layer, props, classifyLens(props));
+      }
+    }
+
+    function renderNormalMode(): void {
+      if (!mapRef) return;
+      cleanupLensVisuals();
+      for (const { layer, props } of markerIndex.values()) {
+        applyNormalMarkerStyle(layer, props);
+        const visible = matchesAll(props);
+        if (visible) {
+          if (!mapRef.hasLayer(layer)) layer.addTo(mapRef);
+        } else {
+          if (mapRef.hasLayer(layer)) mapRef.removeLayer(layer);
+        }
+      }
+    }
+
+    // -------------------- Showing-N-of-M corridor counter --------------------
+    function updateCorridorCounter(): void {
+      const el = document.getElementById('corridor-counter');
+      if (!el || !parcelsGjRef) return;
+      const choice = filterState.corridor;
+      const scopeName = choice === 'south-street' ? 'South Street'
+                      : choice === 'east-passyunk' ? 'East Passyunk'
+                      : '';
+      const bf = filterState.blockFilter;
+      const blockActive = bf.corridor !== null && bf.block_number !== null;
+
+      // Block selected: report visible vs block scope total, with metric suffix
+      if (blockActive && !filterState.culturalLens) {
+        let visible = 0, scopeTotal = 0;
+        for (const f of parcelsGjRef.features) {
+          const p = f.properties as ParcelProps;
+          if (p.vacancy_state === 'non_commercial') continue;
+          if (p.corridor !== bf.corridor || p.block_number !== bf.block_number) continue;
+          scopeTotal++;
+          if (matchesAll(p)) visible++;
+        }
+        const phrase = METRIC_PHRASES[filterState.activeMetric];
+        el.textContent =
+          `Showing ${visible} of ${scopeTotal} ${bf.corridor} ${bf.block_number} block parcels (${phrase})`;
+        return;
+      }
+
+      // Lens mode: report counts of the four lens states (active/former/policy).
+      if (filterState.culturalLens) {
+        let active = 0, former = 0, policy = 0;
+        for (const f of parcelsGjRef.features) {
+          const p = f.properties as ParcelProps;
+          if (p.vacancy_state === 'non_commercial') continue;
+          const inScope =
+            choice === 'all' ||
+            (choice === 'south-street'  && p.corridor === 'South Street') ||
+            (choice === 'east-passyunk' && p.corridor === 'East Passyunk');
+          if (!inScope) continue;
+          if (blockActive && (p.corridor !== bf.corridor || p.block_number !== bf.block_number)) continue;
+          const s = classifyLens(p);
+          if (s === 'active') active++;
+          else if (s === 'former') former++;
+          else if (s === 'policy') policy++;
+        }
+        let tail = '';
+        if (blockActive) tail = ` in ${bf.corridor} ${bf.block_number} block`;
+        else if (scopeName) tail = ` on ${scopeName}`;
+        el.textContent = `Showing ${active} active anchor${active === 1 ? '' : 's'}, ${former} former, ${policy} policy candidate${policy === 1 ? '' : 's'}${tail}`;
+        return;
+      }
+
+      // Normal mode: visible vs scope total.
+      let visible = 0;
+      let scopeTotal = 0;
+      for (const f of parcelsGjRef.features) {
+        const p = f.properties as ParcelProps;
+        if (p.vacancy_state === 'non_commercial') continue;
+        const inScope =
+          choice === 'all' ||
+          (choice === 'south-street'  && p.corridor === 'South Street') ||
+          (choice === 'east-passyunk' && p.corridor === 'East Passyunk');
+        if (!inScope) continue;
+        scopeTotal++;
+        if (matchesAll(p)) visible++;
+      }
+      if (choice === 'all') {
+        el.textContent = `Showing ${visible} parcels`;
+      } else {
+        el.textContent = `Showing ${visible} of ${scopeTotal} ${scopeName} parcels`;
+      }
+    }
+
+    // -------------------- Corridor section Reset (clears block filter) --------------------
+    function wireCorridorReset(): void {
+      const section = document.querySelector('[data-section="corridor"]');
+      if (!section) return;
+      section.addEventListener('click', (e) => {
+        const target = e.target as HTMLElement;
+        if (!target.matches('.filter-section-reset[data-reset="corridor"]')) return;
+        if (filterState.blockFilter.corridor === null) return;
+        filterState.blockFilter = { corridor: null, block_number: null };
+        flyToCorridor(filterState.corridor);
+        updateRibbonSelection();
+        subscribers.forEach((fn) => fn());
+      });
+    }
+
+    // -------------------- Corridor centerline dim/restore --------------------
+    // Opacity values:
+    //   selected (or 'all' = neither dimmed) -> 0.4 (the current full opacity)
+    //   unselected -> 0.12 (30% of 0.4) — "fades to 30% opacity" interpreted as
+    //   30% of the line's current presence so the visual differentiation is
+    //   clear rather than barely perceptible.
+    // Smooth transition handled by CSS on .corridor-line (stroke-opacity 300ms).
+    const CORRIDOR_LINE_FULL = 0.4;
+    const CORRIDOR_LINE_DIM = 0.12;
+
+    function updateCorridorLineOpacities(): void {
+      if (!streetsLayerRef) return;
+      const choice = filterState.corridor;
+      streetsLayerRef.eachLayer((layer) => {
+        const f = (layer as L.GeoJSON & { feature?: GeoJSON.Feature }).feature;
+        const key = f?.properties?.corridor as string | undefined;
+        let opacity = CORRIDOR_LINE_FULL;
+        if (choice !== 'all') {
+          const expectedKey = choice === 'south-street' ? 'south_street' : 'east_passyunk';
+          if (key !== expectedKey) opacity = CORRIDOR_LINE_DIM;
+        }
+        (layer as L.Path).setStyle({ opacity });
+      });
+    }
+
+    // -------------------- Sticky-state observer for the Corridor section --------------------
+    function wireStickyCorridorObserver(): void {
+      const sidebar = document.querySelector<HTMLElement>('.map-sidebar');
+      const sentinel = document.querySelector<HTMLElement>('.sticky-sentinel');
+      const corridorSec = document.querySelector<HTMLElement>('[data-section="corridor"]');
+      if (!sidebar || !sentinel || !corridorSec) return;
+      // The sentinel sits just above the Corridor section. When it scrolls
+      // out of the sidebar's viewport (entry.isIntersecting === false), the
+      // Corridor section is stuck.
+      const obs = new IntersectionObserver(
+        ([entry]) => {
+          corridorSec.classList.toggle('is-stuck', !entry.isIntersecting);
+        },
+        { root: sidebar, threshold: 0 },
+      );
+      obs.observe(sentinel);
+    }
+
+    // -------------------- Corridor segmented control --------------------
+    function flyToCorridor(choice: CorridorChoice): void {
+      if (!mapRef) return;
+      if (choice === 'all') {
+        if (combinedCorridorBounds && combinedCorridorBounds.isValid()) {
+          mapRef.flyToBounds(combinedCorridorBounds, { padding: [60, 60], duration: 0.9 });
+        } else if (initialView) {
+          mapRef.flyTo(initialView.center, initialView.zoom, { duration: 0.9 });
+        }
+        return;
+      }
+      const key = choice === 'south-street' ? 'south_street' : 'east_passyunk';
+      const bounds = corridorBounds[key];
+      if (bounds && bounds.isValid()) {
+        mapRef.flyToBounds(bounds, { padding: [40, 40], duration: 0.9 });
+      }
+    }
+
+    function wireCorridorSegmented(): void {
+      const wrap = document.querySelector<HTMLElement>(
+        '[data-section="corridor"] .corridor-segmented',
+      );
+      if (!wrap) return;
+      wrap.addEventListener('click', (e) => {
+        const btn = (e.target as HTMLElement).closest<HTMLButtonElement>('.corridor-segment');
+        if (!btn) return;
+        const value = btn.dataset.value as CorridorChoice | undefined;
+        if (!value || filterState.corridor === value) return;
+        filterState.corridor = value;
+        // Corridor change clears any block selection.
+        filterState.blockFilter = { corridor: null, block_number: null };
+        wrap.querySelectorAll<HTMLButtonElement>('.corridor-segment').forEach((b) => {
+          b.setAttribute('aria-pressed', b === btn ? 'true' : 'false');
+        });
+        if (parcelsGjRef) {
+          recomputeCounts(parcelsGjRef, value);
+          updateAllCountSpans();
+        }
+        flyToCorridor(value);
+        updateCorridorLineOpacities();
+        updateRibbonSelection();
+        updateRibbonCorridorDimming();
+        subscribers.forEach((fn) => fn());
+      });
+    }
+
+    // -------------------- Sidebar event wiring --------------------
+    function wireBusinessMixSidebar(): void {
+      const section = document.querySelector('[data-section="business-mix"]');
+      if (!section) return;
+
+      // change events: checkboxes + outdoor toggle
+      section.addEventListener('change', (e) => {
+        const t = e.target as HTMLInputElement;
+        if (!t || !(t instanceof HTMLInputElement)) return;
+
+        if (t.classList.contains('filter-vacancy')) {
+          const v = t.dataset.value || '';
+          if (t.checked) filterState.vacancy.add(v);
+          else filterState.vacancy.delete(v);
+          subscribers.forEach((fn) => fn());
+        } else if (t.classList.contains('segment-parent')) {
+          const seg = t.dataset.segment || '';
+          const cats = segmentMap.get(seg) || [];
+          if (t.checked) cats.forEach((c) => filterState.category.add(c));
+          else cats.forEach((c) => filterState.category.delete(c));
+          t.indeterminate = false;
+          // sync children checkboxes
+          document
+            .querySelectorAll<HTMLInputElement>(
+              `.filter-category[data-segment="${CSS.escape(seg)}"]`,
+            )
+            .forEach((c) => { c.checked = t.checked; });
+          subscribers.forEach((fn) => fn());
+        } else if (t.classList.contains('filter-category')) {
+          const cat = t.dataset.category || '';
+          const seg = t.dataset.segment || '';
+          if (t.checked) filterState.category.add(cat);
+          else filterState.category.delete(cat);
+          syncSegmentParent(seg);
+          subscribers.forEach((fn) => fn());
+        } else if (t.id === 'filter-outdoor') {
+          filterState.outdoorOnly = t.checked;
+          subscribers.forEach((fn) => fn());
+        } else if (t.id === 'filter-lens') {
+          filterState.culturalLens = t.checked;
+          subscribers.forEach((fn) => fn());
+        }
+      });
+
+      // click events: chips + segment expand toggle
+      section.addEventListener('click', (e) => {
+        const t = e.target as HTMLElement;
+        if (!t) return;
+
+        // Chip toggle
+        const chip = t.closest('.chip') as HTMLButtonElement | null;
+        if (chip) {
+          const groupEl = chip.closest('.chip-row');
+          const group = groupEl?.getAttribute('data-chip-group');
+          const val = chip.dataset.value || '';
+          const pressed = chip.getAttribute('aria-pressed') === 'true';
+          chip.setAttribute('aria-pressed', pressed ? 'false' : 'true');
+          if (group === 'operator') {
+            if (pressed) filterState.operator.delete(val);
+            else filterState.operator.add(val);
+          } else if (group === 'peak') {
+            const n = Number(val);
+            if (pressed) filterState.peak.delete(n);
+            else filterState.peak.add(n);
+          } else if (group === 'price') {
+            const n = Number(val);
+            if (pressed) filterState.price.delete(n);
+            else filterState.price.add(n);
+          }
+          subscribers.forEach((fn) => fn());
+          return;
+        }
+
+        // Segment expand/collapse: clicks on chevron or label (not checkbox)
+        const headerEl = t.closest('.segment-header');
+        if (headerEl && !t.closest('.segment-parent')) {
+          const segEl = headerEl.closest('.segment');
+          if (segEl) toggleSegmentExpand(segEl);
+        }
+
+        // Reset link
+        if (t.matches('.filter-section-reset[data-reset="business-mix"]')) {
+          resetBusinessMix();
+          subscribers.forEach((fn) => fn());
+        }
+      });
+    }
+
+    // -------------------- Marker index --------------------
+    // Captured during pointToLayer for the commercial+vacant layer so the
+    // subscribe callback can iterate without re-walking the GeoJSON.
+    const markerIndex = new Map<
+      number,
+      { layer: L.CircleMarker; props: ParcelProps }
+    >();
+
+    // -------------------- Module-scope references for corridor navigation --------------------
+    let parcelsGjRef: GeoJSON.FeatureCollection | null = null;
+    let mapRef: L.Map | null = null;
+    let initialView: { center: L.LatLng; zoom: number } | null = null;
+    const corridorBounds: Record<string, L.LatLngBounds> = {};
+    let combinedCorridorBounds: L.LatLngBounds | null = null;
+    let streetsLayerRef: L.GeoJSON | null = null;
 
     function line(label: string, value: string | number): string {
       return `<p><span class="popup-label">${label}:</span> ${value}</p>`;
@@ -230,13 +2394,12 @@ import Layout from '../layouts/Layout.astro';
 
       // ---------- BUILDING DETAILS section ----------
       const buildingDetails: string[] = [];
-      if (p.owner) buildingDetails.push(line('Owner', escapeHtml(p.owner)));
+      if (p.owner) buildingDetails.push(line('Owner', escapeHtml(titleCaseOwner(p.owner))));
       if (isNonCommercial && p.opa_property_use) {
         buildingDetails.push(line('Type', escapeHtml(p.opa_property_use)));
       }
       if (p.year_built) {
-        const yb = String(p.year_built);
-        buildingDetails.push(line('Year built', yb === '1900' ? 'pre-1900' : escapeHtml(yb)));
+        buildingDetails.push(line('Year built', escapeHtml(p.year_built)));
       }
       if (p.zone_type) buildingDetails.push(line('Zone', escapeHtml(p.zone_type)));
       if (p.building_footprint && p.building_footprint > 0) {
@@ -248,7 +2411,10 @@ import Layout from '../layouts/Layout.astro';
         buildingDetails.push(line('Height', `${p.building_height} ft`));
       }
       if (p.open_violations && p.open_violations > 0) {
-        buildingDetails.push(line('Open violations', `${p.open_violations}`));
+        const valHtml = p.open_violations >= 3
+          ? `<span class="popup-violations-high">${p.open_violations}</span>`
+          : `${p.open_violations}`;
+        buildingDetails.push(line('Open violations', valHtml));
       }
       if (
         p.last_sale_year &&
@@ -258,6 +2424,11 @@ import Layout from '../layouts/Layout.astro';
         buildingDetails.push(
           line('Last sale', `${p.last_sale_year} for ${formatPrice(p.last_sale_price)}`),
         );
+        if (Number(p.last_sale_price) === 1) {
+          buildingDetails.push(
+            `<p class="popup-caveat">(non-arms-length transfer)</p>`,
+          );
+        }
       }
 
       // ---------- Assemble ----------
@@ -286,6 +2457,10 @@ import Layout from '../layouts/Layout.astro';
         maxZoom: 19,
         zoomControl: true,
       });
+      // Capture the framing the visitor sees on arrival so "All Corridors"
+      // can fly back to it later.
+      mapRef = map;
+      initialView = { center: map.getCenter(), zoom: map.getZoom() };
 
       L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
         attribution:
@@ -298,13 +2473,46 @@ import Layout from '../layouts/Layout.astro';
       try {
         const streetsResp = await fetch('/data/streets.geojson');
         const streetsGj = await streetsResp.json();
-        L.geoJSON(streetsGj, {
+        streetsLayerRef = L.geoJSON(streetsGj, {
           style: (feature) => {
             const key = feature?.properties?.corridor as string | undefined;
             const base = (key && STREET_STYLES[key]) || { color: '#888', weight: 3 };
-            return { color: base.color, weight: base.weight, opacity: 0.4 };
+            return {
+              color: base.color,
+              weight: base.weight,
+              opacity: 0.4,
+              className: 'corridor-line',
+            };
           },
         }).addTo(map);
+        // Stash bounds per corridor for the corridor-segmented fly-to behavior.
+        for (const f of streetsGj.features) {
+          const key = f?.properties?.corridor as string | undefined;
+          if (key === 'south_street' || key === 'east_passyunk') {
+            const tempLayer = L.geoJSON(f);
+            const b = tempLayer.getBounds();
+            if (b.isValid()) corridorBounds[key] = b;
+          }
+        }
+        // Build a combined bounds box covering both corridors. Used by the
+        // "All Corridors" fly-target and as the initial map framing.
+        const ss = corridorBounds.south_street;
+        const ep = corridorBounds.east_passyunk;
+        if (ss && ep) {
+          combinedCorridorBounds = L.latLngBounds(ss.getSouthWest(), ss.getNorthEast());
+          combinedCorridorBounds.extend(ep);
+        } else if (ss) {
+          combinedCorridorBounds = ss;
+        } else if (ep) {
+          combinedCorridorBounds = ep;
+        }
+        // Initial framing: fit both corridors centered between them. Overrides
+        // the static L.map center/zoom set above. Then re-capture initialView
+        // so the existing flyTo('all') logic falls back to this same framing.
+        if (combinedCorridorBounds && combinedCorridorBounds.isValid()) {
+          map.fitBounds(combinedCorridorBounds, { padding: [60, 60] });
+          initialView = { center: map.getCenter(), zoom: map.getZoom() };
+        }
       } catch (err) {
         console.error('Failed to load streets.geojson', err);
       }
@@ -325,8 +2533,9 @@ import Layout from '../layouts/Layout.astro';
           filter: (feature) =>
             feature.properties?.vacancy_state !== 'non_commercial',
           pointToLayer: (feature, latlng) => {
-            const state = feature.properties?.vacancy_state as string;
-            return L.circleMarker(latlng, {
+            const props = feature.properties as ParcelProps;
+            const state = props.vacancy_state;
+            const marker = L.circleMarker(latlng, {
               radius: 7,
               fillColor: VACANCY_COLORS[state] || '#888',
               color: '#ffffff',
@@ -334,6 +2543,8 @@ import Layout from '../layouts/Layout.astro';
               opacity: 1,
               fillOpacity: 0.9,
             });
+            markerIndex.set(props.id, { layer: marker, props });
+            return marker;
           },
           onEachFeature: bindPopupTo,
         }).addTo(map);
@@ -365,6 +2576,43 @@ import Layout from '../layouts/Layout.astro';
         };
         map.on('zoomend', updateNonCommercialVisibility);
         updateNonCommercialVisibility();
+
+        // -------------------- Wire Corridor section --------------------
+        wireCorridorSegmented();
+        wireStickyCorridorObserver();
+
+        // -------------------- Wire Business mix section --------------------
+        parcelsGjRef = parcelsGj;
+        buildSegmentMap(parcelsGj);
+        recomputeCounts(parcelsGj, filterState.corridor);   // initial counts for 'all'
+        buildBlockStats(parcelsGj);                          // ribbon data (Sub-phase A)
+        renderBusinessMixUI();
+        wireBusinessMixSidebar();
+        renderRibbon();                                       // initial paint (Sub-phase B)
+        wireRibbonControls();                                 // metric selector + block clicks
+        wireCorridorReset();                                  // Reset link in Corridor section header
+        updateRibbonCorridorDimming();                        // initial dimming state
+
+        // -------------------- Subscribe path --------------------
+        subscribe(() => {
+          if (filterState.culturalLens) {
+            renderLensMode();
+          } else {
+            renderNormalMode();
+          }
+          updateSidebarChrome();
+          updateCorridorCounter();
+        });
+
+        // Initial chrome update (badge / reset visibility for default state).
+        updateSidebarChrome();
+        updateCorridorCounter();
+
+        // Expose for manual console testing.
+        (window as unknown as Record<string, unknown>).__filterState = filterState;
+        (window as unknown as Record<string, unknown>).__setFilterState = setFilterState;
+        (window as unknown as Record<string, unknown>).__matchesAll = matchesAll;
+        (window as unknown as Record<string, unknown>).__blockStats = blockStats;
       } catch (err) {
         console.error('Failed to load parcels.geojson', err);
       }
