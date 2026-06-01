@@ -123,11 +123,34 @@ import Layout from '../layouts/Layout.astro';
           <h3>Building mix</h3>
           <div class="filter-section-meta">
             <span class="filter-section-badge" hidden></span>
-            <button class="filter-section-reset" type="button" hidden>Reset</button>
+            <button
+              class="filter-section-reset"
+              type="button"
+              data-reset="building-mix"
+              hidden
+            >Reset</button>
           </div>
         </header>
         <div class="filter-section-body">
-          <p class="filter-coming-soon">Coming soon</p>
+          <div class="filter-group" data-filter-group="zone">
+            <h4 class="filter-group-label">Zone type</h4>
+            <div class="chip-row" data-chip-group="zone"></div>
+          </div>
+
+          <div class="filter-group" data-filter-group="ownership">
+            <h4 class="filter-group-label">Ownership pattern</h4>
+            <div class="chip-row" data-chip-group="ownership"></div>
+          </div>
+
+          <div class="filter-group" data-filter-group="building-height">
+            <h4 class="filter-group-label">Building height</h4>
+            <div class="range-slider" data-range-group="building-height"></div>
+          </div>
+
+          <div class="filter-group" data-filter-group="years-since-sale">
+            <h4 class="filter-group-label">Years since last sale</h4>
+            <div class="range-slider" data-range-group="years-since-sale"></div>
+          </div>
         </div>
       </section>
 
@@ -734,6 +757,90 @@ import Layout from '../layouts/Layout.astro';
       font-variant-numeric: tabular-nums;
     }
 
+    /* Dual-handle range slider (Building mix → Years since last sale).
+       Two overlaid <input type="range"> elements; the thumb on each handles
+       its own drag while the input box itself is pointer-events: none, so the
+       user can grab whichever thumb is closer. */
+    .range-slider {
+      padding: 0 4px;
+    }
+    .range-slider-labels {
+      display: flex;
+      justify-content: space-between;
+      font-size: 11px;
+      color: #57534e;
+      margin-bottom: 6px;
+      font-variant-numeric: tabular-nums;
+    }
+    .range-slider-track {
+      position: relative;
+      height: 4px;
+      background: #d6d3d1;
+      border-radius: 2px;
+      margin: 10px 8px;
+    }
+    .range-slider-fill {
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      background: #1c1917;
+      border-radius: 2px;
+    }
+    .range-slider-handle {
+      position: absolute;
+      top: 50%;
+      left: -8px;
+      width: calc(100% + 16px);
+      height: 4px;
+      margin: 0;
+      padding: 0;
+      background: transparent;
+      pointer-events: none;
+      -webkit-appearance: none;
+      appearance: none;
+      outline: none;
+      transform: translateY(-50%);
+    }
+    .range-slider-handle::-webkit-slider-runnable-track {
+      background: transparent;
+      border: none;
+      height: 4px;
+    }
+    .range-slider-handle::-moz-range-track {
+      background: transparent;
+      border: none;
+      height: 4px;
+    }
+    .range-slider-handle::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      pointer-events: auto;
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      background: #1c1917;
+      border: 2px solid #ffffff;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+      cursor: pointer;
+      margin-top: 0;
+    }
+    .range-slider-handle::-moz-range-thumb {
+      pointer-events: auto;
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: #1c1917;
+      border: 2px solid #ffffff;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+      cursor: pointer;
+    }
+    .range-slider-handle:focus::-webkit-slider-thumb {
+      box-shadow: 0 0 0 3px rgba(28, 25, 23, 0.2), 0 1px 2px rgba(0, 0, 0, 0.2);
+    }
+    .range-slider-handle:focus::-moz-range-thumb {
+      box-shadow: 0 0 0 3px rgba(28, 25, 23, 0.2), 0 1px 2px rgba(0, 0, 0, 0.2);
+    }
+
     /* Outdoor toggle */
     .filter-toggle {
       display: flex;
@@ -990,6 +1097,51 @@ import Layout from '../layouts/Layout.astro';
       { value: 4, label: '$$$$' },
     ];
 
+    // -------------------- Building mix filter options --------------------
+    const OWNERSHIP_OPTIONS: { key: string; label: string; count: number }[] = [
+      { key: 'local',       label: 'Local owner',       count: 341 },
+      { key: 'out_of_area', label: 'Out-of-area owner', count: 170 },
+      { key: 'dollar_sale', label: '$1 sale',           count: 170 },
+    ];
+
+    const ZONE_OPTIONS: { value: string; count: number }[] = [
+      { value: 'CMX-1',   count: 23 },
+      { value: 'CMX-2',   count: 53 },
+      { value: 'CMX-2.5', count: 270 },
+      { value: 'CMX-3',   count: 95 },
+      { value: 'RM-1',    count: 25 },
+      { value: 'RSA-5',   count: 50 },
+      { value: 'CA-1',    count: 2 },
+      { value: 'SPPOA',   count: 1 },
+    ];
+
+    const YEARS_SINCE_SALE_FULL = { min: 0, max: 110 };
+    const BUILDING_HEIGHT_FULL  = { min: 0, max: 65 };
+
+    // Slider config table — generalized so updateRangeSliderUI and the input
+    // handler can dispatch by data-range-group id.
+    type SliderConfig = {
+      stateKey: 'yearsSinceSale' | 'buildingHeight';
+      full: { min: number; max: number };
+      formatLabel: (v: number) => string;
+    };
+    const SLIDER_CONFIGS: Record<string, SliderConfig> = {
+      'years-since-sale': {
+        stateKey: 'yearsSinceSale',
+        full: YEARS_SINCE_SALE_FULL,
+        formatLabel: (v) => `${v} years`,
+      },
+      'building-height': {
+        stateKey: 'buildingHeight',
+        full: BUILDING_HEIGHT_FULL,
+        formatLabel: (v) => `${v} ft`,
+      },
+    };
+
+    // Non-commercial zones — when any of these are checked in the Zone filter,
+    // the non-commercial layer becomes visible regardless of zoom.
+    const NON_COMMERCIAL_ZONES = new Set<string>(['RM-1', 'RSA-5', 'CA-1', 'SPPOA']);
+
     // Segments excluded from the drill-down UI:
     //   "Vacant" — redundant with vacancy_state filter
     //   "Other" — 2-parcel catchall, not meaningful as a filter dimension
@@ -1009,6 +1161,11 @@ import Layout from '../layouts/Layout.astro';
       culturalLens: boolean;       // override: lens visualization overrides matchesAll
       blockFilter: { corridor: string | null; block_number: number | null };
       activeMetric: MetricKey;     // ribbon's active metric; drives metric-implied filter when block is selected
+      // Building mix
+      ownership: Set<string>;      // 'local' / 'out_of_area' / 'dollar_sale'; OR-internal
+      yearsSinceSale: { min: number; max: number };  // range slider 0..110
+      buildingHeight: { min: number; max: number };  // range slider 0..65 (ft)
+      zone: Set<string>;           // zone_type values e.g. 'CMX-2.5'
     };
 
     let allCategories: string[] = [];       // populated after parcels load
@@ -1019,6 +1176,8 @@ import Layout from '../layouts/Layout.astro';
     let peakCount: Record<number, number> = {};
     let operatorCount: Record<string, number> = {};
     let priceCount: Record<number, number> = {};
+    let zoneCount: Record<string, number> = {};
+    let ownershipCount: Record<string, number> = { local: 0, out_of_area: 0, dollar_sale: 0 };
 
     // ADDITIVE paradigm: every filter group starts empty (nothing selected =
     // group inactive = every parcel passes). User clicks to narrow.
@@ -1033,6 +1192,10 @@ import Layout from '../layouts/Layout.astro';
       culturalLens: false,
       blockFilter: { corridor: null, block_number: null },
       activeMetric: 'vacancy_rate',
+      ownership: new Set(),
+      yearsSinceSale: { min: 0, max: 110 },
+      buildingHeight: { min: 0, max: 65 },
+      zone: new Set(),
     };
 
     const subscribers = new Set<() => void>();
@@ -1071,11 +1234,15 @@ import Layout from '../layouts/Layout.astro';
       return value >= range.min && value <= range.max;
     }
 
-    // (passesOwnership stub deferred until Phase 3 when the three toggles
-    // are concretely defined alongside their UI controls.)
-
-    // Suppress 'unused' warnings — the helpers are exported for Phase 3 use.
-    void passesRange;
+    // OR-internal helper for the Ownership pattern group: ANY selected
+    // predicate passing is enough.
+    function passesOwnership(parcel: ParcelProps, ownershipSet: Set<string>): boolean {
+      if (ownershipSet.size === 0) return true;
+      if (ownershipSet.has('local') && parcel.out_of_area_owner === 'No') return true;
+      if (ownershipSet.has('out_of_area') && parcel.out_of_area_owner === 'Yes') return true;
+      if (ownershipSet.has('dollar_sale') && Number(parcel.last_sale_price) === 1) return true;
+      return false;
+    }
 
     // -------------------- Metric-implied filter (block + ribbon metric) --------------------
     // When a block is selected, the active ribbon metric narrows the visible
@@ -1127,6 +1294,11 @@ import Layout from '../layouts/Layout.astro';
       if (!passesFilter(p.peak_activation_period,  filterState.peak))     return false;
       if (!passesFilter(p.consumer_price_level,    filterState.price))    return false;
       if (filterState.outdoorOnly && p.outdoor_footprint !== 'Yes')       return false;
+      // Building mix groups (AND across groups; ownership is OR-internal)
+      if (!passesOwnership(p, filterState.ownership))                                return false;
+      if (!passesRange(p.years_since_last_sale, filterState.yearsSinceSale, YEARS_SINCE_SALE_FULL)) return false;
+      if (!passesRange(p.building_height, filterState.buildingHeight, BUILDING_HEIGHT_FULL))       return false;
+      if (!passesFilter(p.zone_type, filterState.zone))                              return false;
       return true;
     }
 
@@ -1145,6 +1317,26 @@ import Layout from '../layouts/Layout.astro';
     }
     const BUSINESS_MIX_GROUP_COUNT = 7;
 
+    function buildingMixDirtyCount(): number {
+      let n = 0;
+      if (filterState.ownership.size > 0) n++;
+      if (
+        filterState.yearsSinceSale.min > YEARS_SINCE_SALE_FULL.min ||
+        filterState.yearsSinceSale.max < YEARS_SINCE_SALE_FULL.max
+      ) {
+        n++;
+      }
+      if (filterState.zone.size > 0) n++;
+      if (
+        filterState.buildingHeight.min > BUILDING_HEIGHT_FULL.min ||
+        filterState.buildingHeight.max < BUILDING_HEIGHT_FULL.max
+      ) {
+        n++;
+      }
+      return n;
+    }
+    const BUILDING_MIX_GROUP_COUNT = 4;
+
     function resetBusinessMix(): void {
       filterState.vacancy = new Set();
       filterState.category = new Set();
@@ -1154,6 +1346,20 @@ import Layout from '../layouts/Layout.astro';
       filterState.outdoorOnly = false;
       filterState.culturalLens = false;
       resyncBusinessMixUI();
+    }
+
+    function resetBuildingMix(): void {
+      filterState.ownership = new Set();
+      filterState.yearsSinceSale = { min: 0, max: 110 };
+      filterState.buildingHeight = { min: 0, max: 65 };
+      filterState.zone = new Set();
+      // Reset chip aria-pressed for Building mix
+      document
+        .querySelectorAll<HTMLButtonElement>('[data-section="building-mix"] .chip')
+        .forEach((b) => b.setAttribute('aria-pressed', 'false'));
+      // Reset slider input values + UI for both sliders
+      updateRangeSliderUI('years-since-sale');
+      updateRangeSliderUI('building-height');
     }
 
     // -------------------- Segment structure (corridor-independent) --------------------
@@ -1184,21 +1390,37 @@ import Layout from '../layouts/Layout.astro';
       allCategories = sortedSegs.flatMap((s) => segmentMap.get(s) || []);
     }
 
-    // -------------------- Per-corridor count tabulation --------------------
-    // Re-runs whenever the corridor scope changes. Counts are scoped by corridor
-    // only — Business mix selections do NOT affect these counts.
-    function recomputeCounts(parcelsGj: GeoJSON.FeatureCollection, scope: CorridorChoice): void {
+    // -------------------- Chip count tabulation (scope-aware) --------------------
+    // Re-runs on every state change. Each chip count reflects:
+    //   - parcels matching the chip's predicate
+    //   - within the current corridor scope
+    //   - within the current visible-layer scope (commercial+vacant always;
+    //     non-commercial included when the non-commercial layer is visible)
+    // Filters in OTHER chip groups do not affect a group's counts.
+    function recomputeChipCounts(): void {
+      if (!parcelsGjRef) return;
+      const corridor = filterState.corridor;
+      const includeNc = shouldShowNonCommercialLayer();
+
       const segC: Record<string, number> = {};
       const catC: Record<string, number> = {};
       const vacC: Record<string, number> = {};
       const peakC: Record<number, number> = {};
       const opC: Record<string, number> = {};
       const priceC: Record<number, number> = {};
-      for (const f of parcelsGj.features) {
+      const zoneC: Record<string, number> = {};
+      const ownC: Record<string, number> = { local: 0, out_of_area: 0, dollar_sale: 0 };
+
+      for (const f of parcelsGjRef.features) {
         const p = f.properties as ParcelProps;
-        if (scope === 'south-street'  && p.corridor !== 'South Street')  continue;
-        if (scope === 'east-passyunk' && p.corridor !== 'East Passyunk') continue;
-        vacC[p.vacancy_state] = (vacC[p.vacancy_state] || 0) + 1;
+        if (p.vacancy_state === 'non_commercial' && !includeNc) continue;
+        if (corridor === 'south-street'  && p.corridor !== 'South Street')  continue;
+        if (corridor === 'east-passyunk' && p.corridor !== 'East Passyunk') continue;
+
+        // Business mix counts (non-commercial parcels mostly skip via null/sentinel checks)
+        if (p.vacancy_state !== 'non_commercial') {
+          vacC[p.vacancy_state] = (vacC[p.vacancy_state] || 0) + 1;
+        }
         if (typeof p.peak_activation_period === 'number') {
           peakC[p.peak_activation_period] = (peakC[p.peak_activation_period] || 0) + 1;
         }
@@ -1210,17 +1432,60 @@ import Layout from '../layouts/Layout.astro';
         }
         const seg = p.business_segment;
         const cat = p.business_category;
-        if (!seg || EXCLUDED_SEGMENTS.has(seg)) continue;
-        segC[seg] = (segC[seg] || 0) + 1;
-        if (cat) catC[cat] = (catC[cat] || 0) + 1;
+        if (seg && !EXCLUDED_SEGMENTS.has(seg)) {
+          segC[seg] = (segC[seg] || 0) + 1;
+          if (cat) catC[cat] = (catC[cat] || 0) + 1;
+        }
+
+        // Building mix counts
+        if (p.zone_type) zoneC[p.zone_type] = (zoneC[p.zone_type] || 0) + 1;
+        if (p.out_of_area_owner === 'No') ownC.local++;
+        if (p.out_of_area_owner === 'Yes') ownC.out_of_area++;
+        const lsp = p.last_sale_price;
+        if (lsp !== null && lsp !== undefined) {
+          const n = Number(lsp);
+          if (Number.isFinite(n) && n === 1) ownC.dollar_sale++;
+        }
       }
+
+      // Non-commercial zone chips (RM-1, RSA-5, CA-1, SPPOA) reflect the full
+      // corridor-scoped universe regardless of layer visibility. The semantic
+      // is "this count is what becomes visible after the click." Without this
+      // second pass, those chips would read (0) when the layer is hidden,
+      // making them appear useless. Commercial zones (CMX-*) and all other
+      // chip groups keep the visible-scope semantic.
+      if (!includeNc) {
+        for (const f of parcelsGjRef.features) {
+          const p = f.properties as ParcelProps;
+          if (p.vacancy_state !== 'non_commercial') continue;
+          if (corridor === 'south-street'  && p.corridor !== 'South Street')  continue;
+          if (corridor === 'east-passyunk' && p.corridor !== 'East Passyunk') continue;
+          if (p.zone_type && NON_COMMERCIAL_ZONES.has(p.zone_type)) {
+            zoneC[p.zone_type] = (zoneC[p.zone_type] || 0) + 1;
+          }
+        }
+      }
+
       segmentCount = segC;
       categoryCount = catC;
       vacancyCount = vacC;
       peakCount = peakC;
       operatorCount = opC;
       priceCount = priceC;
+      zoneCount = zoneC;
+      ownershipCount = ownC;
     }
+
+    // -------------------- Non-commercial layer visibility logic --------------------
+    function shouldShowNonCommercialLayer(): boolean {
+      if (!mapRef) return false;
+      if (mapRef.getZoom() >= NON_COMMERCIAL_MIN_ZOOM) return true;
+      for (const z of NON_COMMERCIAL_ZONES) {
+        if (filterState.zone.has(z)) return true;
+      }
+      return false;
+    }
+    const NON_COMMERCIAL_MIN_ZOOM = 18;
 
     // -------------------- Sidebar count-span DOM updater --------------------
     function updateAllCountSpans(): void {
@@ -1247,6 +1512,14 @@ import Layout from '../layouts/Layout.astro';
       document.querySelectorAll<HTMLElement>('[data-count-price]').forEach((el) => {
         const v = Number(el.dataset.countPrice);
         el.textContent = `(${priceCount[v] || 0})`;
+      });
+      document.querySelectorAll<HTMLElement>('[data-count-ownership]').forEach((el) => {
+        const v = el.dataset.countOwnership!;
+        el.textContent = `(${ownershipCount[v] || 0})`;
+      });
+      document.querySelectorAll<HTMLElement>('[data-count-zone]').forEach((el) => {
+        const v = el.dataset.countZone!;
+        el.textContent = `(${zoneCount[v] || 0})`;
       });
     }
 
@@ -1313,6 +1586,89 @@ import Layout from '../layouts/Layout.astro';
           <button type="button" class="chip" data-value="${o.value}" aria-pressed="false">${escapeHtml(o.label)} <span class="count" data-count-price="${o.value}">(${priceCount[o.value] || 0})</span></button>
         `).join('');
       }
+    }
+
+    // -------------------- Building mix UI --------------------
+    function renderRangeSlider(groupId: string, labelMinAria: string, labelMaxAria: string): void {
+      const cfg = SLIDER_CONFIGS[groupId];
+      if (!cfg) return;
+      const root = document.querySelector<HTMLElement>(
+        `.range-slider[data-range-group="${groupId}"]`,
+      );
+      if (!root) return;
+      root.innerHTML = `
+        <div class="range-slider-labels">
+          <span class="range-slider-value range-slider-value-min">${escapeHtml(cfg.formatLabel(cfg.full.min))}</span>
+          <span class="range-slider-value range-slider-value-max">${escapeHtml(cfg.formatLabel(cfg.full.max))}</span>
+        </div>
+        <div class="range-slider-track">
+          <div class="range-slider-fill"></div>
+          <input type="range" class="range-slider-handle range-slider-handle-min" min="${cfg.full.min}" max="${cfg.full.max}" step="1" value="${cfg.full.min}" aria-label="${escapeHtml(labelMinAria)}" />
+          <input type="range" class="range-slider-handle range-slider-handle-max" min="${cfg.full.min}" max="${cfg.full.max}" step="1" value="${cfg.full.max}" aria-label="${escapeHtml(labelMaxAria)}" />
+        </div>
+      `;
+      updateRangeSliderUI(groupId);
+    }
+
+    function renderBuildingMixUI(): void {
+      // Render order mirrors the section's visual order: Zone, Ownership,
+      // Building height, Years since last sale.
+
+      // Zone chips
+      const zoneWrap = document.querySelector<HTMLElement>(
+        '.chip-row[data-chip-group="zone"]',
+      );
+      if (zoneWrap) {
+        zoneWrap.innerHTML = ZONE_OPTIONS.map(
+          (z) => `
+          <button type="button" class="chip" data-value="${escapeHtml(z.value)}" aria-pressed="false">${escapeHtml(z.value)} <span class="count" data-count-zone="${escapeHtml(z.value)}">(${zoneCount[z.value] || 0})</span></button>
+        `,
+        ).join('');
+      }
+
+      // Ownership chips — initial counts filled by recomputeChipCounts + updateAllCountSpans
+      const ownWrap = document.querySelector<HTMLElement>(
+        '.chip-row[data-chip-group="ownership"]',
+      );
+      if (ownWrap) {
+        ownWrap.innerHTML = OWNERSHIP_OPTIONS.map(
+          (o) => `
+          <button type="button" class="chip" data-value="${o.key}" aria-pressed="false">${escapeHtml(o.label)} <span class="count" data-count-ownership="${o.key}">(${ownershipCount[o.key] || 0})</span></button>
+        `,
+        ).join('');
+      }
+
+      // Range sliders — markup + initial sync (building height first, then years)
+      renderRangeSlider('building-height', 'Minimum building height', 'Maximum building height');
+      renderRangeSlider('years-since-sale', 'Minimum years since last sale', 'Maximum years since last sale');
+    }
+
+    // Keeps a slider's two inputs, fill bar, and label text in sync with
+    // filterState[stateKey]. Generalized over groupId via SLIDER_CONFIGS.
+    function updateRangeSliderUI(groupId: string): void {
+      const cfg = SLIDER_CONFIGS[groupId];
+      if (!cfg) return;
+      const root = document.querySelector<HTMLElement>(
+        `.range-slider[data-range-group="${groupId}"]`,
+      );
+      if (!root) return;
+      const minInput = root.querySelector<HTMLInputElement>('.range-slider-handle-min');
+      const maxInput = root.querySelector<HTMLInputElement>('.range-slider-handle-max');
+      const fill = root.querySelector<HTMLElement>('.range-slider-fill');
+      const minLabel = root.querySelector<HTMLElement>('.range-slider-value-min');
+      const maxLabel = root.querySelector<HTMLElement>('.range-slider-value-max');
+      if (!minInput || !maxInput || !fill || !minLabel || !maxLabel) return;
+      const state = filterState[cfg.stateKey];
+      const { min, max } = state;
+      if (minInput.value !== String(min)) minInput.value = String(min);
+      if (maxInput.value !== String(max)) maxInput.value = String(max);
+      const range = cfg.full.max - cfg.full.min;
+      const leftPct = ((min - cfg.full.min) / range) * 100;
+      const rightPct = ((cfg.full.max - max) / range) * 100;
+      fill.style.left = `${leftPct}%`;
+      fill.style.right = `${rightPct}%`;
+      minLabel.textContent = cfg.formatLabel(min);
+      maxLabel.textContent = cfg.formatLabel(max);
     }
 
     function resyncBusinessMixUI(): void {
@@ -1391,6 +1747,24 @@ import Layout from '../layouts/Layout.astro';
         if (dirty > 0) {
           if (badge) {
             badge.textContent = `${dirty} of ${BUSINESS_MIX_GROUP_COUNT}`;
+            badge.removeAttribute('hidden');
+          }
+          reset?.removeAttribute('hidden');
+        } else {
+          badge?.setAttribute('hidden', '');
+          reset?.setAttribute('hidden', '');
+        }
+      }
+
+      // Building mix section
+      const bldgDirty = buildingMixDirtyCount();
+      const bldgSection = document.querySelector<HTMLElement>('[data-section="building-mix"]');
+      if (bldgSection) {
+        const badge = bldgSection.querySelector<HTMLElement>('.filter-section-badge');
+        const reset = bldgSection.querySelector<HTMLElement>('.filter-section-reset');
+        if (bldgDirty > 0) {
+          if (badge) {
+            badge.textContent = `${bldgDirty} of ${BUILDING_MIX_GROUP_COUNT}`;
             badge.removeAttribute('hidden');
           }
           reset?.removeAttribute('hidden');
@@ -2030,12 +2404,25 @@ import Layout from '../layouts/Layout.astro';
       }
     }
 
+    function applyNormalNonCommercialStyle(layer: L.CircleMarker): void {
+      layer.setStyle({
+        radius: 7,
+        fillColor: VACANCY_COLORS.non_commercial,
+        color: '#ffffff',
+        weight: 1,
+        opacity: 0.4,
+        fillOpacity: 0.35,
+        dashArray: undefined,
+      });
+    }
+
     function renderLensMode(): void {
       if (!mapRef) return;
       cleanupLensVisuals();
       const choice = filterState.corridor;
       const bf = filterState.blockFilter;
-      for (const { layer, props } of markerIndex.values()) {
+      const ncVisible = shouldShowNonCommercialLayer();
+      const inScope = (props: ParcelProps): boolean => {
         const inCorridor =
           choice === 'all' ||
           (choice === 'south-street'  && props.corridor === 'South Street') ||
@@ -2043,21 +2430,47 @@ import Layout from '../layouts/Layout.astro';
         const inBlock =
           bf.corridor === null || bf.block_number === null ||
           (props.corridor === bf.corridor && props.block_number === bf.block_number);
-        if (!inCorridor || !inBlock) {
+        return inCorridor && inBlock;
+      };
+      // Commercial + vacant
+      for (const { layer, props } of markerIndex.values()) {
+        if (!inScope(props)) {
           if (mapRef.hasLayer(layer)) mapRef.removeLayer(layer);
           continue;
         }
         if (!mapRef.hasLayer(layer)) layer.addTo(mapRef);
         applyLensStyle(layer, props, classifyLens(props));
       }
+      // Non-commercial (only when layer should be visible)
+      for (const { layer, props } of nonCommercialMarkerIndex.values()) {
+        const show = ncVisible && inScope(props);
+        if (show) {
+          if (!mapRef.hasLayer(layer)) layer.addTo(mapRef);
+          applyLensStyle(layer, props, classifyLens(props));
+        } else {
+          if (mapRef.hasLayer(layer)) mapRef.removeLayer(layer);
+        }
+      }
     }
 
     function renderNormalMode(): void {
       if (!mapRef) return;
       cleanupLensVisuals();
+      const ncVisible = shouldShowNonCommercialLayer();
+      // Commercial + vacant
       for (const { layer, props } of markerIndex.values()) {
         applyNormalMarkerStyle(layer, props);
         const visible = matchesAll(props);
+        if (visible) {
+          if (!mapRef.hasLayer(layer)) layer.addTo(mapRef);
+        } else {
+          if (mapRef.hasLayer(layer)) mapRef.removeLayer(layer);
+        }
+      }
+      // Non-commercial (only when layer should be visible; participates in matchesAll)
+      for (const { layer, props } of nonCommercialMarkerIndex.values()) {
+        applyNormalNonCommercialStyle(layer);
+        const visible = ncVisible && matchesAll(props);
         if (visible) {
           if (!mapRef.hasLayer(layer)) layer.addTo(mapRef);
         } else {
@@ -2077,12 +2490,14 @@ import Layout from '../layouts/Layout.astro';
       const bf = filterState.blockFilter;
       const blockActive = bf.corridor !== null && bf.block_number !== null;
 
+      const includeNc = shouldShowNonCommercialLayer();
+
       // Block selected: report visible vs block scope total, with metric suffix
       if (blockActive && !filterState.culturalLens) {
         let visible = 0, scopeTotal = 0;
         for (const f of parcelsGjRef.features) {
           const p = f.properties as ParcelProps;
-          if (p.vacancy_state === 'non_commercial') continue;
+          if (p.vacancy_state === 'non_commercial' && !includeNc) continue;
           if (p.corridor !== bf.corridor || p.block_number !== bf.block_number) continue;
           scopeTotal++;
           if (matchesAll(p)) visible++;
@@ -2098,7 +2513,7 @@ import Layout from '../layouts/Layout.astro';
         let active = 0, former = 0, policy = 0;
         for (const f of parcelsGjRef.features) {
           const p = f.properties as ParcelProps;
-          if (p.vacancy_state === 'non_commercial') continue;
+          if (p.vacancy_state === 'non_commercial' && !includeNc) continue;
           const inScope =
             choice === 'all' ||
             (choice === 'south-street'  && p.corridor === 'South Street') ||
@@ -2122,7 +2537,7 @@ import Layout from '../layouts/Layout.astro';
       let scopeTotal = 0;
       for (const f of parcelsGjRef.features) {
         const p = f.properties as ParcelProps;
-        if (p.vacancy_state === 'non_commercial') continue;
+        if (p.vacancy_state === 'non_commercial' && !includeNc) continue;
         const inScope =
           choice === 'all' ||
           (choice === 'south-street'  && p.corridor === 'South Street') ||
@@ -2230,10 +2645,6 @@ import Layout from '../layouts/Layout.astro';
         wrap.querySelectorAll<HTMLButtonElement>('.corridor-segment').forEach((b) => {
           b.setAttribute('aria-pressed', b === btn ? 'true' : 'false');
         });
-        if (parcelsGjRef) {
-          recomputeCounts(parcelsGjRef, value);
-          updateAllCountSpans();
-        }
         flyToCorridor(value);
         updateCorridorLineOpacities();
         updateRibbonSelection();
@@ -2330,10 +2741,75 @@ import Layout from '../layouts/Layout.astro';
       });
     }
 
+    // -------------------- Building mix wiring --------------------
+    function wireBuildingMixSidebar(): void {
+      const section = document.querySelector('[data-section="building-mix"]');
+      if (!section) return;
+
+      // Chip toggles + Reset link
+      section.addEventListener('click', (e) => {
+        const t = e.target as HTMLElement;
+        if (!t) return;
+
+        const chip = t.closest('.chip') as HTMLButtonElement | null;
+        if (chip) {
+          const groupEl = chip.closest('.chip-row');
+          const group = groupEl?.getAttribute('data-chip-group');
+          const val = chip.dataset.value || '';
+          const pressed = chip.getAttribute('aria-pressed') === 'true';
+          chip.setAttribute('aria-pressed', pressed ? 'false' : 'true');
+          if (group === 'ownership') {
+            if (pressed) filterState.ownership.delete(val);
+            else filterState.ownership.add(val);
+          } else if (group === 'zone') {
+            if (pressed) filterState.zone.delete(val);
+            else filterState.zone.add(val);
+          }
+          subscribers.forEach((fn) => fn());
+          return;
+        }
+
+        if (t.matches('.filter-section-reset[data-reset="building-mix"]')) {
+          resetBuildingMix();
+          subscribers.forEach((fn) => fn());
+        }
+      });
+
+      // Range slider drag events — dispatch by data-range-group on the wrapper
+      section.addEventListener('input', (e) => {
+        const t = e.target as HTMLInputElement;
+        if (!t) return;
+        const sliderEl = t.closest<HTMLElement>('.range-slider');
+        const groupId = sliderEl?.getAttribute('data-range-group') || '';
+        const cfg = SLIDER_CONFIGS[groupId];
+        if (!cfg) return;
+        const state = filterState[cfg.stateKey];
+        const isMin = t.classList.contains('range-slider-handle-min');
+        const isMax = t.classList.contains('range-slider-handle-max');
+        if (!isMin && !isMax) return;
+        let newVal = Number(t.value);
+        if (isMin) {
+          if (newVal > state.max) { newVal = state.max; t.value = String(newVal); }
+          state.min = newVal;
+        } else {
+          if (newVal < state.min) { newVal = state.min; t.value = String(newVal); }
+          state.max = newVal;
+        }
+        updateRangeSliderUI(groupId);
+        subscribers.forEach((fn) => fn());
+      });
+    }
+
     // -------------------- Marker index --------------------
     // Captured during pointToLayer for the commercial+vacant layer so the
     // subscribe callback can iterate without re-walking the GeoJSON.
     const markerIndex = new Map<
+      number,
+      { layer: L.CircleMarker; props: ParcelProps }
+    >();
+    // Non-commercial markers tracked individually so they can participate in
+    // matchesAll / lens visibility instead of being a wholesale layer toggle.
+    const nonCommercialMarkerIndex = new Map<
       number,
       { layer: L.CircleMarker; props: ParcelProps }
     >();
@@ -2549,33 +3025,34 @@ import Layout from '../layouts/Layout.astro';
           onEachFeature: bindPopupTo,
         }).addTo(map);
 
-        // Non-commercial dots: hidden below zoom 18, faded at/above
-        const nonCommercialLayer = L.geoJSON(parcelsGj, {
+        // Non-commercial dots: created standalone (not added to map at init);
+        // the subscribe path manages add/remove per marker based on
+        // shouldShowNonCommercialLayer() + matchesAll() / lens scope.
+        L.geoJSON(parcelsGj, {
           filter: (feature) =>
             feature.properties?.vacancy_state === 'non_commercial',
-          pointToLayer: (_feature, latlng) =>
-            L.circleMarker(latlng, {
+          pointToLayer: (feature, latlng) => {
+            const props = feature.properties as ParcelProps;
+            const marker = L.circleMarker(latlng, {
               radius: 7,
               fillColor: VACANCY_COLORS.non_commercial,
               color: '#ffffff',
               weight: 1,
               opacity: 0.4,
               fillOpacity: 0.35,
-            }),
+            });
+            nonCommercialMarkerIndex.set(props.id, { layer: marker, props });
+            return marker;
+          },
           onEachFeature: bindPopupTo,
         });
+        // No .addTo(map) — markers are managed individually below.
 
-        const NON_COMMERCIAL_MIN_ZOOM = 18;
-        const updateNonCommercialVisibility = () => {
-          const visible = map.getZoom() >= NON_COMMERCIAL_MIN_ZOOM;
-          if (visible && !map.hasLayer(nonCommercialLayer)) {
-            nonCommercialLayer.addTo(map);
-          } else if (!visible && map.hasLayer(nonCommercialLayer)) {
-            map.removeLayer(nonCommercialLayer);
-          }
-        };
-        map.on('zoomend', updateNonCommercialVisibility);
-        updateNonCommercialVisibility();
+        // Zoom change feeds back into subscribers so non-commercial visibility
+        // recomputes alongside everything else (chip counts, etc.).
+        map.on('zoomend', () => {
+          subscribers.forEach((fn) => fn());
+        });
 
         // -------------------- Wire Corridor section --------------------
         wireCorridorSegmented();
@@ -2584,10 +3061,12 @@ import Layout from '../layouts/Layout.astro';
         // -------------------- Wire Business mix section --------------------
         parcelsGjRef = parcelsGj;
         buildSegmentMap(parcelsGj);
-        recomputeCounts(parcelsGj, filterState.corridor);   // initial counts for 'all'
         buildBlockStats(parcelsGj);                          // ribbon data (Sub-phase A)
+        recomputeChipCounts();                                // initial counts (scope-aware)
         renderBusinessMixUI();
         wireBusinessMixSidebar();
+        renderBuildingMixUI();                                // Phase 5: Building mix chips + sliders
+        wireBuildingMixSidebar();
         renderRibbon();                                       // initial paint (Sub-phase B)
         wireRibbonControls();                                 // metric selector + block clicks
         wireCorridorReset();                                  // Reset link in Corridor section header
@@ -2595,6 +3074,8 @@ import Layout from '../layouts/Layout.astro';
 
         // -------------------- Subscribe path --------------------
         subscribe(() => {
+          recomputeChipCounts();
+          updateAllCountSpans();
           if (filterState.culturalLens) {
             renderLensMode();
           } else {
@@ -2605,8 +3086,12 @@ import Layout from '../layouts/Layout.astro';
         });
 
         // Initial chrome update (badge / reset visibility for default state).
+        updateAllCountSpans();
         updateSidebarChrome();
         updateCorridorCounter();
+        // Run subscribers once to perform the initial render (which also adds
+        // markers to the map based on current visibility logic).
+        subscribers.forEach((fn) => fn());
 
         // Expose for manual console testing.
         (window as unknown as Record<string, unknown>).__filterState = filterState;
