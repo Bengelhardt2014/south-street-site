@@ -59,6 +59,30 @@ import Layout from '../layouts/Layout.astro';
             >East Passyunk</button>
           </div>
           <p class="corridor-counter" id="corridor-counter"></p>
+
+          <div class="filter-group" data-filter-group="bids">
+            <label class="filter-toggle">
+              <input type="checkbox" id="overlay-bids" checked />
+              <span>Business Improvement Districts</span>
+            </label>
+            <p class="overlay-caption overlay-caption-bid">South Street Headhouse &amp; East Passyunk Ave</p>
+          </div>
+
+          <div class="filter-group" data-filter-group="rcos">
+            <label class="filter-toggle">
+              <input type="checkbox" id="overlay-rcos" />
+              <span>Registered Community Organizations</span>
+            </label>
+            <p class="overlay-caption overlay-caption-rco">Hover a boundary for its name</p>
+          </div>
+
+          <div class="filter-group" data-filter-group="zoning">
+            <label class="filter-toggle">
+              <input type="checkbox" id="overlay-zoning" />
+              <span>Base zoning</span>
+            </label>
+            <p class="overlay-caption overlay-caption-zoning">Light fill, colored by zoning family</p>
+          </div>
         </div>
       </section>
 
@@ -151,19 +175,6 @@ import Layout from '../layouts/Layout.astro';
             <h4 class="filter-group-label">Years since last sale</h4>
             <div class="range-slider" data-range-group="years-since-sale"></div>
           </div>
-        </div>
-      </section>
-
-      <section class="filter-section" data-section="map-overlays">
-        <header class="filter-section-header">
-          <h3>Map overlays</h3>
-          <div class="filter-section-meta">
-            <span class="filter-section-badge" hidden></span>
-            <button class="filter-section-reset" type="button" hidden>Reset</button>
-          </div>
-        </header>
-        <div class="filter-section-body">
-          <p class="filter-coming-soon">Coming soon</p>
         </div>
       </section>
 
@@ -275,15 +286,16 @@ import Layout from '../layouts/Layout.astro';
     }
     .ribbon-toggle {
       position: absolute;
-      top: -11px;
+      top: -19px;
       left: 50%;
       transform: translateX(-50%);
-      width: 44px;
-      height: 22px;
+      width: 64px;
+      height: 30px;
       background: #ffffff;
-      border: 1px solid #d6d3d1;
+      border: 1.5px solid #b8b4b0;
       border-bottom-color: #ffffff;  /* mask the part overlapping the ribbon top border */
-      border-radius: 6px 6px 0 0;
+      border-radius: 8px 8px 0 0;
+      box-shadow: 0 -2px 6px rgba(0, 0, 0, 0.12);
       display: flex;
       align-items: center;
       justify-content: center;
@@ -293,14 +305,19 @@ import Layout from '../layouts/Layout.astro';
       /* Must be > Leaflet's popup-pane (700) so the protruding tab isn't
          covered by tile-pane (200) or any other Leaflet pane. */
       z-index: 1000;
-      transition: opacity 0.1s ease;
+      transition: background 0.12s ease, border-color 0.12s ease;
     }
     .ribbon-toggle:hover {
-      opacity: 0.7;
+      background: #f5f3f0;
+      border-color: #1c1917;
+    }
+    .ribbon-toggle:focus-visible {
+      outline: 2px solid #534AB7;
+      outline-offset: 1px;
     }
     .ribbon-toggle-chevron {
-      width: 14px;
-      height: 14px;
+      width: 18px;
+      height: 18px;
       transition: transform 0.25s ease;
     }
     .block-ribbon-wrapper.is-collapsed .ribbon-toggle-chevron {
@@ -889,6 +906,115 @@ import Layout from '../layouts/Layout.astro';
     }
     .leaflet-tooltip.cultural-label:before {
       display: none;  /* hide tooltip arrow */
+    }
+
+    /* Map-overlay captions (indented past the checkbox). Hidden by default;
+       revealed only while their own toggle is checked, to keep the group compact. */
+    .overlay-caption {
+      display: none;
+      margin: 1px 0 0 22px;
+      font-size: 11px;
+      color: #78716c;
+      font-style: italic;
+    }
+    .filter-group:has(.filter-toggle input:checked) > .overlay-caption {
+      display: block;
+    }
+
+    /* Condense the three overlay toggles into one tight group. The first row
+       (BID) keeps a little separation from the corridor counter above it. */
+    .filter-group[data-filter-group="bids"] {
+      margin-top: 12px;
+    }
+    .filter-group[data-filter-group="rcos"],
+    .filter-group[data-filter-group="zoning"] {
+      margin-top: 3px;
+    }
+
+    /* BID permanent labels (teal family) */
+    .leaflet-tooltip.bid-label {
+      background: rgba(255, 255, 255, 0.9);
+      border: 1px solid rgba(14, 116, 144, 0.45);
+      border-radius: 3px;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.08);
+      padding: 1px 6px;
+      font-size: 11px;
+      font-weight: 600;
+      color: #0e7490;
+      white-space: nowrap;
+    }
+    .leaflet-tooltip.bid-label:before { display: none; }
+    /* BID outlines stay visible always, but their permanent labels hide while a
+       single corridor is selected (toggled on the map container by the corridor
+       filter). They reappear under "All Corridors". */
+    .bid-labels-hidden .leaflet-tooltip.bid-label { display: none; }
+
+    /* RCO hover labels. Default amber (East Passyunk); the .rco-label-south
+       modifier recolors to the South Street purple so the label matches its
+       boundary outline. */
+    .leaflet-tooltip.rco-label {
+      background: rgba(255, 255, 255, 0.92);
+      border: 1px solid rgba(180, 83, 9, 0.5);
+      border-radius: 3px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.12);
+      padding: 1px 6px;
+      font-size: 11px;
+      font-weight: 600;
+      color: #b45309;
+      white-space: nowrap;
+    }
+    .leaflet-tooltip.rco-label.rco-label-south {
+      border-color: rgba(147, 51, 234, 0.5);
+      color: #9333EA;
+    }
+    .leaflet-tooltip.rco-label:before { display: none; }
+    /* Past the block-level zoom threshold the RCO hover label is suppressed so it
+       doesn't interfere while someone is examining a single block. */
+    .rco-hover-off .leaflet-tooltip.rco-label { display: none; }
+
+    /* Base-zoning legend (Leaflet control; only present while the layer is on) */
+    .zoning-legend {
+      background: rgba(255, 255, 255, 0.94);
+      border: 1px solid #d6d3d1;
+      border-radius: 5px;
+      box-shadow: 0 1px 4px rgba(0, 0, 0, 0.14);
+      padding: 8px 10px;
+      font-size: 11px;
+      line-height: 1.3;
+      color: #1c1917;
+      max-width: 190px;
+    }
+    .zoning-legend-title {
+      font-weight: 700;
+      font-size: 10.5px;
+      letter-spacing: 0.03em;
+      text-transform: uppercase;
+      color: #57534e;
+      margin: 0 0 5px 0;
+    }
+    .zoning-legend-row {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      margin: 2px 0;
+    }
+    .zoning-legend-swatch {
+      width: 13px;
+      height: 13px;
+      border-radius: 2px;
+      border: 1px solid rgba(0, 0, 0, 0.18);
+      flex-shrink: 0;
+    }
+    .zoning-legend-name { font-weight: 600; }
+    .zoning-legend-codes { color: #78716c; }
+
+    /* RCO polygons must catch hover across their fill (even at 0 fill opacity)
+       so the name tooltip fires anywhere inside the ring — not just on the
+       1.5px stroke. They sit in the low-z 'boundaries' pane, below the parcel
+       dots, so dots still win the click where the two overlap. */
+    path.rco-shape {
+      pointer-events: auto;
+      cursor: help;
     }
 
     /* Popup styling */
@@ -2251,40 +2377,35 @@ import Layout from '../layouts/Layout.astro';
       });
     }
 
-    function wireRibbonToggle(): void {
+    // Block-ribbon collapse state lives at module scope so both the manual
+    // toggle button and the corridor filter can drive it.
+    let ribbonCollapsed = false;
+    function applyRibbonState(collapsed: boolean): void {
       const wrapper = document.getElementById('block-ribbon-wrapper');
       const btn = document.getElementById('ribbon-toggle');
       if (!wrapper || !btn) return;
+      ribbonCollapsed = collapsed;
+      wrapper.classList.toggle('is-collapsed', collapsed);
+      btn.setAttribute('aria-expanded', collapsed ? 'false' : 'true');
+      btn.setAttribute('aria-label', collapsed ? 'Expand ribbon' : 'Collapse ribbon');
+      // Let the CSS height transition finish, then ask Leaflet to recompute its
+      // container size so tiles render at the new map height.
+      window.setTimeout(() => {
+        if (mapRef) mapRef.invalidateSize();
+      }, 280);
+    }
 
-      const STORAGE_KEY = 'block-ribbon-collapsed';
-      const applyState = (collapsed: boolean): void => {
-        wrapper.classList.toggle('is-collapsed', collapsed);
-        btn.setAttribute('aria-expanded', collapsed ? 'false' : 'true');
-        btn.setAttribute('aria-label', collapsed ? 'Expand ribbon' : 'Collapse ribbon');
-      };
+    // Corridor filter drives the ribbon: All Corridors collapses it; selecting a
+    // single corridor auto-expands it. Manual toggling works between changes.
+    function syncRibbonToCorridor(): void {
+      applyRibbonState(filterState.corridor === 'all');
+    }
 
-      // Restore persisted state (default expanded on first visit).
-      let collapsed = false;
-      try {
-        collapsed = localStorage.getItem(STORAGE_KEY) === 'true';
-      } catch {
-        // localStorage may be unavailable (private mode); silent fall-through.
-      }
-      applyState(collapsed);
-
+    function wireRibbonToggle(): void {
+      const btn = document.getElementById('ribbon-toggle');
+      if (!btn) return;
       btn.addEventListener('click', () => {
-        collapsed = !collapsed;
-        try {
-          localStorage.setItem(STORAGE_KEY, String(collapsed));
-        } catch {
-          /* ignore */
-        }
-        applyState(collapsed);
-        // Let the 250ms CSS transition finish, then ask Leaflet to recompute
-        // its container size so tiles render at the new map height.
-        window.setTimeout(() => {
-          if (mapRef) mapRef.invalidateSize();
-        }, 280);
+        applyRibbonState(!ribbonCollapsed);
       });
     }
 
@@ -2649,6 +2770,7 @@ import Layout from '../layouts/Layout.astro';
         updateCorridorLineOpacities();
         updateRibbonSelection();
         updateRibbonCorridorDimming();
+        syncRibbonToCorridor();   // All → collapse, single corridor → expand
         subscribers.forEach((fn) => fn());
       });
     }
@@ -2821,6 +2943,11 @@ import Layout from '../layouts/Layout.astro';
     const corridorBounds: Record<string, L.LatLngBounds> = {};
     let combinedCorridorBounds: L.LatLngBounds | null = null;
     let streetsLayerRef: L.GeoJSON | null = null;
+    // Boundary overlays (BID / RCO) — created lazily, default OFF, live in a
+    // dedicated low-z pane below the parcel dots.
+    let bidLayerRef: L.GeoJSON | null = null;
+    let rcoLayerRef: L.GeoJSON | null = null;
+    let zoningLayerRef: L.GeoJSON | null = null;
 
     function line(label: string, value: string | number): string {
       return `<p><span class="popup-label">${label}:</span> ${value}</p>`;
@@ -2926,6 +3053,221 @@ import Layout from '../layouts/Layout.astro';
       return html;
     }
 
+    // Build the BID + RCO boundary layers (default OFF) and wire their sidebar
+    // checkboxes. Layers live in the 'boundaries' pane so they sit below dots.
+    async function initBoundaryOverlays(map: L.Map): Promise<void> {
+      // At/above this zoom a single block roughly fills the viewport, so RCO
+      // hover labels are suppressed to avoid interfering with block inspection.
+      const RCO_HOVER_DISABLE_ZOOM = 18;
+      const rcoHoverDisabled = () => map.getZoom() >= RCO_HOVER_DISABLE_ZOOM;
+
+      // ---- BID layer: 2px teal outline, very light fill, permanent labels ----
+      try {
+        const resp = await fetch('/data/bids.geojson');
+        const gj = await resp.json();
+        bidLayerRef = L.geoJSON(gj, {
+          pane: 'boundaries',
+          interactive: false, // labels carry the meaning; never grab clicks
+          style: () => ({
+            color: '#0e7490',
+            weight: 2,
+            opacity: 0.9,
+            fill: true,
+            fillColor: '#0e7490',
+            fillOpacity: 0.08,
+          }),
+          onEachFeature: (feature, layer) => {
+            const name = (feature.properties as { name?: string })?.name;
+            if (name) {
+              layer.bindTooltip(name, {
+                permanent: true,
+                direction: 'center',
+                className: 'bid-label',
+              });
+            }
+          },
+        });
+      } catch (err) {
+        console.error('Failed to load bids.geojson', err);
+      }
+
+      // ---- RCO layer: thin dashed amber outline, name on hover ----
+      try {
+        const resp = await fetch('/data/rcos.geojson');
+        const gj = await resp.json();
+        // South Street RCOs get a distinct magenta-purple (#9333EA) — kept clear
+        // of the muted #7B3F99 South Street centerline so the two don't blend.
+        // East Passyunk RCOs keep the amber.
+        const SOUTH_ST_RCOS = new Set([
+          'Queen Village Neighbors Association',
+          'Society Hill Civic Association',
+          'Bella Vista Neighbors Association',
+          'Washington Square West Civic Association',
+          'South Street/Headhouse District',
+        ]);
+        const rcoColor = (name?: string) =>
+          name && SOUTH_ST_RCOS.has(name) ? '#9333EA' : '#b45309';
+        rcoLayerRef = L.geoJSON(gj, {
+          pane: 'boundaries',
+          style: (feature) => {
+            const c = rcoColor((feature?.properties as { name?: string })?.name);
+            return {
+              color: c,
+              weight: 1.5,
+              opacity: 0.85,
+              dashArray: '4 3',
+              fill: true,
+              fillColor: c,
+              fillOpacity: 0,
+              className: 'rco-shape', // CSS gives this pointer-events:auto for hover
+            };
+          },
+          onEachFeature: (feature, layer) => {
+            const name = (feature.properties as { name?: string })?.name;
+            if (name) {
+              // Label text matches the boundary color: purple for South Street
+              // RCOs, amber (default) for East Passyunk.
+              const isSouth = SOUTH_ST_RCOS.has(name);
+              layer.bindTooltip(name, {
+                sticky: true,
+                direction: 'top',
+                className: isSouth ? 'rco-label rco-label-south' : 'rco-label',
+              });
+            }
+            // Light fill flash on hover so the hovered ring reads at a glance —
+            // skipped past the block-zoom threshold (hover is disabled there).
+            layer.on('mouseover', () => {
+              if (rcoHoverDisabled()) return;
+              (layer as L.Path).setStyle({ fillOpacity: 0.1 });
+            });
+            layer.on('mouseout', () =>
+              (layer as L.Path).setStyle({ fillOpacity: 0 }),
+            );
+          },
+        });
+      } catch (err) {
+        console.error('Failed to load rcos.geojson', err);
+      }
+
+      // ---- Base zoning: light fill colored by zoning family ----
+      // Per-code colors approximating a standard Philadelphia zoning map.
+      const ZONING_COLORS: Record<string, string> = {
+        SPPOA: '#6BAF6B',                                   // green — recreation / open space
+        CMX1: '#FCAE91', CMX2: '#FCAE91', 'CMX2.5': '#FCAE91', // salmon — low commercial mixed-use
+        CMX3: '#EF3B2C', CMX4: '#EF3B2C',                   // red — mid commercial mixed-use
+        CMX5: '#99000D',                                    // dark red — high commercial mixed-use
+        RSA3: '#F5F0A9', RSA5: '#F5F0A9',                   // pale yellow — single-family residential
+        RM1: '#FDD0A2', RM2: '#FDD0A2', RM4: '#FDD0A2',     // light orange — multi-family residential
+        RMX2: '#FD8D3C', RMX3: '#FD8D3C',                   // orange — residential mixed-use
+        CA1: '#9E9AC8', CA2: '#9E9AC8',                     // muted purple — auto-oriented commercial
+        I2: '#999999', ICMX: '#999999', IP: '#999999', IRMX: '#999999', // gray — industrial
+      };
+      // Legend groupings (family label + the codes that map to each color).
+      const ZONING_FAMILIES: { name: string; codes: string; color: string }[] = [
+        { name: 'Open space', codes: 'SPPOA', color: '#6BAF6B' },
+        { name: 'Commercial mixed-use (low)', codes: 'CMX-1/2/2.5', color: '#FCAE91' },
+        { name: 'Commercial mixed-use (mid)', codes: 'CMX-3/4', color: '#EF3B2C' },
+        { name: 'Commercial mixed-use (high)', codes: 'CMX-5', color: '#99000D' },
+        { name: 'Single-family residential', codes: 'RSA-3/5', color: '#F5F0A9' },
+        { name: 'Multi-family residential', codes: 'RM-1/2/4', color: '#FDD0A2' },
+        { name: 'Residential mixed-use', codes: 'RMX-2/3', color: '#FD8D3C' },
+        { name: 'Auto-oriented commercial', codes: 'CA-1/2', color: '#9E9AC8' },
+        { name: 'Industrial', codes: 'I-2 / ICMX / IP / IRMX', color: '#999999' },
+      ];
+      try {
+        const resp = await fetch('/data/zoning_base.geojson');
+        const gj = await resp.json();
+        zoningLayerRef = L.geoJSON(gj, {
+          pane: 'zoning',
+          interactive: false, // pure backdrop — never intercept clicks
+          style: (feature) => {
+            const code = (feature?.properties as { code?: string })?.code ?? '';
+            return {
+              stroke: false,
+              fill: true,
+              fillColor: ZONING_COLORS[code] || '#cccccc',
+              fillOpacity: 0.28,
+            };
+          },
+        });
+      } catch (err) {
+        console.error('Failed to load zoning_base.geojson', err);
+      }
+
+      // Legend control — only on the map while base zoning is on.
+      const zoningLegend = new L.Control({ position: 'bottomleft' });
+      zoningLegend.onAdd = () => {
+        const div = L.DomUtil.create('div', 'zoning-legend');
+        div.innerHTML =
+          '<p class="zoning-legend-title">Base zoning</p>' +
+          ZONING_FAMILIES.map(
+            (f) =>
+              `<div class="zoning-legend-row">` +
+              `<span class="zoning-legend-swatch" style="background:${f.color}"></span>` +
+              `<span><span class="zoning-legend-name">${f.name}</span> ` +
+              `<span class="zoning-legend-codes">${f.codes}</span></span>` +
+              `</div>`,
+          ).join('');
+        return div;
+      };
+
+      // BID permanent labels hide while a single corridor is selected; they show
+      // only under "All Corridors". The outlines themselves are never affected.
+      const updateBidLabelVisibility = () => {
+        map.getContainer().classList.toggle(
+          'bid-labels-hidden',
+          filterState.corridor !== 'all',
+        );
+      };
+      // Re-evaluate on every filter change (corridor switches fire subscribers).
+      subscribe(updateBidLabelVisibility);
+
+      // Suppress RCO hover labels once zoomed to block level (see threshold).
+      const updateRcoHoverForZoom = () => {
+        map.getContainer().classList.toggle('rco-hover-off', rcoHoverDisabled());
+      };
+      map.on('zoomend', updateRcoHoverForZoom);
+      updateRcoHoverForZoom();
+
+      // ---- Wire sidebar checkboxes ----
+      // BID defaults ON; RCO defaults OFF (toggle adds it on demand).
+      const bidBox = document.getElementById('overlay-bids') as HTMLInputElement | null;
+      const rcoBox = document.getElementById('overlay-rcos') as HTMLInputElement | null;
+      if (bidBox && bidLayerRef) {
+        bidBox.checked = true;
+        bidLayerRef.addTo(map);
+        bidBox.addEventListener('change', () => {
+          if (!bidLayerRef) return;
+          if (bidBox.checked) bidLayerRef.addTo(map);
+          else map.removeLayer(bidLayerRef);
+        });
+      }
+      if (rcoBox && rcoLayerRef) {
+        rcoBox.checked = false; // default OFF — not added to the map on load
+        rcoBox.addEventListener('change', () => {
+          if (!rcoLayerRef) return;
+          if (rcoBox.checked) rcoLayerRef.addTo(map);
+          else map.removeLayer(rcoLayerRef);
+        });
+      }
+      const zoningBox = document.getElementById('overlay-zoning') as HTMLInputElement | null;
+      if (zoningBox && zoningLayerRef) {
+        zoningBox.checked = false; // default OFF
+        zoningBox.addEventListener('change', () => {
+          if (!zoningLayerRef) return;
+          if (zoningBox.checked) {
+            zoningLayerRef.addTo(map);
+            zoningLegend.addTo(map);   // legend appears only with the layer
+          } else {
+            map.removeLayer(zoningLayerRef);
+            zoningLegend.remove();
+          }
+        });
+      }
+      // Apply initial label visibility for the default corridor state.
+      updateBidLabelVisibility();
+    }
+
     async function initMap() {
       const map = L.map('map', {
         center: [39.938, -75.155],
@@ -2944,6 +3286,21 @@ import Layout from '../layouts/Layout.astro';
         subdomains: 'abcd',
         maxZoom: 19,
       }).addTo(map);
+
+      // Dedicated pane for BID/RCO boundary overlays. z-index 350 sits above the
+      // tile pane (200) but below the default overlayPane (400) where the street
+      // lines and parcel circleMarkers render — so boundaries always draw beneath
+      // the dots and the dots stay on top and clickable.
+      map.createPane('boundaries');
+      const boundaryPane = map.getPane('boundaries');
+      if (boundaryPane) boundaryPane.style.zIndex = '350';
+
+      // Base-zoning fill sits in its own pane at z-index 340 — above the tiles
+      // (200) but below the boundary outlines (350) and the parcel dots /
+      // streets in overlayPane (400), so dots and BID/RCO outlines stay on top.
+      map.createPane('zoning');
+      const zoningPane = map.getPane('zoning');
+      if (zoningPane) zoningPane.style.zIndex = '340';
 
       // Streets layer — render below parcels
       try {
@@ -3058,6 +3415,9 @@ import Layout from '../layouts/Layout.astro';
         wireCorridorSegmented();
         wireStickyCorridorObserver();
 
+        // -------------------- Wire Map overlays section ----------------
+        await initBoundaryOverlays(map);
+
         // -------------------- Wire Business mix section --------------------
         parcelsGjRef = parcelsGj;
         buildSegmentMap(parcelsGj);
@@ -3071,6 +3431,7 @@ import Layout from '../layouts/Layout.astro';
         wireRibbonControls();                                 // metric selector + block clicks
         wireCorridorReset();                                  // Reset link in Corridor section header
         updateRibbonCorridorDimming();                        // initial dimming state
+        syncRibbonToCorridor();                               // initial collapse (default corridor = All)
 
         // -------------------- Subscribe path --------------------
         subscribe(() => {
