@@ -14,7 +14,7 @@ import Layout from '../layouts/Layout.astro';
     <aside class="map-sidebar border-b border-stone-200 md:w-[360px] md:shrink-0 md:border-b-0 md:overflow-y-auto">
       <div class="sidebar-intro">
         <h2 class="text-[1.1rem] font-bold text-stone-900">Saving South Street: Parcel Map</h2>
-        <p class="mt-2 text-[0.9rem] leading-relaxed text-stone-600">
+        <p class="mt-1 text-[0.9rem] leading-snug text-stone-600">
           519 parcels along South Street and East Passyunk Avenue, color-coded by commercial vacancy state. Click any dot for details.
         </p>
       </div>
@@ -74,6 +74,14 @@ import Layout from '../layouts/Layout.astro';
               <span>Registered Community Organizations</span>
             </label>
             <p class="overlay-caption overlay-caption-rco">Hover a boundary for its name</p>
+          </div>
+
+          <div class="filter-group" data-filter-group="density">
+            <label class="filter-toggle">
+              <input type="checkbox" id="overlay-density" />
+              <span>Density score</span>
+            </label>
+            <p class="overlay-caption overlay-caption-density">South Street corridor only. Three-quarter-mile (15-minute) walk catchment and resident density against retail critical mass.</p>
           </div>
 
           <div class="filter-group" data-filter-group="zoning">
@@ -178,16 +186,30 @@ import Layout from '../layouts/Layout.astro';
         </div>
       </section>
 
-      <section class="filter-section" data-section="demographic-background">
+      <section class="filter-section" data-section="neighborhoods">
         <header class="filter-section-header">
-          <h3>Demographic background</h3>
+          <h3>Neighborhoods</h3>
           <div class="filter-section-meta">
             <span class="filter-section-badge" hidden></span>
             <button class="filter-section-reset" type="button" hidden>Reset</button>
           </div>
         </header>
         <div class="filter-section-body">
-          <p class="filter-coming-soon">Coming soon</p>
+          <div class="nbhd-trigger-list" id="nbhd-trigger-list">
+            <div class="nbhd-trigger-group">
+              <h4 class="nbhd-trigger-heading">South Street</h4>
+              <button type="button" class="nbhd-trigger" data-nbhd="Society Hill" data-shape="Society Hill Civic Association"><span class="nbhd-dot nbhd-dot-south"></span>Society Hill</button>
+              <button type="button" class="nbhd-trigger" data-nbhd="Washington Square West" data-tract="11.02"><span class="nbhd-dot nbhd-dot-south"></span>Washington Square West</button>
+              <button type="button" class="nbhd-trigger" data-nbhd="Queen Village" data-shape="Queen Village Neighbors Association"><span class="nbhd-dot nbhd-dot-south"></span>Queen Village</button>
+              <button type="button" class="nbhd-trigger" data-nbhd="Bella Vista" data-shape="Bella Vista Neighbors Association"><span class="nbhd-dot nbhd-dot-south"></span>Bella Vista</button>
+            </div>
+            <div class="nbhd-trigger-group">
+              <h4 class="nbhd-trigger-heading">East Passyunk</h4>
+              <button type="button" class="nbhd-trigger" data-nbhd="Passyunk Square" data-shape="Passyunk Square Civic Association"><span class="nbhd-dot nbhd-dot-east"></span>Passyunk Square</button>
+              <button type="button" class="nbhd-trigger" data-nbhd="Passyunk Square" data-shape="East Passyunk Crossing Civic Association (EPX)"><span class="nbhd-dot nbhd-dot-east"></span>East Passyunk Crossing</button>
+              <button type="button" class="nbhd-trigger" data-nbhd="Pennsport"><span class="nbhd-dot nbhd-dot-east"></span>Pennsport</button>
+            </div>
+          </div>
         </div>
       </section>
     </aside>
@@ -524,7 +546,7 @@ import Layout from '../layouts/Layout.astro';
 
     /* Sidebar — intro block */
     .sidebar-intro {
-      padding: 24px;
+      padding: 16px 24px 12px 24px;
     }
 
     /* Sidebar — filter sections */
@@ -923,12 +945,12 @@ import Layout from '../layouts/Layout.astro';
 
     /* Condense the three overlay toggles into one tight group. The first row
        (BID) keeps a little separation from the corridor counter above it. */
-    .filter-group[data-filter-group="bids"] {
-      margin-top: 12px;
-    }
+    /* The four overlay toggles read as one tight, evenly-spaced group. */
+    .filter-group[data-filter-group="bids"],
     .filter-group[data-filter-group="rcos"],
-    .filter-group[data-filter-group="zoning"] {
-      margin-top: 3px;
+    .filter-group[data-filter-group="zoning"],
+    .filter-group[data-filter-group="density"] {
+      margin-top: 6px;
     }
 
     /* BID permanent labels (teal family) */
@@ -1007,6 +1029,270 @@ import Layout from '../layouts/Layout.astro';
     }
     .zoning-legend-name { font-weight: 600; }
     .zoning-legend-codes { color: #78716c; }
+
+    /* Catchment ring label (¾-mile walk) */
+    .ring-label {
+      font-size: 10.5px;
+      font-weight: 600;
+      color: #6d28d9;
+      background: rgba(255, 255, 255, 0.85);
+      border: 1px solid rgba(109, 40, 217, 0.4);
+      border-radius: 3px;
+      padding: 1px 5px;
+      white-space: nowrap;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
+    }
+
+    /* Critical-mass / density panel (Leaflet control, top-left) */
+    .density-panel {
+      width: 234px;
+      background: rgba(255, 255, 255, 0.96);
+      border: 1px solid #d6d3d1;
+      border-radius: 8px;
+      box-shadow: 0 3px 14px rgba(0, 0, 0, 0.18);
+      padding: 12px 14px;
+      font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+      color: #1c1917;
+    }
+    .density-panel-title {
+      margin: 0 0 7px 0;
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: -0.01em;
+    }
+    .density-panel-row {
+      margin: 2px 0;
+      font-size: 11.5px;
+      color: #57534e;
+    }
+    .density-panel-row b { color: #1c1917; font-weight: 700; }
+    .density-ratio { margin: 9px 0 4px 0; }
+    .density-ratio-head { font-size: 11.5px; color: #57534e; }
+    .density-ratio-head b { font-size: 14px; color: #0f766e; font-weight: 700; }
+    .density-bar {
+      position: relative;
+      height: 9px;
+      margin: 5px 0 4px 0;
+      background: #ece9e3;
+      border-radius: 5px;
+      overflow: hidden;
+    }
+    .density-bar-fill {
+      height: 100%;
+      width: 62%;
+      background: #0f766e;
+      border-radius: 5px;
+      transition: width 0.12s ease, background 0.12s ease;
+    }
+    .density-bar-fill.is-reached { background: #15803d; }
+    .density-ratio-label {
+      font-size: 10.5px;
+      font-weight: 600;
+      color: #a4524a;
+    }
+    .density-ratio-label.is-reached { color: #15803d; }
+    .density-slider-label {
+      display: block;
+      margin: 10px 0 3px 0;
+      font-size: 11px;
+      color: #57534e;
+    }
+    .density-slider-label b { color: #1c1917; }
+    #dp-slider { width: 100%; margin: 0; accent-color: #0f766e; }
+    .density-hint {
+      margin: 5px 0 0 0;
+      font-size: 10px;
+      font-style: italic;
+      color: #78716c;
+    }
+    .density-nbhd {
+      margin: 8px 0 0 0;
+      padding: 5px 7px;
+      background: #eef6f5;
+      border-left: 3px solid #0f766e;
+      border-radius: 3px;
+      font-size: 10.5px;
+      color: #1c1917;
+    }
+    .density-est { color: #a8a29e; font-weight: 400; }
+    .density-note {
+      margin: 9px 0 0 0;
+      font-size: 9px;
+      font-style: italic;
+      color: #a8a29e;
+      line-height: 1.3;
+    }
+    .density-legend { margin-top: 10px; }
+    .density-legend-cap {
+      font-size: 9.5px;
+      color: #78716c;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+    }
+    .density-legend-bar {
+      height: 8px;
+      margin: 4px 0 2px 0;
+      border-radius: 4px;
+      background: linear-gradient(to right, #d7f0ee, #0d4d4a);
+    }
+    .density-legend-ends {
+      display: flex;
+      justify-content: space-between;
+      font-size: 9px;
+      color: #78716c;
+    }
+
+    /* Sidebar neighborhood trigger list (under the RCO toggle) */
+    .nbhd-trigger-list {
+      margin-top: 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .nbhd-trigger-heading {
+      margin: 0 0 3px 0;
+      font-size: 10.5px;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      color: #78716c;
+    }
+    .nbhd-trigger {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      width: 100%;
+      padding: 4px 6px;
+      border: none;
+      background: transparent;
+      border-radius: 4px;
+      font-size: 12.5px;
+      color: #1c1917;
+      text-align: left;
+      cursor: pointer;
+      transition: background 0.1s ease;
+    }
+    .nbhd-trigger:hover { background: #f0ece3; }
+    .nbhd-trigger.is-active {
+      background: #ece7f8;
+      font-weight: 600;
+    }
+    .nbhd-dot {
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+    .nbhd-dot-south { background: #9333EA; }
+    .nbhd-dot-east { background: #b45309; }
+
+    /* Disabled overlay toggle (e.g. Density score while East Passyunk is selected) */
+    .filter-group.is-disabled {
+      opacity: 0.45;
+      pointer-events: none;
+    }
+
+    /* Neighborhood demographic card (Leaflet control, docked top-right) */
+    .nbhd-card {
+      width: 250px;
+      background: #ffffff;
+      border: 1px solid #d6d3d1;
+      border-radius: 8px;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.18);
+      padding: 14px 16px 12px 16px;
+      font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+      color: #1c1917;
+    }
+    .nbhd-card-close {
+      position: absolute;
+      top: 8px;
+      right: 9px;
+      width: 22px;
+      height: 22px;
+      border: none;
+      background: transparent;
+      font-size: 20px;
+      line-height: 1;
+      color: #a8a29e;
+      cursor: pointer;
+      border-radius: 4px;
+    }
+    .nbhd-card-close:hover { background: #f5f5f4; color: #1c1917; }
+    .nbhd-card-title {
+      margin: 0 24px 0 0;
+      font-size: 16px;
+      font-weight: 700;
+      letter-spacing: -0.01em;
+    }
+    .nbhd-card-subtitle {
+      margin: 1px 0 10px 0;
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: #9333EA;
+    }
+    .nbhd-card-subtitle.is-east { color: #b45309; }
+    .nbhd-stats { margin: 0; }
+    .nbhd-stat {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 8px;
+      padding: 4px 0;
+      border-bottom: 1px solid #f0ece3;
+    }
+    .nbhd-stat dt {
+      font-size: 11.5px;
+      color: #57534e;
+    }
+    .nbhd-stat dd {
+      margin: 0;
+      font-size: 13.5px;
+      font-weight: 700;
+      text-align: right;
+      white-space: nowrap;
+    }
+    .nbhd-delta {
+      display: block;
+      font-size: 10.5px;
+      font-weight: 600;
+      color: #15803d;
+    }
+    .nbhd-delta.is-negative { color: #b91c1c; }
+    /* Demographic-shift deltas (age, renter %, age 18-34) are neutral — no
+       good/bad value judgment implied by their direction. */
+    .nbhd-delta.is-neutral { color: #78716c; }
+    .nbhd-card-vacancy {
+      margin: 9px 0 0 0;
+      font-size: 11.5px;
+      color: #57534e;
+    }
+    /* Current corridor vacancy — muted red, a counterpoint to the green wealth
+       gains above. The 1995 baseline is smaller and muted. */
+    .nbhd-vacancy-now {
+      font-weight: 600;
+      color: #a4524a;
+    }
+    .nbhd-vacancy-base {
+      font-size: 10px;
+      color: #a8a29e;
+    }
+    .nbhd-card-note {
+      margin: 9px 0 0 0;
+      padding: 6px 8px;
+      background: #f5efe4;
+      border-left: 3px solid #c9bfa6;
+      border-radius: 3px;
+      font-size: 10.5px;
+      color: #57534e;
+    }
+    .nbhd-card-footnote {
+      margin: 9px 0 0 0;
+      font-size: 9.5px;
+      font-style: italic;
+      color: #a8a29e;
+    }
 
     /* RCO polygons must catch hover across their fill (even at 0 fill opacity)
        so the name tooltip fires anywhere inside the ring — not just on the
@@ -1105,6 +1391,13 @@ import Layout from '../layouts/Layout.astro';
 
   <script>
     import L from 'leaflet';
+
+    // --- Corridor vacancy figures for the neighborhood card ---
+    // Hard-coded from the timeline series (NOT recomputed from the parcels) so
+    // they compare cleanly against the 1995 trough. Edit these to adjust the
+    // numbers shown on the cards.
+    const SOUTH_ST_VACANCY_1995 = 13.8;        // % vacant — 1995 trough
+    const SOUTH_ST_VACANCY_CURRENT = 27.8;     // % vacant — 2026 corridor-wide observed
 
     const VACANCY_COLORS: Record<string, string> = {
       active: '#4a7c2e',
@@ -2948,6 +3241,8 @@ import Layout from '../layouts/Layout.astro';
     let bidLayerRef: L.GeoJSON | null = null;
     let rcoLayerRef: L.GeoJSON | null = null;
     let zoningLayerRef: L.GeoJSON | null = null;
+    let densityLayerRef: L.GeoJSON | null = null;
+    let ringLayerRef: L.GeoJSON | null = null;
 
     function line(label: string, value: string | number): string {
       return `<p><span class="popup-label">${label}:</span> ${value}</p>`;
@@ -3061,6 +3356,298 @@ import Layout from '../layouts/Layout.astro';
       const RCO_HOVER_DISABLE_ZOOM = 18;
       const rcoHoverDisabled = () => map.getZoom() >= RCO_HOVER_DISABLE_ZOOM;
 
+      // ================= Neighborhood demographic card =================
+      // Maps between demographic neighborhood names and RCO shape names. Only
+      // the five with both data AND a shape are clickable on the map; East
+      // Passyunk Crossing has a shape but no data (boundary only), and Pennsport
+      // has data but no shape (sidebar trigger only).
+      type DecadeRec = Record<string, number | null>;
+      type NbhdRec = {
+        corridor: string;
+        decades: Record<string, DecadeRec>;
+        note?: string;
+        partial?: boolean;
+      };
+      // RCO shape name -> demographic card key. Five shapes carry data; the EPX
+      // shape shares the Passyunk Square (East Passyunk catchment) card. Shapes
+      // not listed here (South Street/Headhouse District) stay boundary-only.
+      const RCO_TO_NBHD: Record<string, string> = {
+        'Society Hill Civic Association': 'Society Hill',
+        'Washington Square West Civic Association': 'Washington Square West',
+        'Queen Village Neighbors Association': 'Queen Village',
+        'Bella Vista Neighbors Association': 'Bella Vista',
+        'Passyunk Square Civic Association': 'Passyunk Square',
+        'East Passyunk Crossing Civic Association (EPX)': 'Passyunk Square',
+      };
+      // Card key -> every RCO shape it should highlight. Passyunk Square covers
+      // both the Passyunk Square and EPX shapes. WSW highlights a tract instead
+      // (handled separately), so it lists no RCO shapes.
+      const NBHD_TO_SHAPES: Record<string, string[]> = {
+        'Society Hill': ['Society Hill Civic Association'],
+        'Washington Square West': [],
+        'Queen Village': ['Queen Village Neighbors Association'],
+        'Bella Vista': ['Bella Vista Neighbors Association'],
+        'Passyunk Square': [
+          'Passyunk Square Civic Association',
+          'East Passyunk Crossing Civic Association (EPX)',
+        ],
+        'Pennsport': [],
+      };
+      const TRACT_CARDS = new Set(['Washington Square West']);
+
+      let demographics: Record<string, NbhdRec> = {};
+      try {
+        const resp = await fetch('/data/neighborhood_demographics.json');
+        demographics = await resp.json();
+      } catch (err) {
+        console.error('Failed to load neighborhood_demographics.json', err);
+      }
+
+      // Highlight state: a set of RCO sublayers (one or two) and/or the WSW tract
+      // layer. activeShapeNames lets us restore the RCO highlight if the layer is
+      // toggled off and back on while the card is open.
+      let highlightedRcoLayers: L.Path[] = [];
+      let wswTractLayer: L.GeoJSON | null = null;
+      let activeShapeNames: string[] = [];
+      let activeNbhd: string | null = null;
+      // Map view captured before flying to a neighborhood, restored on card close.
+      let preCardView: { center: L.LatLng; zoom: number } | null = null;
+
+      const INC = 'Median Household Income (2020$)';
+      const HOME = 'Median Home Value (2020$)';
+
+      // --- formatting helpers ---
+      const fmtInt = (v: number | null) =>
+        v == null ? '—' : Math.round(v).toLocaleString('en-US');
+      const fmtMoney = (v: number | null) =>
+        v == null ? '—' : '$' + Math.round(v).toLocaleString('en-US');
+      const fmtPct = (frac: number | null) =>
+        frac == null ? '—' : Math.round(frac * 100) + '%';
+      const fmtAge = (v: number | null) =>
+        v == null ? '—' : Number.isInteger(v) ? String(v) : v.toFixed(1);
+      const pctChange = (oldV: number | null, newV: number | null): string => {
+        if (oldV == null || newV == null || oldV === 0) return '';
+        const p = Math.round(((newV - oldV) / oldV) * 100);
+        return (p >= 0 ? '+' : '') + p + '% since 1970';
+      };
+      const yearsChange = (oldV: number | null, newV: number | null): string => {
+        if (oldV == null || newV == null) return '';
+        const n = Math.round(newV - oldV);
+        return (n >= 0 ? '+' : '') + n + ' yrs since 1970';
+      };
+      const ppChange = (oldV: number | null, newV: number | null): string => {
+        if (oldV == null || newV == null) return '';
+        const n = Math.round((newV - oldV) * 100);
+        return (n >= 0 ? '+' : '') + n + ' pts since 1970';
+      };
+      // mode 'neutral' → always grey (median age in years). mode 'signed' →
+      // green up / red down, with an exact-zero change shown grey (neither).
+      const deltaSpan = (s: string, mode: 'signed' | 'neutral'): string => {
+        if (!s) return '';
+        let cls = 'nbhd-delta';
+        if (mode === 'neutral') {
+          cls += ' is-neutral';
+        } else {
+          const m = s.match(/^([+-]?)(\d+)/);
+          const num = m ? Number(m[1] + m[2]) : 0;
+          if (num < 0) cls += ' is-negative';
+          else if (num === 0) cls += ' is-neutral';
+        }
+        return `<span class="${cls}">${s}</span>`;
+      };
+
+      // Build the card body HTML for one neighborhood.
+      const buildCardHtml = (name: string): string => {
+        const rec = demographics[name];
+        if (!rec) return '';
+        const a: DecadeRec = rec.decades['1970'] || {};
+        const b: DecadeRec = rec.decades['2020'] || {};
+        const isEast = rec.corridor === 'East Passyunk';
+        const stat = (label: string, value: string, delta = '') =>
+          `<div class="nbhd-stat"><dt>${label}</dt><dd>${value}${delta}</dd></div>`;
+        // Corridor vacancy line: South Street only, pairing current vs. the 1995
+        // trough. East Passyunk cards show no vacancy line.
+        const vacancyLine = isEast
+          ? ''
+          : `<p class="nbhd-card-vacancy">South Street corridor: ` +
+            `<span class="nbhd-vacancy-now">${SOUTH_ST_VACANCY_CURRENT}% vacant</span>` +
+            `<span class="nbhd-vacancy-base">, up from ${SOUTH_ST_VACANCY_1995}% in 1995</span></p>`;
+        return (
+          `<button class="nbhd-card-close" type="button" aria-label="Close">&times;</button>` +
+          `<h3 class="nbhd-card-title">${escapeHtml(name)}</h3>` +
+          `<p class="nbhd-card-subtitle${isEast ? ' is-east' : ''}">${escapeHtml(rec.corridor)} corridor</p>` +
+          `<dl class="nbhd-stats">` +
+            stat('Population (2020)', fmtInt(b['Total Population'])) +
+            stat('Median household income', fmtMoney(b[INC]), deltaSpan(pctChange(a[INC], b[INC]), 'signed')) +
+            stat('Median home value', fmtMoney(b[HOME]), deltaSpan(pctChange(a[HOME], b[HOME]), 'signed')) +
+            stat('Owner-occupied', fmtPct(b['% Owner-Occupied']), deltaSpan(ppChange(a['% Owner-Occupied'], b['% Owner-Occupied']), 'signed')) +
+            stat('Median age', fmtAge(b['Median Age']), deltaSpan(yearsChange(a['Median Age'], b['Median Age']), 'neutral')) +
+            stat('Age 18–34', fmtPct(b['% 18-34']), deltaSpan(ppChange(a['% 18-34'], b['% 18-34']), 'signed')) +
+          `</dl>` +
+          vacancyLine +
+          (rec.note ? `<p class="nbhd-card-note">${escapeHtml(rec.note)}</p>` : '') +
+          `<p class="nbhd-card-footnote">Dollar figures inflation-adjusted to 2020.</p>`
+        );
+      };
+
+      // Card lives in a Leaflet control docked top-right; hidden until selected.
+      let cardEl: HTMLElement | null = null;
+      const cardControl = new L.Control({ position: 'topright' });
+      cardControl.onAdd = () => {
+        const div = L.DomUtil.create('div', 'nbhd-card');
+        div.style.position = 'relative';
+        div.style.display = 'none';
+        L.DomEvent.disableClickPropagation(div);
+        L.DomEvent.disableScrollPropagation(div);
+        div.addEventListener('click', (e) => {
+          if ((e.target as HTMLElement).closest('.nbhd-card-close')) closeCard();
+        });
+        cardEl = div;
+        return div;
+      };
+      cardControl.addTo(map);
+
+      const featName = (l: L.Layer) =>
+        (l as L.GeoJSON & { feature?: GeoJSON.Feature }).feature?.properties?.name as
+          | string
+          | undefined;
+
+      // Clear any active highlight (RCO sublayers reset + WSW tract removed).
+      const clearHighlight = (): void => {
+        if (rcoLayerRef) highlightedRcoLayers.forEach((p) => rcoLayerRef!.resetStyle(p));
+        highlightedRcoLayers = [];
+        activeShapeNames = [];
+        if (wswTractLayer && map.hasLayer(wswTractLayer)) map.removeLayer(wswTractLayer);
+      };
+
+      // Highlight one or more RCO shapes by name, flying to their combined bounds.
+      const highlightShapes = (rcoNames: string[], fly: boolean): void => {
+        activeShapeNames = rcoNames;
+        if (!rcoLayerRef || rcoNames.length === 0) return;
+        const bounds = L.latLngBounds([]);
+        rcoLayerRef.eachLayer((l) => {
+          if (rcoNames.includes(featName(l) ?? '')) {
+            const path = l as L.Path;
+            path.setStyle({ weight: 3, fillOpacity: 0.18, dashArray: '' });
+            path.bringToFront();
+            highlightedRcoLayers.push(path);
+            const b = (path as L.Polygon).getBounds();
+            if (b && b.isValid()) bounds.extend(b);
+          }
+        });
+        if (fly && bounds.isValid()) map.flyToBounds(bounds, { padding: [40, 40], maxZoom: 16 });
+      };
+
+      // Washington Square West highlights/zooms census tract 11.02, not the large
+      // WSW RCO polygon. The tract layer is its own (non-RCO) overlay.
+      const highlightTract = async (fly: boolean): Promise<void> => {
+        if (!wswTractLayer) {
+          try {
+            const resp = await fetch('/data/wsw_tract.geojson');
+            const gj = await resp.json();
+            wswTractLayer = L.geoJSON(gj, {
+              pane: 'boundaries',
+              interactive: false,
+              style: {
+                color: '#9333EA',
+                weight: 3,
+                opacity: 0.95,
+                fill: true,
+                fillColor: '#9333EA',
+                fillOpacity: 0.18,
+              },
+            });
+          } catch (err) {
+            console.error('Failed to load wsw_tract.geojson', err);
+            return;
+          }
+        }
+        wswTractLayer.addTo(map);
+        if (fly) {
+          const bounds = wswTractLayer.getBounds();
+          if (bounds.isValid()) map.flyToBounds(bounds, { padding: [40, 40], maxZoom: 16 });
+        }
+      };
+
+      // Turn the RCO overlay on if it is currently off (keeps the checkbox synced).
+      const ensureRcoOn = (): void => {
+        const box = document.getElementById('overlay-rcos') as HTMLInputElement | null;
+        if (box && rcoLayerRef && !box.checked) {
+          box.checked = true;
+          rcoLayerRef.addTo(map);
+        }
+      };
+
+      const setActiveTriggerEl = (el: Element | null): void => {
+        document.querySelectorAll('.nbhd-trigger').forEach((b) => {
+          b.classList.toggle('is-active', b === el);
+        });
+      };
+
+      function renderCard(name: string, activeEl: Element | null): void {
+        if (!cardEl || !demographics[name]) return;
+        activeNbhd = name;
+        cardEl.innerHTML = buildCardHtml(name);
+        cardEl.style.display = 'block';
+        setActiveTriggerEl(activeEl);
+      }
+
+      function closeCard(): void {
+        if (cardEl) cardEl.style.display = 'none';
+        activeNbhd = null;
+        setActiveTriggerEl(null);
+        clearHighlight();
+        // Return the visitor to wherever they were before exploring a neighborhood.
+        if (preCardView) {
+          map.flyTo(preCardView.center, preCardView.zoom);
+          preCardView = null;
+        }
+      }
+
+      // Shared selection path. Highlights ALL shapes the card covers (so the
+      // Passyunk Square card lights both the Passyunk Square and EPX shapes),
+      // or the WSW tract. `fly`/`ensureOn` differ for sidebar vs map clicks.
+      function selectNeighborhood(
+        card: string,
+        activeEl: Element | null,
+        opts: { fly: boolean; ensureOn: boolean },
+      ): void {
+        if (!demographics[card]) return;
+        // Capture the current view to restore on close — but only when opening
+        // fresh (card not already up), so swapping neighborhoods doesn't lose the
+        // original framing. Only when we actually fly.
+        const cardOpen = cardEl?.style.display === 'block';
+        if (opts.fly && !cardOpen) {
+          preCardView = { center: map.getCenter(), zoom: map.getZoom() };
+        }
+        renderCard(card, activeEl);
+        clearHighlight();
+        if (opts.ensureOn) ensureRcoOn();
+        if (TRACT_CARDS.has(card)) {
+          void highlightTract(opts.fly);
+          return;
+        }
+        const shapes = NBHD_TO_SHAPES[card] || [];
+        if (shapes.length) highlightShapes(shapes, opts.fly);
+      }
+
+      // Map shape click: open the card and highlight in place (no fly), marking
+      // the clicked shape's sidebar row active.
+      function openFromMapShape(rcoName: string): void {
+        const card = RCO_TO_NBHD[rcoName];
+        if (!card) return;
+        const btn = document.querySelector(`.nbhd-trigger[data-shape="${rcoName}"]`);
+        selectNeighborhood(card, btn, { fly: false, ensureOn: false });
+      }
+
+      // Sidebar trigger: open the card, turn RCO on, fly to + highlight the
+      // shape(s) or the WSW tract. Pennsport (no shape) opens the card only.
+      document.getElementById('nbhd-trigger-list')?.addEventListener('click', (e) => {
+        const btn = (e.target as HTMLElement).closest<HTMLButtonElement>('.nbhd-trigger');
+        if (!btn || !btn.dataset.nbhd) return;
+        selectNeighborhood(btn.dataset.nbhd, btn, { fly: true, ensureOn: true });
+      });
+
       // ---- BID layer: 2px teal outline, very light fill, permanent labels ----
       try {
         const resp = await fetch('/data/bids.geojson');
@@ -3135,14 +3722,23 @@ import Layout from '../layouts/Layout.astro';
               });
             }
             // Light fill flash on hover so the hovered ring reads at a glance —
-            // skipped past the block-zoom threshold (hover is disabled there).
+            // skipped past the block-zoom threshold (hover is disabled there) and
+            // for the currently-highlighted shape (so its highlight fill stays).
             layer.on('mouseover', () => {
-              if (rcoHoverDisabled()) return;
+              if (rcoHoverDisabled() || highlightedRcoLayers.includes(layer as L.Path)) return;
               (layer as L.Path).setStyle({ fillOpacity: 0.1 });
             });
-            layer.on('mouseout', () =>
-              (layer as L.Path).setStyle({ fillOpacity: 0 }),
-            );
+            layer.on('mouseout', () => {
+              if (highlightedRcoLayers.includes(layer as L.Path)) return;
+              (layer as L.Path).setStyle({ fillOpacity: 0 });
+            });
+            // Click opens the demographic card and highlights every shape the
+            // card covers (Passyunk Square + EPX together). EPX shares the
+            // Passyunk Square card; South Street/Headhouse District has no
+            // record, so it stays boundary-only (no-op).
+            if (name && RCO_TO_NBHD[name]) {
+              layer.on('click', () => openFromMapShape(name));
+            }
           },
         });
       } catch (err) {
@@ -3211,6 +3807,126 @@ import Layout from '../layouts/Layout.astro';
         return div;
       };
 
+      // ================= Density score layer (South Street only) =================
+      // Teal density ramp, light (low) -> dark (high), matching the legend.
+      // Range tracks the 15-tract set (low tract 1.01 clipped to the circle,
+      // high tract 11.01).
+      const DENS_LOW = 19000, DENS_HIGH = 66000;
+      const LO_RGB = [0xd7, 0xf0, 0xee], HI_RGB = [0x0d, 0x4d, 0x4a];
+      const densityColor = (d: number): string => {
+        const t = Math.max(0, Math.min(1, (d - DENS_LOW) / (DENS_HIGH - DENS_LOW)));
+        const c = LO_RGB.map((lo, i) => Math.round(lo + (HI_RGB[i] - lo) * t));
+        return `rgb(${c[0]}, ${c[1]}, ${c[2]})`;
+      };
+
+      const RETAIL_SQFT = 300000;   // estimated sq ft of corridor retail (denominator)
+      const BENCHMARK = 400;        // residents per 2,000 sq ft target
+      const PER = 2000;
+      // Three-quarter-mile (15-min) circle catchment total = Σ full pop across the
+      // 15 overlapping tracts (verified = 46,201).
+      const CATCHMENT_TOTAL = 46201;
+      // Residents needed to hit the 400 benchmark (slider runs 0–20,000, enough
+      // to drag past critical mass).
+      const residentsForBench = Math.ceil((BENCHMARK * RETAIL_SQFT) / PER); // 60,000
+      const SLIDER_MAX = 20000;
+
+      // Catchment ring (dashed purple, no fill) + its one-time label.
+      let ringLabelMarker: L.Marker | null = null;
+      try {
+        const resp = await fetch('/data/catchment_southst.geojson');
+        const gj = await resp.json();
+        ringLayerRef = L.geoJSON(gj, {
+          pane: 'boundaries',
+          interactive: false,
+          style: { color: '#6d28d9', weight: 2, opacity: 0.9, dashArray: '6 5', fill: false },
+        });
+        const rb = ringLayerRef.getBounds();
+        if (rb.isValid()) {
+          const north = L.latLng(rb.getNorth(), (rb.getWest() + rb.getEast()) / 2);
+          ringLabelMarker = L.marker(north, {
+            interactive: false,
+            icon: L.divIcon({ className: 'ring-label', html: '¾-mile walk · 15 min', iconSize: null }),
+          });
+        }
+      } catch (err) {
+        console.error('Failed to load catchment_southst.geojson', err);
+      }
+
+      // Choropleth, colored by per-tract density (people / sq mi).
+      try {
+        const resp = await fetch('/data/tracts_density_southst.geojson');
+        const gj = await resp.json();
+        densityLayerRef = L.geoJSON(gj, {
+          pane: 'density',
+          interactive: false, // pure backdrop — dots stay clickable
+          style: (feature) => ({
+            stroke: true,
+            color: '#ffffff',
+            weight: 0.8,
+            fill: true,
+            fillColor: densityColor((feature?.properties as { density?: number })?.density ?? DENS_LOW),
+            fillOpacity: 0.82,
+          }),
+        });
+      } catch (err) {
+        console.error('Failed to load tracts_density_southst.geojson', err);
+      }
+
+      // Critical-mass panel (top-left so it never overlaps the top-right card).
+      const fmtR = (n: number) => Math.round(n).toLocaleString('en-US');
+      const densityPanel = new L.Control({ position: 'topleft' });
+      densityPanel.onAdd = () => {
+        const div = L.DomUtil.create('div', 'density-panel');
+        L.DomEvent.disableClickPropagation(div);
+        L.DomEvent.disableScrollPropagation(div);
+        div.innerHTML =
+          `<h4 class="density-panel-title">15-minute walk catchment</h4>` +
+          `<p class="density-panel-row"><b>${fmtR(CATCHMENT_TOTAL)}</b> residents in the ¾-mi ring</p>` +
+          `<p class="density-panel-row">~<b>${fmtR(RETAIL_SQFT)}</b> sq ft of retail <span class="density-est">(est.)</span></p>` +
+          `<div class="density-ratio">` +
+            `<div class="density-ratio-head"><b id="dp-ratio">—</b> residents per 2,000 sq ft <span class="density-est">(est.)</span></div>` +
+            `<div class="density-bar"><div class="density-bar-fill" id="dp-bar"></div></div>` +
+            `<div class="density-ratio-label" id="dp-label">—</div>` +
+          `</div>` +
+          `<label class="density-slider-label">Add residents to the ring: <b id="dp-added">0</b></label>` +
+          `<input type="range" id="dp-slider" min="0" max="${SLIDER_MAX}" step="500" value="0">` +
+          `<p class="density-hint" id="dp-hint">—</p>` +
+          `<div class="density-legend">` +
+            `<span class="density-legend-cap">Resident density (per sq mi)</span>` +
+            `<div class="density-legend-bar"></div>` +
+            `<div class="density-legend-ends"><span>19k</span><span>66k</span></div>` +
+          `</div>` +
+          `<p class="density-note">Catchment: census tracts overlapping the corridor. Retail floor area is an estimate.</p>`;
+        return div;
+      };
+
+      // Live recompute of the ratio bar from the slider.
+      const updateRatioUI = (added: number): void => {
+        const ratioEl = document.getElementById('dp-ratio');
+        const barEl = document.getElementById('dp-bar');
+        const labelEl = document.getElementById('dp-label');
+        const hintEl = document.getElementById('dp-hint');
+        const addedEl = document.getElementById('dp-added');
+        if (!ratioEl || !barEl || !labelEl || !hintEl || !addedEl) return;
+        const total = CATCHMENT_TOTAL + added;
+        const ratio = (total / RETAIL_SQFT) * PER;
+        ratioEl.textContent = String(Math.round(ratio));
+        addedEl.textContent = fmtR(added);
+        barEl.style.width = Math.min(100, (ratio / BENCHMARK) * 100) + '%';
+        if (ratio >= BENCHMARK) {
+          barEl.classList.add('is-reached');
+          labelEl.textContent = 'critical mass reached';
+          labelEl.classList.add('is-reached');
+          hintEl.textContent = '';
+        } else {
+          barEl.classList.remove('is-reached');
+          labelEl.classList.remove('is-reached');
+          labelEl.textContent = Math.round((1 - ratio / BENCHMARK) * 100) + '% below the 400 benchmark';
+          const need = residentsForBench - total;
+          hintEl.textContent = `needs about ${fmtR(need)} more to reach critical mass`;
+        }
+      };
+
       // BID permanent labels hide while a single corridor is selected; they show
       // only under "All Corridors". The outlines themselves are never affected.
       const updateBidLabelVisibility = () => {
@@ -3246,8 +3962,14 @@ import Layout from '../layouts/Layout.astro';
         rcoBox.checked = false; // default OFF — not added to the map on load
         rcoBox.addEventListener('change', () => {
           if (!rcoLayerRef) return;
-          if (rcoBox.checked) rcoLayerRef.addTo(map);
-          else map.removeLayer(rcoLayerRef);
+          if (rcoBox.checked) {
+            rcoLayerRef.addTo(map);
+            // Re-apply the highlight for the open card's shape(s), if any.
+            if (activeShapeNames.length) highlightShapes(activeShapeNames, false);
+          } else {
+            highlightedRcoLayers = []; // layers leaving the map; drop stale refs
+            map.removeLayer(rcoLayerRef);
+          }
         });
       }
       const zoningBox = document.getElementById('overlay-zoning') as HTMLInputElement | null;
@@ -3264,6 +3986,46 @@ import Layout from '../layouts/Layout.astro';
           }
         });
       }
+      // Density score: choropleth + ring + panel toggle together (default OFF).
+      const showDensity = (): void => {
+        if (densityLayerRef) densityLayerRef.addTo(map);
+        if (ringLayerRef) ringLayerRef.addTo(map);
+        if (ringLabelMarker) ringLabelMarker.addTo(map);
+        densityPanel.addTo(map);
+        updateRatioUI(0);
+        const slider = document.getElementById('dp-slider') as HTMLInputElement | null;
+        slider?.addEventListener('input', () => updateRatioUI(Number(slider.value)));
+      };
+      const hideDensity = (): void => {
+        if (densityLayerRef) map.removeLayer(densityLayerRef);
+        if (ringLayerRef) map.removeLayer(ringLayerRef);
+        if (ringLabelMarker) map.removeLayer(ringLabelMarker);
+        densityPanel.remove();
+      };
+      const densityBox = document.getElementById('overlay-density') as HTMLInputElement | null;
+      if (densityBox) {
+        densityBox.checked = false;
+        densityBox.addEventListener('change', () => {
+          if (densityBox.checked) showDensity();
+          else hideDensity();
+        });
+      }
+
+      // Density is a South Street measure: disable + gray the toggle on East
+      // Passyunk, and hide the layer if it was on. Re-enable on All / South St.
+      const updateDensityAvailability = (): void => {
+        if (!densityBox) return;
+        const isEP = filterState.corridor === 'east-passyunk';
+        densityBox.disabled = isEP;
+        densityBox.closest('.filter-group')?.classList.toggle('is-disabled', isEP);
+        if (isEP && densityBox.checked) {
+          densityBox.checked = false;
+          hideDensity();
+        }
+      };
+      subscribe(updateDensityAvailability);
+      updateDensityAvailability();
+
       // Apply initial label visibility for the default corridor state.
       updateBidLabelVisibility();
     }
@@ -3301,6 +4063,13 @@ import Layout from '../layouts/Layout.astro';
       map.createPane('zoning');
       const zoningPane = map.getPane('zoning');
       if (zoningPane) zoningPane.style.zIndex = '340';
+
+      // Density choropleth sits lowest of the overlays (z-index 330) — below the
+      // zoning fill, the boundary outlines, and the dots. Its catchment ring
+      // renders in the 'boundaries' pane (350), above the choropleth, below dots.
+      map.createPane('density');
+      const densityPane = map.getPane('density');
+      if (densityPane) densityPane.style.zIndex = '330';
 
       // Streets layer — render below parcels
       try {

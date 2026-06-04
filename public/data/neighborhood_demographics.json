@@ -1,0 +1,539 @@
+{
+  "Society Hill": {
+    "corridor": "South Street",
+    "decades": {
+      "1970": {
+        "Total Population": 3726,
+        "Total Households": 1810,
+        "Median Household Income (2020$)": 73032,
+        "Median Home Value (2020$)": 320359,
+        "% Owner-Occupied": 0.2282,
+        "Renter-Occupied Units": 1471,
+        "% Renter-Occupied": 0.7717733473242392,
+        "Median Age": 33.7,
+        "% 18-34": 0.4051,
+        "% Bachelor's Degree or Higher": 0.4761
+      },
+      "1980": {
+        "Total Population": 4013,
+        "Total Households": 2214,
+        "Median Household Income (2020$)": 85221,
+        "Median Home Value (2020$)": 558759,
+        "% Owner-Occupied": 0.4458,
+        "Renter-Occupied Units": 1227,
+        "% Renter-Occupied": 0.55420054200542,
+        "Median Age": 35,
+        "% 18-34": 0.3723,
+        "% Bachelor's Degree or Higher": 0.6375
+      },
+      "1990": {
+        "Total Population": 5715,
+        "Total Households": 3419,
+        "Median Household Income (2020$)": 109681,
+        "Median Home Value (2020$)": 688590,
+        "% Owner-Occupied": 0.5504,
+        "Renter-Occupied Units": 1529,
+        "% Renter-Occupied": 0.4495736548074096,
+        "Median Age": 40.1,
+        "% 18-34": 0.3134,
+        "% Bachelor's Degree or Higher": 0.6924
+      },
+      "2000": {
+        "Total Population": 5820,
+        "Total Households": 3638,
+        "Median Household Income (2020$)": 117807,
+        "Median Home Value (2020$)": 393525,
+        "% Owner-Occupied": 0.5917,
+        "Renter-Occupied Units": 1484,
+        "% Renter-Occupied": 0.4082530949105915,
+        "Median Age": 44.1,
+        "% 18-34": 0.2829,
+        "% Bachelor's Degree or Higher": 0.7491
+      },
+      "2010": {
+        "Total Population": 6215,
+        "Total Households": 3699,
+        "Median Household Income (2020$)": 110484,
+        "Median Home Value (2020$)": 610435,
+        "% Owner-Occupied": 0.6175,
+        "Renter-Occupied Units": 1415,
+        "% Renter-Occupied": 0.3825358204920249,
+        "Median Age": 46.3,
+        "% 18-34": 0.2713,
+        "% Bachelor's Degree or Higher": 0.7654
+      },
+      "2020": {
+        "Total Population": 7644,
+        "Total Households": 4308,
+        "Median Household Income (2020$)": 116082,
+        "Median Home Value (2020$)": 613610,
+        "% Owner-Occupied": 0.5766,
+        "Renter-Occupied Units": 1824,
+        "% Renter-Occupied": 0.4233983286908078,
+        "Median Age": 50.9,
+        "% 18-34": 0.238,
+        "% Bachelor's Degree or Higher": 0.8572
+      },
+      "2023": {
+        "Total Population": 6309,
+        "Total Households": 3965,
+        "Median Household Income (2020$)": 107842,
+        "Median Home Value (2020$)": 443977,
+        "% Owner-Occupied": 0.6182,
+        "Renter-Occupied Units": 1514,
+        "% Renter-Occupied": 0.38184110970996216,
+        "Median Age": 57.5,
+        "% 18-34": 0.2425,
+        "% Bachelor's Degree or Higher": 0.8309
+      }
+    }
+  },
+  "Washington Square West": {
+    "corridor": "South Street",
+    "decades": {
+      "1970": {
+        "Total Population": 2761,
+        "Total Households": 1714,
+        "Median Household Income (2020$)": 33189,
+        "Median Home Value (2020$)": 212786,
+        "% Owner-Occupied": 0.1172,
+        "Renter-Occupied Units": 1507,
+        "% Renter-Occupied": 0.8828353837141183,
+        "Median Age": 30.6,
+        "% 18-34": 0.4918,
+        "% Bachelor's Degree or Higher": 0.2905
+      },
+      "1980": {
+        "Total Population": 2630,
+        "Total Households": 1671,
+        "Median Household Income (2020$)": 52018,
+        "Median Home Value (2020$)": 314577,
+        "% Owner-Occupied": 0.1924,
+        "Renter-Occupied Units": 1348,
+        "% Renter-Occupied": 0.8076692630317556,
+        "Median Age": 30.8,
+        "% 18-34": 0.5595,
+        "% Bachelor's Degree or Higher": 0.6034
+      },
+      "1990": {
+        "Total Population": 2455,
+        "Total Households": 1549,
+        "Median Household Income (2020$)": 57643,
+        "Median Home Value (2020$)": 347970,
+        "% Owner-Occupied": 0.2553,
+        "Renter-Occupied Units": 1155,
+        "% Renter-Occupied": 0.7446808510638298,
+        "Median Age": 29.6,
+        "% 18-34": 0.5976,
+        "% Bachelor's Degree or Higher": 0.6379
+      },
+      "2000": {
+        "Total Population": 2604,
+        "Total Households": 1705,
+        "Median Household Income (2020$)": 61134,
+        "Median Home Value (2020$)": 271095,
+        "% Owner-Occupied": 0.2545,
+        "Renter-Occupied Units": 1233,
+        "% Renter-Occupied": 0.74546553808948,
+        "Median Age": 31.8,
+        "% 18-34": 0.5531,
+        "% Bachelor's Degree or Higher": 0.7534
+      },
+      "2010": {
+        "Total Population": 2659,
+        "Total Households": 1624,
+        "Median Household Income (2020$)": 85268,
+        "Median Home Value (2020$)": 544500,
+        "% Owner-Occupied": 0.3473,
+        "Renter-Occupied Units": 1060,
+        "% Renter-Occupied": 0.6527093596059114,
+        "Median Age": 30.7,
+        "% 18-34": 0.563,
+        "% Bachelor's Degree or Higher": 0.894
+      },
+      "2020": {
+        "Total Population": 2800,
+        "Total Households": 1706,
+        "Median Household Income (2020$)": 105368,
+        "Median Home Value (2020$)": 591600,
+        "% Owner-Occupied": 0.3277,
+        "Renter-Occupied Units": 1147,
+        "% Renter-Occupied": 0.6723329425556858,
+        "Median Age": 37,
+        "% 18-34": 0.4871,
+        "% Bachelor's Degree or Higher": 0.9359
+      },
+      "2023": {
+        "Total Population": 2960,
+        "Total Households": 1584,
+        "Median Household Income (2020$)": 115780,
+        "Median Home Value (2020$)": 654965,
+        "% Owner-Occupied": 0.4943,
+        "Renter-Occupied Units": 801,
+        "% Renter-Occupied": 0.5056818181818182,
+        "Median Age": 35.9,
+        "% 18-34": 0.3693,
+        "% Bachelor's Degree or Higher": 0.9281
+      }
+    },
+    "partial": true,
+    "note": "Tract 11.02 only — partial neighborhood."
+  },
+  "Queen Village": {
+    "corridor": "South Street",
+    "decades": {
+      "1970": {
+        "Total Population": 3108,
+        "Total Households": 985,
+        "Median Household Income (2020$)": 35906,
+        "Median Home Value (2020$)": 53398,
+        "% Owner-Occupied": 0.3281,
+        "Renter-Occupied Units": 817,
+        "% Renter-Occupied": 0.671875,
+        "Median Age": 37.8,
+        "% 18-34": 0.2183,
+        "% Bachelor's Degree or Higher": 0.0382
+      },
+      "1980": {
+        "Total Population": 2760,
+        "Total Households": 1401,
+        "Median Household Income (2020$)": 47149,
+        "Median Home Value (2020$)": 216970,
+        "% Owner-Occupied": 0.3973,
+        "Renter-Occupied Units": 839,
+        "% Renter-Occupied": 0.6027298850574713,
+        "Median Age": 32.6,
+        "% 18-34": 0.4459,
+        "% Bachelor's Degree or Higher": 0.4244
+      },
+      "1990": {
+        "Total Population": 4439,
+        "Total Households": 2359,
+        "Median Household Income (2020$)": 73171,
+        "Median Home Value (2020$)": 333935,
+        "% Owner-Occupied": 0.4381,
+        "Renter-Occupied Units": 1298,
+        "% Renter-Occupied": 0.5619047619047619,
+        "Median Age": 33.4,
+        "% 18-34": 0.4224,
+        "% Bachelor's Degree or Higher": 0.5014
+      },
+      "2000": {
+        "Total Population": 4409,
+        "Total Households": 2476,
+        "Median Household Income (2020$)": 79103,
+        "Median Home Value (2020$)": 269694,
+        "% Owner-Occupied": 0.4698,
+        "Renter-Occupied Units": 1324,
+        "% Renter-Occupied": 0.5302362835402483,
+        "Median Age": 34.1,
+        "% 18-34": 0.4204,
+        "% Bachelor's Degree or Higher": 0.6255
+      },
+      "2010": {
+        "Total Population": 4839,
+        "Total Households": 2554,
+        "Median Household Income (2020$)": 84545,
+        "Median Home Value (2020$)": 546937,
+        "% Owner-Occupied": 0.4933,
+        "Renter-Occupied Units": 1294,
+        "% Renter-Occupied": 0.5066562255285826,
+        "Median Age": 34.4,
+        "% 18-34": 0.4059,
+        "% Bachelor's Degree or Higher": 0.6699
+      },
+      "2020": {
+        "Total Population": 5662,
+        "Total Households": 2826,
+        "Median Household Income (2020$)": 115840,
+        "Median Home Value (2020$)": 590601,
+        "% Owner-Occupied": 0.4586,
+        "Renter-Occupied Units": 1530,
+        "% Renter-Occupied": 0.5414012738853503,
+        "Median Age": 34.6,
+        "% 18-34": 0.3499,
+        "% Bachelor's Degree or Higher": 0.8247
+      },
+      "2023": {
+        "Total Population": 5474,
+        "Total Households": 2725,
+        "Median Household Income (2020$)": 123527,
+        "Median Home Value (2020$)": 570690,
+        "% Owner-Occupied": 0.5695,
+        "Renter-Occupied Units": 1173,
+        "% Renter-Occupied": 0.43045871559633025,
+        "Median Age": 34.3,
+        "% 18-34": 0.3349,
+        "% Bachelor's Degree or Higher": 0.8516
+      }
+    }
+  },
+  "Bella Vista": {
+    "corridor": "South Street",
+    "decades": {
+      "1970": {
+        "Total Population": 14926,
+        "Total Households": 3834,
+        "Median Household Income (2020$)": 33369,
+        "Median Home Value (2020$)": 53661,
+        "% Owner-Occupied": 0.4301,
+        "Renter-Occupied Units": 2776,
+        "% Renter-Occupied": 0.5699035105727777,
+        "Median Age": 32.5,
+        "% 18-34": 0.204,
+        "% Bachelor's Degree or Higher": 0.0231
+      },
+      "1980": {
+        "Total Population": 10897,
+        "Total Households": 4282,
+        "Median Household Income (2020$)": 31576,
+        "Median Home Value (2020$)": 82697,
+        "% Owner-Occupied": 0.4914,
+        "Renter-Occupied Units": 2160,
+        "% Renter-Occupied": 0.5085943018601365,
+        "Median Age": 35.2,
+        "% 18-34": 0.2861,
+        "% Bachelor's Degree or Higher": 0.096
+      },
+      "1990": {
+        "Total Population": 10095,
+        "Total Households": 4495,
+        "Median Household Income (2020$)": 42927,
+        "Median Home Value (2020$)": 155849,
+        "% Owner-Occupied": 0.4958,
+        "Renter-Occupied Units": 2297,
+        "% Renter-Occupied": 0.5041703248463565,
+        "Median Age": 34.8,
+        "% 18-34": 0.3245,
+        "% Bachelor's Degree or Higher": 0.2215
+      },
+      "2000": {
+        "Total Population": 9004,
+        "Total Households": 4360,
+        "Median Household Income (2020$)": 58616,
+        "Median Home Value (2020$)": 148400,
+        "% Owner-Occupied": 0.5101,
+        "Renter-Occupied Units": 2141,
+        "% Renter-Occupied": 0.48993135011441646,
+        "Median Age": 37.2,
+        "% 18-34": 0.3181,
+        "% Bachelor's Degree or Higher": 0.3563
+      },
+      "2010": {
+        "Total Population": 10710,
+        "Total Households": 4991,
+        "Median Household Income (2020$)": 62950,
+        "Median Home Value (2020$)": 384000,
+        "% Owner-Occupied": 0.5203,
+        "Renter-Occupied Units": 2394,
+        "% Renter-Occupied": 0.4796633941093969,
+        "Median Age": 33,
+        "% 18-34": 0.3977,
+        "% Bachelor's Degree or Higher": 0.5042
+      },
+      "2020": {
+        "Total Population": 12438,
+        "Total Households": 5897,
+        "Median Household Income (2020$)": 82785,
+        "Median Home Value (2020$)": 435165,
+        "% Owner-Occupied": 0.4806,
+        "Renter-Occupied Units": 3063,
+        "% Renter-Occupied": 0.5194166525351874,
+        "Median Age": 34.8,
+        "% 18-34": 0.3608,
+        "% Bachelor's Degree or Higher": 0.6729
+      },
+      "2023": {
+        "Total Population": 10978,
+        "Total Households": 5769,
+        "Median Household Income (2020$)": 86910,
+        "Median Home Value (2020$)": 460222,
+        "% Owner-Occupied": 0.5157,
+        "Renter-Occupied Units": 2794,
+        "% Renter-Occupied": 0.484312705841567,
+        "Median Age": 35.1,
+        "% 18-34": 0.3356,
+        "% Bachelor's Degree or Higher": 0.7287
+      }
+    }
+  },
+  "Passyunk Square": {
+    "corridor": "East Passyunk",
+    "decades": {
+      "1970": {
+        "Total Population": 15924,
+        "Total Households": 4378,
+        "Median Household Income (2020$)": 49196,
+        "Median Home Value (2020$)": 64552,
+        "% Owner-Occupied": 0.6921,
+        "Renter-Occupied Units": 1656,
+        "% Renter-Occupied": 0.30792116028263294,
+        "Median Age": 38.4,
+        "% 18-34": 0.2169,
+        "% Bachelor's Degree or Higher": 0.0228
+      },
+      "1980": {
+        "Total Population": 13390,
+        "Total Households": 5315,
+        "Median Household Income (2020$)": 37278,
+        "Median Home Value (2020$)": 72996,
+        "% Owner-Occupied": 0.702,
+        "Renter-Occupied Units": 1579,
+        "% Renter-Occupied": 0.2980369950924877,
+        "Median Age": 41.7,
+        "% 18-34": 0.243,
+        "% Bachelor's Degree or Higher": 0.0642
+      },
+      "1990": {
+        "Total Population": 11499,
+        "Total Households": 4994,
+        "Median Household Income (2020$)": 44228,
+        "Median Home Value (2020$)": 108887,
+        "% Owner-Occupied": 0.7146,
+        "Renter-Occupied Units": 1415,
+        "% Renter-Occupied": 0.2853973376361436,
+        "Median Age": 42.2,
+        "% 18-34": 0.2415,
+        "% Bachelor's Degree or Higher": 0.1222
+      },
+      "2000": {
+        "Total Population": 11637,
+        "Total Households": 5336,
+        "Median Household Income (2020$)": 40854,
+        "Median Home Value (2020$)": 91696,
+        "% Owner-Occupied": 0.6679,
+        "Renter-Occupied Units": 1759,
+        "% Renter-Occupied": 0.33213746223564955,
+        "Median Age": 41.6,
+        "% 18-34": 0.2371,
+        "% Bachelor's Degree or Higher": 0.175
+      },
+      "2010": {
+        "Total Population": 12362,
+        "Total Households": 5548,
+        "Median Household Income (2020$)": 48778,
+        "Median Home Value (2020$)": 266647,
+        "% Owner-Occupied": 0.6049,
+        "Renter-Occupied Units": 2192,
+        "% Renter-Occupied": 0.39509733237202593,
+        "Median Age": 36.9,
+        "% 18-34": 0.3364,
+        "% Bachelor's Degree or Higher": 0.2911
+      },
+      "2020": {
+        "Total Population": 12769,
+        "Total Households": 5865,
+        "Median Household Income (2020$)": 68473,
+        "Median Home Value (2020$)": 331214,
+        "% Owner-Occupied": 0.5739,
+        "Renter-Occupied Units": 2499,
+        "% Renter-Occupied": 0.4260869565217391,
+        "Median Age": 35.6,
+        "% 18-34": 0.3294,
+        "% Bachelor's Degree or Higher": 0.5397
+      },
+      "2023": {
+        "Total Population": 12948,
+        "Total Households": 5927,
+        "Median Household Income (2020$)": 89267,
+        "Median Home Value (2020$)": 359012,
+        "% Owner-Occupied": 0.6071,
+        "Renter-Occupied Units": 2329,
+        "% Renter-Occupied": 0.3929475282605028,
+        "Median Age": 37.8,
+        "% 18-34": 0.3068,
+        "% Bachelor's Degree or Higher": 0.6232
+      }
+    },
+    "note": "Covers Passyunk Square and East Passyunk Crossing."
+  },
+  "Pennsport": {
+    "corridor": "East Passyunk",
+    "decades": {
+      "1970": {
+        "Total Population": 16526,
+        "Total Households": 4215,
+        "Median Household Income (2020$)": 39873,
+        "Median Home Value (2020$)": 51601,
+        "% Owner-Occupied": 0.5707,
+        "Renter-Occupied Units": 2274,
+        "% Renter-Occupied": 0.4292996035491788,
+        "Median Age": 30.7,
+        "% 18-34": 0.2175,
+        "% Bachelor's Degree or Higher": 0.0283
+      },
+      "1980": {
+        "Total Population": 13040,
+        "Total Households": 4848,
+        "Median Household Income (2020$)": 31322,
+        "Median Home Value (2020$)": 60538,
+        "% Owner-Occupied": 0.5947,
+        "Renter-Occupied Units": 1949,
+        "% Renter-Occupied": 0.405281763360366,
+        "Median Age": 33.5,
+        "% 18-34": 0.2627,
+        "% Bachelor's Degree or Higher": 0.0563
+      },
+      "1990": {
+        "Total Population": 11241,
+        "Total Households": 4546,
+        "Median Household Income (2020$)": 42938,
+        "Median Home Value (2020$)": 110264,
+        "% Owner-Occupied": 0.6292,
+        "Renter-Occupied Units": 1662,
+        "% Renter-Occupied": 0.3708165997322624,
+        "Median Age": 33.3,
+        "% 18-34": 0.2902,
+        "% Bachelor's Degree or Higher": 0.1051
+      },
+      "2000": {
+        "Total Population": 11238,
+        "Total Households": 4151,
+        "Median Household Income (2020$)": 34219,
+        "Median Home Value (2020$)": 89615,
+        "% Owner-Occupied": 0.514,
+        "Renter-Occupied Units": 2025,
+        "% Renter-Occupied": 0.48596112311015116,
+        "Median Age": 32.3,
+        "% 18-34": 0.2561,
+        "% Bachelor's Degree or Higher": 0.1367
+      },
+      "2010": {
+        "Total Population": 11967,
+        "Total Households": 4693,
+        "Median Household Income (2020$)": 33640,
+        "Median Home Value (2020$)": 267532,
+        "% Owner-Occupied": 0.449,
+        "Renter-Occupied Units": 2586,
+        "% Renter-Occupied": 0.5510334540805455,
+        "Median Age": 32.3,
+        "% 18-34": 0.3644,
+        "% Bachelor's Degree or Higher": 0.2041
+      },
+      "2020": {
+        "Total Population": 12957,
+        "Total Households": 5372,
+        "Median Household Income (2020$)": 70927,
+        "Median Home Value (2020$)": 329079,
+        "% Owner-Occupied": 0.4704,
+        "Renter-Occupied Units": 2845,
+        "% Renter-Occupied": 0.5295979151154132,
+        "Median Age": 34.7,
+        "% 18-34": 0.3292,
+        "% Bachelor's Degree or Higher": 0.4525
+      },
+      "2023": {
+        "Total Population": 12179,
+        "Total Households": 5762,
+        "Median Household Income (2020$)": 70318,
+        "Median Home Value (2020$)": 360236,
+        "% Owner-Occupied": 0.5569,
+        "Renter-Occupied Units": 2553,
+        "% Renter-Occupied": 0.4430753210690732,
+        "Median Age": 36,
+        "% 18-34": 0.2699,
+        "% Bachelor's Degree or Higher": 0.5067
+      }
+    }
+  }
+}
