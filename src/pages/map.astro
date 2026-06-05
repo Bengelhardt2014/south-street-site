@@ -1,0 +1,4238 @@
+---
+import Layout from '../layouts/Layout.astro';
+---
+
+<Layout title="Map — Saving South Street" fullBleed>
+  <link
+    rel="stylesheet"
+    href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+    crossorigin=""
+  />
+
+  <div class="map-layout flex flex-col md:flex-row">
+    <aside class="map-sidebar border-b border-stone-200 md:w-[360px] md:shrink-0 md:border-b-0 md:overflow-y-auto">
+      <div class="sidebar-intro">
+        <h2 class="text-[1.1rem] font-bold text-stone-900">Saving South Street: Parcel Map</h2>
+        <p class="mt-1 text-[0.9rem] leading-snug text-stone-600">
+          519 parcels along South Street and East Passyunk Avenue, color-coded by commercial vacancy state. Click any dot for details.
+        </p>
+      </div>
+
+      <div class="sticky-sentinel" aria-hidden="true"></div>
+
+      <section class="filter-section" data-section="corridor">
+        <header class="filter-section-header">
+          <h3>Corridor</h3>
+          <div class="filter-section-meta">
+            <span class="filter-section-badge" hidden></span>
+            <button
+              class="filter-section-reset"
+              type="button"
+              data-reset="corridor"
+              hidden
+            >Reset</button>
+          </div>
+        </header>
+        <div class="filter-section-body">
+          <div class="corridor-segmented" role="radiogroup" aria-label="Corridor filter">
+            <button
+              type="button"
+              class="corridor-segment"
+              data-value="all"
+              aria-pressed="true"
+              role="radio"
+            >All Corridors</button>
+            <button
+              type="button"
+              class="corridor-segment"
+              data-value="south-street"
+              aria-pressed="false"
+              role="radio"
+            >South Street</button>
+            <button
+              type="button"
+              class="corridor-segment"
+              data-value="east-passyunk"
+              aria-pressed="false"
+              role="radio"
+            >East Passyunk</button>
+          </div>
+          <p class="corridor-counter" id="corridor-counter"></p>
+
+          <div class="filter-group" data-filter-group="bids">
+            <label class="filter-toggle">
+              <input type="checkbox" id="overlay-bids" checked />
+              <span>Business Improvement Districts</span>
+            </label>
+            <p class="overlay-caption overlay-caption-bid">South Street Headhouse &amp; East Passyunk Ave</p>
+          </div>
+
+          <div class="filter-group" data-filter-group="rcos">
+            <label class="filter-toggle">
+              <input type="checkbox" id="overlay-rcos" />
+              <span>Registered Community Organizations</span>
+            </label>
+            <p class="overlay-caption overlay-caption-rco">Hover a boundary for its name</p>
+          </div>
+
+          <div class="filter-group" data-filter-group="density">
+            <label class="filter-toggle">
+              <input type="checkbox" id="overlay-density" />
+              <span>Density score</span>
+            </label>
+            <p class="overlay-caption overlay-caption-density">South Street corridor only. Three-quarter-mile (15-minute) walk catchment and resident density against retail critical mass.</p>
+          </div>
+
+          <div class="filter-group" data-filter-group="zoning">
+            <label class="filter-toggle">
+              <input type="checkbox" id="overlay-zoning" />
+              <span>Base zoning</span>
+            </label>
+            <p class="overlay-caption overlay-caption-zoning">Light fill, colored by zoning family</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="filter-section" data-section="business-mix">
+        <header class="filter-section-header">
+          <h3>Business mix</h3>
+          <div class="filter-section-meta">
+            <span class="filter-section-badge" hidden></span>
+            <button
+              class="filter-section-reset"
+              type="button"
+              data-reset="business-mix"
+              hidden
+            >Reset</button>
+          </div>
+        </header>
+        <div class="filter-section-body">
+          <div class="filter-group" data-filter-group="vacancy">
+            <h4 class="filter-group-label">Vacancy state</h4>
+            <div class="filter-vacancy-list"></div>
+          </div>
+
+          <div class="filter-group" data-filter-group="segment">
+            <h4 class="filter-group-label">Business segment</h4>
+            <div id="segment-list"></div>
+          </div>
+
+          <div class="filter-group" data-filter-group="operator">
+            <h4 class="filter-group-label">Operator type</h4>
+            <div class="chip-row" data-chip-group="operator"></div>
+          </div>
+
+          <div class="filter-group" data-filter-group="peak">
+            <h4 class="filter-group-label">Peak activation period</h4>
+            <div class="chip-row" data-chip-group="peak"></div>
+          </div>
+
+          <div class="filter-group" data-filter-group="price">
+            <h4 class="filter-group-label">Consumer price level</h4>
+            <div class="chip-row" data-chip-group="price"></div>
+          </div>
+
+          <div class="filter-group" data-filter-group="outdoor">
+            <label class="filter-toggle">
+              <input type="checkbox" id="filter-outdoor" />
+              <span>Show only parcels with outdoor footprint</span>
+            </label>
+          </div>
+
+          <div class="filter-group lens-block" data-filter-group="lens">
+            <label class="filter-toggle">
+              <input type="checkbox" id="filter-lens" />
+              <span>Cultural anchor lens</span>
+            </label>
+            <p class="lens-caption">arts, entertainment, museum, etc</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="filter-section" data-section="building-mix">
+        <header class="filter-section-header">
+          <h3>Building mix</h3>
+          <div class="filter-section-meta">
+            <span class="filter-section-badge" hidden></span>
+            <button
+              class="filter-section-reset"
+              type="button"
+              data-reset="building-mix"
+              hidden
+            >Reset</button>
+          </div>
+        </header>
+        <div class="filter-section-body">
+          <div class="filter-group" data-filter-group="zone">
+            <h4 class="filter-group-label">Zone type</h4>
+            <div class="chip-row" data-chip-group="zone"></div>
+          </div>
+
+          <div class="filter-group" data-filter-group="ownership">
+            <h4 class="filter-group-label">Ownership pattern</h4>
+            <div class="chip-row" data-chip-group="ownership"></div>
+          </div>
+
+          <div class="filter-group" data-filter-group="building-height">
+            <h4 class="filter-group-label">Building height</h4>
+            <div class="range-slider" data-range-group="building-height"></div>
+          </div>
+
+          <div class="filter-group" data-filter-group="years-since-sale">
+            <h4 class="filter-group-label">Years since last sale</h4>
+            <div class="range-slider" data-range-group="years-since-sale"></div>
+          </div>
+        </div>
+      </section>
+
+      <section class="filter-section" data-section="neighborhoods">
+        <header class="filter-section-header">
+          <h3>Neighborhoods</h3>
+          <div class="filter-section-meta">
+            <span class="filter-section-badge" hidden></span>
+            <button class="filter-section-reset" type="button" hidden>Reset</button>
+          </div>
+        </header>
+        <div class="filter-section-body">
+          <div class="nbhd-trigger-list" id="nbhd-trigger-list">
+            <div class="nbhd-trigger-group">
+              <h4 class="nbhd-trigger-heading">South Street</h4>
+              <button type="button" class="nbhd-trigger" data-nbhd="Society Hill" data-shape="Society Hill Civic Association"><span class="nbhd-dot nbhd-dot-south"></span>Society Hill</button>
+              <button type="button" class="nbhd-trigger" data-nbhd="Washington Square West" data-tract="11.02"><span class="nbhd-dot nbhd-dot-south"></span>Washington Square West</button>
+              <button type="button" class="nbhd-trigger" data-nbhd="Queen Village" data-shape="Queen Village Neighbors Association"><span class="nbhd-dot nbhd-dot-south"></span>Queen Village</button>
+              <button type="button" class="nbhd-trigger" data-nbhd="Bella Vista" data-shape="Bella Vista Neighbors Association"><span class="nbhd-dot nbhd-dot-south"></span>Bella Vista</button>
+            </div>
+            <div class="nbhd-trigger-group">
+              <h4 class="nbhd-trigger-heading">East Passyunk</h4>
+              <button type="button" class="nbhd-trigger" data-nbhd="Passyunk Square" data-shape="Passyunk Square Civic Association"><span class="nbhd-dot nbhd-dot-east"></span>Passyunk Square</button>
+              <button type="button" class="nbhd-trigger" data-nbhd="Passyunk Square" data-shape="East Passyunk Crossing Civic Association (EPX)"><span class="nbhd-dot nbhd-dot-east"></span>East Passyunk Crossing</button>
+              <button type="button" class="nbhd-trigger" data-nbhd="Pennsport"><span class="nbhd-dot nbhd-dot-east"></span>Pennsport</button>
+            </div>
+          </div>
+        </div>
+      </section>
+    </aside>
+
+    <div class="map-column flex-1 md:border-l md:border-stone-300">
+      <div id="map" class="map-canvas"></div>
+      <div class="block-ribbon-wrapper" id="block-ribbon-wrapper">
+        <button
+          class="ribbon-toggle"
+          type="button"
+          id="ribbon-toggle"
+          aria-label="Collapse ribbon"
+          aria-expanded="true"
+        >
+          <svg class="ribbon-toggle-chevron" viewBox="0 0 12 8" fill="none" aria-hidden="true">
+            <path d="M1.5 1.5l4.5 4 4.5-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </button>
+        <div class="block-ribbon" id="block-ribbon">
+          <div class="ribbon-header">
+            <h3 class="ribbon-title">Block-level view</h3>
+            <select class="ribbon-metric-select" id="ribbon-metric-select" aria-label="Block metric">
+              <option value="vacancy_rate">Vacancy rate (%)</option>
+              <option value="outdoor_rate">Outdoor footprint (%)</option>
+              <option value="quick_service_rate">Quick service (%)</option>
+              <option value="nuisance_count">Nuisance retail (count)</option>
+              <option value="local_chain_count">Local chains (count)</option>
+            </select>
+          </div>
+          <div class="ribbon-corridor-row" data-corridor-row="south_street">
+            <div class="ribbon-corridor-label">SOUTH STREET</div>
+            <div class="ribbon-blocks" data-blocks-for="South Street"></div>
+          </div>
+          <div class="ribbon-corridor-row" data-corridor-row="east_passyunk">
+            <div class="ribbon-corridor-label">EAST PASSYUNK</div>
+            <div class="ribbon-blocks" data-blocks-for="East Passyunk"></div>
+          </div>
+          <div class="ribbon-legend">
+            <span class="ribbon-legend-label">Low</span>
+            <div class="ribbon-legend-bar" id="ribbon-legend-bar"></div>
+            <span class="ribbon-legend-label">High</span>
+          </div>
+        </div>
+        <div class="ribbon-tooltip" id="ribbon-tooltip" hidden></div>
+      </div>
+    </div>
+  </div>
+
+  <style is:global>
+    /* Map layout fills the viewport below the site header. Header is approx 61px;
+       fall back to subtracting a fixed value but allow CSS calc on dvh for mobile UI bars. */
+    :root {
+      --site-header-h: 61px;
+    }
+
+    .map-layout {
+      min-height: calc(100dvh - var(--site-header-h));
+    }
+
+    @media (min-width: 768px) {
+      .map-layout {
+        height: calc(100dvh - var(--site-header-h));
+        min-height: 0;
+      }
+    }
+
+    .map-sidebar {
+      background-color: #f5f3ef;
+    }
+
+    .map-canvas {
+      background-color: #eaeaea;
+    }
+
+    /* Map column: stacks the map above the block-level ribbon. */
+    .map-column {
+      display: flex;
+      flex-direction: column;
+    }
+    .map-column #map {
+      height: 70vh;          /* mobile default */
+    }
+    @media (min-width: 768px) {
+      .map-column #map {
+        height: auto;
+        flex: 1;
+        min-height: 0;       /* enable flex-shrink for nested flex */
+      }
+    }
+
+    /* Block-level heat ribbon below the map.
+       Wrapper holds the absolute-positioned toggle "tab" plus the ribbon body. */
+    .block-ribbon-wrapper {
+      position: relative;
+      flex-shrink: 0;
+    }
+    .ribbon-toggle {
+      position: absolute;
+      top: -19px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 64px;
+      height: 30px;
+      background: #ffffff;
+      border: 1.5px solid #b8b4b0;
+      border-bottom-color: #ffffff;  /* mask the part overlapping the ribbon top border */
+      border-radius: 8px 8px 0 0;
+      box-shadow: 0 -2px 6px rgba(0, 0, 0, 0.12);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      color: #1a1a1a;
+      padding: 0;
+      /* Must be > Leaflet's popup-pane (700) so the protruding tab isn't
+         covered by tile-pane (200) or any other Leaflet pane. */
+      z-index: 1000;
+      transition: background 0.12s ease, border-color 0.12s ease;
+    }
+    .ribbon-toggle:hover {
+      background: #f5f3f0;
+      border-color: #1c1917;
+    }
+    .ribbon-toggle:focus-visible {
+      outline: 2px solid #534AB7;
+      outline-offset: 1px;
+    }
+    .ribbon-toggle-chevron {
+      width: 18px;
+      height: 18px;
+      transition: transform 0.25s ease;
+    }
+    .block-ribbon-wrapper.is-collapsed .ribbon-toggle-chevron {
+      transform: rotate(180deg);
+    }
+    .block-ribbon {
+      background: #ffffff;
+      border-top: 1px solid #d6d3d1;
+      padding: 14px 16px 12px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      font-size: 12px;
+      color: #1c1917;
+      overflow: hidden;
+      max-height: 600px;
+      transition: max-height 0.25s ease,
+                  padding-top 0.25s ease,
+                  padding-bottom 0.25s ease;
+    }
+    .block-ribbon-wrapper.is-collapsed .block-ribbon {
+      max-height: 14px;   /* thin strip under the tab so collapsed total ~25-28px */
+      padding-top: 0;
+      padding-bottom: 0;
+    }
+    .ribbon-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .ribbon-title {
+      margin: 0;
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: -0.005em;
+      color: #1c1917;
+    }
+    .ribbon-metric-select {
+      font-size: 12px;
+      padding: 3px 6px;
+      border: 1px solid #d6d3d1;
+      border-radius: 3px;
+      background: #ffffff;
+      color: #1c1917;
+      cursor: pointer;
+    }
+    .ribbon-corridor-row {
+      display: grid;
+      grid-template-columns: 110px 1fr;
+      gap: 10px;
+      align-items: center;
+      opacity: 1;
+      transition: opacity 0.3s ease;
+    }
+    .ribbon-corridor-row.is-dimmed {
+      opacity: 0.5;
+    }
+    .ribbon-corridor-label {
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: #78716c;
+    }
+    .ribbon-blocks {
+      display: grid;
+      gap: 2px;
+    }
+    .ribbon-blocks[data-block-count="11"] { grid-template-columns: repeat(11, 1fr); }
+    .ribbon-blocks[data-block-count="8"]  { grid-template-columns: repeat(8,  1fr); }
+    .ribbon-block {
+      position: relative;
+      padding: 4px 2px;
+      border-radius: 3px;
+      text-align: center;
+      cursor: pointer;
+      user-select: none;
+      overflow: hidden;
+      transition: transform 0.15s ease, box-shadow 0.2s ease;
+    }
+    .ribbon-block:hover:not(.is-selected) {
+      transform: translateY(-1px);
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+    }
+    .ribbon-block.is-selected {
+      box-shadow: inset 0 0 0 3px #1a1a1a, 0 4px 12px rgba(26, 26, 26, 0.25);
+      transform: scale(1.04);
+      z-index: 5;
+    }
+    .ribbon-block-num {
+      font-size: 11px;
+      font-weight: 500;
+      line-height: 1.2;
+      position: relative;
+      z-index: 1;
+    }
+    .ribbon-block-val {
+      font-size: 10px;
+      line-height: 1.2;
+      position: relative;
+      z-index: 1;
+    }
+    /* Low-confidence diagonal striping overlay (denominator < 5 on % metrics) */
+    .ribbon-block.is-low-conf::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      background: repeating-linear-gradient(
+        45deg,
+        transparent 0 4px,
+        rgba(255, 255, 255, 0.5) 4px 5px
+      );
+    }
+    .ribbon-legend {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 2px;
+    }
+    .ribbon-legend-label {
+      font-size: 10px;
+      color: #78716c;
+    }
+    .ribbon-legend-bar {
+      flex: 1;
+      height: 6px;
+      border-radius: 3px;
+    }
+
+    /* Block hover tooltip */
+    .ribbon-tooltip {
+      position: fixed;
+      z-index: 1100;
+      background: #ffffff;
+      border: 1px solid #d6d3d1;
+      border-radius: 6px;
+      padding: 8px 10px;
+      font-size: 12px;
+      color: #1c1917;
+      line-height: 1.4;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+      pointer-events: none;
+      max-width: 280px;
+    }
+    .ribbon-tooltip[hidden] {
+      display: none;
+    }
+    .ribbon-tooltip-header {
+      font-weight: 600;
+      color: #1c1917;
+      margin-bottom: 4px;
+    }
+    .ribbon-tooltip-body {
+      color: #57534e;
+    }
+    .ribbon-tooltip-body + .ribbon-tooltip-body {
+      margin-top: 2px;
+      font-size: 11px;
+    }
+    /* Arrow — double-border trick so it has a 1px border line */
+    .ribbon-tooltip[data-arrow="down"]::before,
+    .ribbon-tooltip[data-arrow="down"]::after {
+      content: '';
+      position: absolute;
+      top: 100%;
+      left: 50%;
+      width: 0;
+      height: 0;
+      border: 6px solid transparent;
+      pointer-events: none;
+    }
+    .ribbon-tooltip[data-arrow="down"]::before {
+      transform: translateX(-50%);
+      border-top-color: #d6d3d1;
+      border-bottom-width: 0;
+    }
+    .ribbon-tooltip[data-arrow="down"]::after {
+      transform: translateX(-50%) translateY(-1px);
+      border-top-color: #ffffff;
+      border-bottom-width: 0;
+    }
+    .ribbon-tooltip[data-arrow="up"]::before,
+    .ribbon-tooltip[data-arrow="up"]::after {
+      content: '';
+      position: absolute;
+      bottom: 100%;
+      left: 50%;
+      width: 0;
+      height: 0;
+      border: 6px solid transparent;
+      pointer-events: none;
+    }
+    .ribbon-tooltip[data-arrow="up"]::before {
+      transform: translateX(-50%);
+      border-bottom-color: #d6d3d1;
+      border-top-width: 0;
+    }
+    .ribbon-tooltip[data-arrow="up"]::after {
+      transform: translateX(-50%) translateY(1px);
+      border-bottom-color: #ffffff;
+      border-top-width: 0;
+    }
+
+    /* Sidebar — intro block */
+    .sidebar-intro {
+      padding: 16px 24px 12px 24px;
+    }
+
+    /* Sidebar — filter sections */
+    .filter-section {
+      padding: 14px 24px 16px 24px;
+      border-top: 1px solid #e7e5e4;
+    }
+    .filter-section-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 8px;
+    }
+    .filter-section-header h3 {
+      margin: 0;
+      font-size: 15px;
+      font-weight: 500;
+      letter-spacing: -0.005em;
+      color: #1c1917;
+    }
+    .filter-section-meta {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .filter-section-badge {
+      background-color: #e7e5e4;
+      color: #57534e;
+      border-radius: 999px;
+      padding: 1px 8px;
+      font-size: 11px;
+      font-weight: 500;
+      letter-spacing: 0.01em;
+    }
+    .filter-section-reset {
+      background: none;
+      border: none;
+      padding: 0;
+      font-size: 12px;
+      color: #57534e;
+      text-decoration: underline;
+      cursor: pointer;
+    }
+    .filter-section-reset:hover {
+      color: #1c1917;
+    }
+    .filter-section-body {
+      font-size: 13px;
+      color: #57534e;
+    }
+    .filter-coming-soon {
+      margin: 0;
+      color: #a8a29e;
+      font-style: italic;
+    }
+
+    /* Filter group spacing within a section */
+    .filter-group {
+      margin-top: 16px;
+    }
+    .filter-group:first-child {
+      margin-top: 0;
+    }
+    .filter-group-label {
+      margin: 0 0 6px 0;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: #78716c;
+    }
+
+    /* Checkbox rows (vacancy, category checkboxes) */
+    .filter-check {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 2px 0;
+      font-size: 13px;
+      color: #1c1917;
+      cursor: pointer;
+      line-height: 1.3;
+    }
+    .filter-check input[type="checkbox"] {
+      accent-color: #1c1917;
+      margin: 0;
+    }
+    .filter-swatch {
+      display: inline-block;
+      width: 11px;
+      height: 11px;
+      border-radius: 50%;
+      border: 1px solid rgba(0, 0, 0, 0.12);
+      flex-shrink: 0;
+    }
+    .filter-check-label {
+      flex: 1;
+    }
+    .count {
+      color: #a8a29e;
+      font-size: 12px;
+      font-variant-numeric: tabular-nums;
+    }
+
+    /* Segment drill-down */
+    .segment {
+      margin: 2px 0;
+    }
+    .segment-header {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 2px 0;
+    }
+    .segment-chevron {
+      width: 16px;
+      height: 16px;
+      padding: 0;
+      background: none;
+      border: none;
+      color: #78716c;
+      font-size: 10px;
+      line-height: 1;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      transition: transform 0.12s ease;
+    }
+    .segment-chevron[aria-expanded="true"] {
+      transform: rotate(90deg);
+    }
+    .segment-parent {
+      accent-color: #1c1917;
+      margin: 0;
+    }
+    .segment-label {
+      flex: 1;
+      padding: 0;
+      background: none;
+      border: none;
+      color: #1c1917;
+      font-size: 13px;
+      text-align: left;
+      cursor: pointer;
+      line-height: 1.3;
+    }
+    .segment-children {
+      padding-left: 28px;
+      margin: 2px 0 6px 0;
+    }
+    .segment-children .filter-check {
+      font-size: 12.5px;
+      padding: 1px 0;
+    }
+
+    /* Chips */
+    .chip-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 5px;
+    }
+    .chip {
+      padding: 3px 10px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 500;
+      background: #e7e5e4;
+      color: #57534e;
+      border: 1px solid transparent;
+      cursor: pointer;
+      transition: background 0.1s, color 0.1s;
+    }
+    .chip[aria-pressed="true"] {
+      background: #1c1917;
+      color: #fafaf9;
+    }
+    .chip:hover {
+      border-color: #a8a29e;
+    }
+    .chip[aria-pressed="true"]:hover {
+      border-color: #1c1917;
+    }
+
+    /* Corridor centerline lines (rendered as SVG paths). Smooth fade between
+       full and dimmed opacity when the user switches corridor selection. */
+    .corridor-line {
+      transition: stroke-opacity 300ms ease;
+    }
+
+    /* Sticky sentinel — 1px element just above the Corridor section. The
+       IntersectionObserver watches this; when it leaves the sidebar viewport
+       (i.e., user scrolled past the intro), we set .is-stuck on the Corridor
+       section so its shadow appears. The -1px margin collapses the visual
+       gap so the sentinel is invisible. */
+    .sticky-sentinel {
+      height: 1px;
+      margin: 0 0 -1px 0;
+    }
+
+    /* Corridor section sticks to the top of the sidebar scroll container.
+       Background must match the sidebar so scrolling content doesn't show
+       through behind it. */
+    .filter-section[data-section="corridor"] {
+      position: sticky;
+      top: 0;
+      background-color: #f5f3ef;
+      z-index: 5;
+      transition: box-shadow 0.18s ease;
+    }
+    .filter-section[data-section="corridor"].is-stuck {
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
+    }
+
+    /* Corridor segmented control — 3 pill buttons spanning sidebar width */
+    .corridor-segmented {
+      display: flex;
+      gap: 4px;
+    }
+    .corridor-segment {
+      flex: 1;
+      padding: 6px 6px;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 500;
+      color: #57534e;
+      background: #ffffff;
+      border: 1px solid #d6d3d1;
+      cursor: pointer;
+      text-align: center;
+      white-space: nowrap;
+      transition: background 0.1s, color 0.1s, border-color 0.1s;
+    }
+    .corridor-segment:hover {
+      border-color: #a8a29e;
+    }
+    .corridor-segment[aria-pressed="true"] {
+      background: #1c1917;
+      color: #fafaf9;
+      border-color: #1c1917;
+    }
+    .corridor-counter {
+      margin: 8px 0 0 0;
+      font-size: 12px;
+      color: #78716c;
+      font-variant-numeric: tabular-nums;
+    }
+
+    /* Dual-handle range slider (Building mix → Years since last sale).
+       Two overlaid <input type="range"> elements; the thumb on each handles
+       its own drag while the input box itself is pointer-events: none, so the
+       user can grab whichever thumb is closer. */
+    .range-slider {
+      padding: 0 4px;
+    }
+    .range-slider-labels {
+      display: flex;
+      justify-content: space-between;
+      font-size: 11px;
+      color: #57534e;
+      margin-bottom: 6px;
+      font-variant-numeric: tabular-nums;
+    }
+    .range-slider-track {
+      position: relative;
+      height: 4px;
+      background: #d6d3d1;
+      border-radius: 2px;
+      margin: 10px 8px;
+    }
+    .range-slider-fill {
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      background: #1c1917;
+      border-radius: 2px;
+    }
+    .range-slider-handle {
+      position: absolute;
+      top: 50%;
+      left: -8px;
+      width: calc(100% + 16px);
+      height: 4px;
+      margin: 0;
+      padding: 0;
+      background: transparent;
+      pointer-events: none;
+      -webkit-appearance: none;
+      appearance: none;
+      outline: none;
+      transform: translateY(-50%);
+    }
+    .range-slider-handle::-webkit-slider-runnable-track {
+      background: transparent;
+      border: none;
+      height: 4px;
+    }
+    .range-slider-handle::-moz-range-track {
+      background: transparent;
+      border: none;
+      height: 4px;
+    }
+    .range-slider-handle::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      pointer-events: auto;
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      background: #1c1917;
+      border: 2px solid #ffffff;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+      cursor: pointer;
+      margin-top: 0;
+    }
+    .range-slider-handle::-moz-range-thumb {
+      pointer-events: auto;
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: #1c1917;
+      border: 2px solid #ffffff;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+      cursor: pointer;
+    }
+    .range-slider-handle:focus::-webkit-slider-thumb {
+      box-shadow: 0 0 0 3px rgba(28, 25, 23, 0.2), 0 1px 2px rgba(0, 0, 0, 0.2);
+    }
+    .range-slider-handle:focus::-moz-range-thumb {
+      box-shadow: 0 0 0 3px rgba(28, 25, 23, 0.2), 0 1px 2px rgba(0, 0, 0, 0.2);
+    }
+
+    /* Outdoor toggle */
+    .filter-toggle {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 13px;
+      color: #1c1917;
+      cursor: pointer;
+    }
+    .filter-toggle input[type="checkbox"] {
+      accent-color: #1c1917;
+      margin: 0;
+    }
+
+    /* Cultural anchor lens block — distinct affordance with purple left accent
+       and a warmer-than-sidebar background. */
+    .lens-block {
+      padding: 10px 12px;
+      background: #f5efe4;
+      border-left: 3px solid #534AB7;
+      border-radius: 3px;
+    }
+    .lens-block .filter-toggle {
+      font-weight: 500;
+    }
+    .lens-caption {
+      margin: 4px 0 8px 22px; /* indent past the checkbox */
+      font-size: 11px;
+      color: #78716c;
+      font-style: italic;
+    }
+    /* Cultural anchor labels (Leaflet permanent tooltips) */
+    .leaflet-tooltip.cultural-label {
+      background: rgba(255, 255, 255, 0.88);
+      border: 1px solid rgba(83, 74, 183, 0.3);
+      border-radius: 3px;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.08);
+      padding: 1px 6px;
+      font-size: 11px;
+      font-weight: 500;
+      color: #1c1917;
+      white-space: nowrap;
+    }
+    .leaflet-tooltip.cultural-label-faded {
+      opacity: 0.5;
+    }
+    .leaflet-tooltip.cultural-label:before {
+      display: none;  /* hide tooltip arrow */
+    }
+
+    /* Map-overlay captions (indented past the checkbox). Hidden by default;
+       revealed only while their own toggle is checked, to keep the group compact. */
+    .overlay-caption {
+      display: none;
+      margin: 1px 0 0 22px;
+      font-size: 11px;
+      color: #78716c;
+      font-style: italic;
+    }
+    .filter-group:has(.filter-toggle input:checked) > .overlay-caption {
+      display: block;
+    }
+
+    /* Condense the three overlay toggles into one tight group. The first row
+       (BID) keeps a little separation from the corridor counter above it. */
+    /* The four overlay toggles read as one tight, evenly-spaced group. */
+    .filter-group[data-filter-group="bids"],
+    .filter-group[data-filter-group="rcos"],
+    .filter-group[data-filter-group="zoning"],
+    .filter-group[data-filter-group="density"] {
+      margin-top: 6px;
+    }
+
+    /* BID permanent labels (teal family) */
+    .leaflet-tooltip.bid-label {
+      background: rgba(255, 255, 255, 0.9);
+      border: 1px solid rgba(14, 116, 144, 0.45);
+      border-radius: 3px;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.08);
+      padding: 1px 6px;
+      font-size: 11px;
+      font-weight: 600;
+      color: #0e7490;
+      white-space: nowrap;
+    }
+    .leaflet-tooltip.bid-label:before { display: none; }
+    /* BID outlines stay visible always, but their permanent labels hide while a
+       single corridor is selected (toggled on the map container by the corridor
+       filter). They reappear under "All Corridors". */
+    .bid-labels-hidden .leaflet-tooltip.bid-label { display: none; }
+
+    /* RCO hover labels. Default amber (East Passyunk); the .rco-label-south
+       modifier recolors to the South Street purple so the label matches its
+       boundary outline. */
+    .leaflet-tooltip.rco-label {
+      background: rgba(255, 255, 255, 0.92);
+      border: 1px solid rgba(180, 83, 9, 0.5);
+      border-radius: 3px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.12);
+      padding: 1px 6px;
+      font-size: 11px;
+      font-weight: 600;
+      color: #b45309;
+      white-space: nowrap;
+    }
+    .leaflet-tooltip.rco-label.rco-label-south {
+      border-color: rgba(147, 51, 234, 0.5);
+      color: #9333EA;
+    }
+    .leaflet-tooltip.rco-label:before { display: none; }
+    /* Past the block-level zoom threshold the RCO hover label is suppressed so it
+       doesn't interfere while someone is examining a single block. */
+    .rco-hover-off .leaflet-tooltip.rco-label { display: none; }
+
+    /* Base-zoning legend (Leaflet control; only present while the layer is on) */
+    .zoning-legend {
+      background: rgba(255, 255, 255, 0.94);
+      border: 1px solid #d6d3d1;
+      border-radius: 5px;
+      box-shadow: 0 1px 4px rgba(0, 0, 0, 0.14);
+      padding: 8px 10px;
+      font-size: 11px;
+      line-height: 1.3;
+      color: #1c1917;
+      max-width: 190px;
+    }
+    .zoning-legend-title {
+      font-weight: 700;
+      font-size: 10.5px;
+      letter-spacing: 0.03em;
+      text-transform: uppercase;
+      color: #57534e;
+      margin: 0 0 5px 0;
+    }
+    .zoning-legend-row {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      margin: 2px 0;
+    }
+    .zoning-legend-swatch {
+      width: 13px;
+      height: 13px;
+      border-radius: 2px;
+      border: 1px solid rgba(0, 0, 0, 0.18);
+      flex-shrink: 0;
+    }
+    .zoning-legend-name { font-weight: 600; }
+    .zoning-legend-codes { color: #78716c; }
+
+    /* Catchment ring label (¾-mile walk) */
+    .ring-label {
+      font-size: 10.5px;
+      font-weight: 600;
+      color: #6d28d9;
+      background: rgba(255, 255, 255, 0.85);
+      border: 1px solid rgba(109, 40, 217, 0.4);
+      border-radius: 3px;
+      padding: 1px 5px;
+      white-space: nowrap;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
+    }
+
+    /* Critical-mass / density panel (Leaflet control, top-left) */
+    .density-panel {
+      width: 234px;
+      background: rgba(255, 255, 255, 0.96);
+      border: 1px solid #d6d3d1;
+      border-radius: 8px;
+      box-shadow: 0 3px 14px rgba(0, 0, 0, 0.18);
+      padding: 12px 14px;
+      font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+      color: #1c1917;
+    }
+    .density-panel-title {
+      margin: 0 0 7px 0;
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: -0.01em;
+    }
+    .density-panel-row {
+      margin: 2px 0;
+      font-size: 11.5px;
+      color: #57534e;
+    }
+    .density-panel-row b { color: #1c1917; font-weight: 700; }
+    .density-ratio { margin: 9px 0 4px 0; }
+    .density-ratio-head { font-size: 11.5px; color: #57534e; }
+    .density-ratio-head b { font-size: 14px; color: #0f766e; font-weight: 700; }
+    .density-bar {
+      position: relative;
+      height: 9px;
+      margin: 5px 0 4px 0;
+      background: #ece9e3;
+      border-radius: 5px;
+      overflow: hidden;
+    }
+    .density-bar-fill {
+      height: 100%;
+      width: 62%;
+      background: #0f766e;
+      border-radius: 5px;
+      transition: width 0.12s ease, background 0.12s ease;
+    }
+    .density-bar-fill.is-reached { background: #15803d; }
+    .density-ratio-label {
+      font-size: 10.5px;
+      font-weight: 600;
+      color: #a4524a;
+    }
+    .density-ratio-label.is-reached { color: #15803d; }
+    .density-slider-label {
+      display: block;
+      margin: 10px 0 3px 0;
+      font-size: 11px;
+      color: #57534e;
+    }
+    .density-slider-label b { color: #1c1917; }
+    #dp-slider { width: 100%; margin: 0; accent-color: #0f766e; }
+    .density-hint {
+      margin: 5px 0 0 0;
+      font-size: 10px;
+      font-style: italic;
+      color: #78716c;
+    }
+    .density-nbhd {
+      margin: 8px 0 0 0;
+      padding: 5px 7px;
+      background: #eef6f5;
+      border-left: 3px solid #0f766e;
+      border-radius: 3px;
+      font-size: 10.5px;
+      color: #1c1917;
+    }
+    .density-est { color: #a8a29e; font-weight: 400; }
+    .density-note {
+      margin: 9px 0 0 0;
+      font-size: 9px;
+      font-style: italic;
+      color: #a8a29e;
+      line-height: 1.3;
+    }
+    .density-legend { margin-top: 10px; }
+    .density-legend-cap {
+      font-size: 9.5px;
+      color: #78716c;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+    }
+    .density-legend-bar {
+      height: 8px;
+      margin: 4px 0 2px 0;
+      border-radius: 4px;
+      background: linear-gradient(to right, #d7f0ee, #0d4d4a);
+    }
+    .density-legend-ends {
+      display: flex;
+      justify-content: space-between;
+      font-size: 9px;
+      color: #78716c;
+    }
+
+    /* Sidebar neighborhood trigger list (under the RCO toggle) */
+    .nbhd-trigger-list {
+      margin-top: 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .nbhd-trigger-heading {
+      margin: 0 0 3px 0;
+      font-size: 10.5px;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      color: #78716c;
+    }
+    .nbhd-trigger {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      width: 100%;
+      padding: 4px 6px;
+      border: none;
+      background: transparent;
+      border-radius: 4px;
+      font-size: 12.5px;
+      color: #1c1917;
+      text-align: left;
+      cursor: pointer;
+      transition: background 0.1s ease;
+    }
+    .nbhd-trigger:hover { background: #f0ece3; }
+    .nbhd-trigger.is-active {
+      background: #ece7f8;
+      font-weight: 600;
+    }
+    .nbhd-dot {
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+    .nbhd-dot-south { background: #9333EA; }
+    .nbhd-dot-east { background: #b45309; }
+
+    /* Disabled overlay toggle (e.g. Density score while East Passyunk is selected) */
+    .filter-group.is-disabled {
+      opacity: 0.45;
+      pointer-events: none;
+    }
+
+    /* Neighborhood demographic card (Leaflet control, docked top-right) */
+    .nbhd-card {
+      width: 250px;
+      background: #ffffff;
+      border: 1px solid #d6d3d1;
+      border-radius: 8px;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.18);
+      padding: 14px 16px 12px 16px;
+      font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+      color: #1c1917;
+    }
+    .nbhd-card-close {
+      position: absolute;
+      top: 8px;
+      right: 9px;
+      width: 22px;
+      height: 22px;
+      border: none;
+      background: transparent;
+      font-size: 20px;
+      line-height: 1;
+      color: #a8a29e;
+      cursor: pointer;
+      border-radius: 4px;
+    }
+    .nbhd-card-close:hover { background: #f5f5f4; color: #1c1917; }
+    .nbhd-card-title {
+      margin: 0 24px 0 0;
+      font-size: 16px;
+      font-weight: 700;
+      letter-spacing: -0.01em;
+    }
+    .nbhd-card-subtitle {
+      margin: 1px 0 10px 0;
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: #9333EA;
+    }
+    .nbhd-card-subtitle.is-east { color: #b45309; }
+    .nbhd-stats { margin: 0; }
+    .nbhd-stat {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 8px;
+      padding: 4px 0;
+      border-bottom: 1px solid #f0ece3;
+    }
+    .nbhd-stat dt {
+      font-size: 11.5px;
+      color: #57534e;
+    }
+    .nbhd-stat dd {
+      margin: 0;
+      font-size: 13.5px;
+      font-weight: 700;
+      text-align: right;
+      white-space: nowrap;
+    }
+    .nbhd-delta {
+      display: block;
+      font-size: 10.5px;
+      font-weight: 600;
+      color: #15803d;
+    }
+    .nbhd-delta.is-negative { color: #b91c1c; }
+    /* Demographic-shift deltas (age, renter %, age 18-34) are neutral — no
+       good/bad value judgment implied by their direction. */
+    .nbhd-delta.is-neutral { color: #78716c; }
+    .nbhd-card-vacancy {
+      margin: 9px 0 0 0;
+      font-size: 11.5px;
+      color: #57534e;
+    }
+    /* Current corridor vacancy — muted red, a counterpoint to the green wealth
+       gains above. The 1995 baseline is smaller and muted. */
+    .nbhd-vacancy-now {
+      font-weight: 600;
+      color: #a4524a;
+    }
+    .nbhd-vacancy-base {
+      font-size: 10px;
+      color: #a8a29e;
+    }
+    .nbhd-card-note {
+      margin: 9px 0 0 0;
+      padding: 6px 8px;
+      background: #f5efe4;
+      border-left: 3px solid #c9bfa6;
+      border-radius: 3px;
+      font-size: 10.5px;
+      color: #57534e;
+    }
+    .nbhd-card-footnote {
+      margin: 9px 0 0 0;
+      font-size: 9.5px;
+      font-style: italic;
+      color: #a8a29e;
+    }
+
+    /* RCO polygons must catch hover across their fill (even at 0 fill opacity)
+       so the name tooltip fires anywhere inside the ring — not just on the
+       1.5px stroke. They sit in the low-z 'boundaries' pane, below the parcel
+       dots, so dots still win the click where the two overlap. */
+    path.rco-shape {
+      pointer-events: auto;
+      cursor: help;
+    }
+
+    /* Popup styling */
+    .leaflet-popup-content-wrapper {
+      border-radius: 6px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.12);
+    }
+    .leaflet-popup-content {
+      margin: 12px 14px;
+      font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+      font-size: 12.5px;
+      line-height: 1.3;
+      color: #1c1917;
+      min-width: 200px;
+      max-width: 260px;
+    }
+    .popup-address {
+      font-weight: 600;
+      font-size: 14px;
+      letter-spacing: -0.005em;
+      margin: 0;
+      color: #1c1917;
+    }
+    .popup-subheader {
+      font-size: 11.5px;
+      font-weight: 400;
+      color: #78716c;
+      margin: 1px 0 0 0;
+    }
+    .popup-pill-row {
+      margin: 4px 0;
+    }
+    .popup-pill {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 999px;
+      font-size: 11px;
+      font-weight: 500;
+      letter-spacing: 0.01em;
+    }
+    .popup-pill--short_term {
+      background-color: #c8632c;
+      color: #ffffff;
+    }
+    .popup-pill--long_term {
+      background-color: #8b1a1a;
+      color: #ffffff;
+    }
+    .popup-pill--under_renovation {
+      background-color: #e0b020;
+      color: #1c1917;
+    }
+    .popup-section {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+      margin-top: 10px;
+    }
+    .popup-section-title {
+      font-size: 10px;
+      text-transform: uppercase;
+      color: #a8a29e;
+      font-weight: 500;
+      letter-spacing: 0.5px;
+      margin: 0 0 1px 0;
+    }
+    /* Defeat Leaflet's default .leaflet-popup-content p { margin: 18px 0 } */
+    .leaflet-popup-content .popup-section p {
+      margin: 0 !important;
+      padding: 0 !important;
+    }
+    .popup-label {
+      font-weight: 600;
+      color: #1c1917;
+    }
+    .popup-caveat {
+      margin: 0 !important;
+      padding: 0 !important;
+      font-size: 11px;
+      font-style: italic;
+      color: #a8a29e;
+    }
+    .popup-violations-high {
+      color: #A32D2D;
+      font-weight: 600;
+    }
+  </style>
+
+  <script>
+    import L from 'leaflet';
+
+    // --- Corridor vacancy figures for the neighborhood card ---
+    // Hard-coded from the timeline series (NOT recomputed from the parcels) so
+    // they compare cleanly against the 1995 trough. Edit these to adjust the
+    // numbers shown on the cards.
+    const SOUTH_ST_VACANCY_1995 = 13.8;        // % vacant — 1995 trough
+    const SOUTH_ST_VACANCY_CURRENT = 27.8;     // % vacant — 2026 corridor-wide observed
+
+    const VACANCY_COLORS: Record<string, string> = {
+      active: '#4a7c2e',
+      under_renovation: '#e0b020',
+      short_term: '#c8632c',
+      long_term: '#8b1a1a',
+      non_commercial: '#a8a29e',
+    };
+
+    const STREET_STYLES: Record<string, { color: string; weight: number }> = {
+      south_street: { color: '#7B3F99', weight: 14 },
+      east_passyunk: { color: '#E67E22', weight: 14 },
+    };
+
+    function escapeHtml(value: unknown): string {
+      if (value === null || value === undefined) return '';
+      return String(value)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+    }
+
+    function formatPrice(v: unknown): string {
+      const n = Number(v);
+      if (!Number.isFinite(n)) return escapeHtml(v);
+      if (n === 1) return '$1';
+      return '$' + n.toLocaleString('en-US');
+    }
+
+    // Title-case OPA owner strings ("AXELROD MICHAEL TR" -> "Axelrod Michael TR").
+    // Acronyms and Roman numerals are preserved uppercase. Words spelled out
+    // (REVOCABLE / IRREVOCABLE / TRUST) are title-cased per the user's example.
+    const OWNER_PRESERVE_UPPER = new Set([
+      'TR', 'LLC', 'INC', 'LP', 'LTD', 'LTD.', 'CO', 'CO.',
+      'JR', 'JR.', 'SR', 'SR.',
+      'I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X',
+    ]);
+    function titleCaseOwner(s: string): string {
+      // Split keeping delimiters (whitespace, /, comma, hyphen) so we can
+      // recombine them as-is.
+      return s.split(/(\s+|\/|,|-)/g).map((tok) => {
+        if (/^\s+$/.test(tok) || /^[\/,-]$/.test(tok)) return tok;
+        const upper = tok.toUpperCase();
+        if (OWNER_PRESERVE_UPPER.has(upper)) return upper;
+        if (tok.length === 1) return upper;   // single-letter initial -> uppercase
+        return tok.charAt(0).toUpperCase() + tok.slice(1).toLowerCase();
+      }).join('');
+    }
+
+    type ParcelProps = {
+      id: number;
+      address: string | null;
+      corridor: string | null;
+      vacancy_state: string;
+      vacant: string | null;
+      vacancy_type: string | null;
+      business_category: string | null;
+      business_segment: string | null;
+      operator_type: string | null;
+      outdoor_footprint: string | null;
+      cultural_tenant: string | null;
+      cultural_status: string | null;
+      year_built: number | string | null;
+      zone_type: string | null;
+      building_footprint: number | null;
+      building_height: number | null;
+      open_violations: number | null;
+      last_sale_year: number | null;
+      last_sale_price: number | string | null;
+      owner: string | null;
+      opa_property_use: string | null;
+      out_of_area_owner: string | null;
+      corporate_owner: string | null;
+      // Augmented fields (Day 3, Phase 1)
+      block_number: number | null;
+      years_since_last_sale: number | null;
+      lot_area: number | null;
+      frontage: number | null;
+      storefront_condition: number | null;
+      structural_condition: number | null;
+      consumer_price_level: number | null;
+      peak_activation_period: number | null;
+      mailing_city_state: string | null;
+      last_sale_date: string | null;
+    };
+
+    // -------------------- Business mix filter options --------------------
+    // 4 commercial vacancy states. The 5th internal value 'non_commercial'
+    // (135 residential/civic parcels) is not filterable — that layer is
+    // zoom-controlled (visible at zoom >= 18) and treated as background context.
+    const VACANCY_OPTIONS: { value: string; label: string; color: string }[] = [
+      { value: 'active',           label: 'Occupied',             color: '#4a7c2e' },
+      { value: 'short_term',       label: 'Short-term turnover',  color: '#c8632c' },
+      { value: 'under_renovation', label: 'Under renovation',     color: '#e0b020' },
+      { value: 'long_term',        label: 'Long-term vacant',     color: '#8b1a1a' },
+    ];
+
+    const PEAK_OPTIONS: { value: number; label: string }[] = [
+      { value: 1, label: 'Morning' },
+      { value: 2, label: 'Midday' },
+      { value: 3, label: 'Afternoon' },
+      { value: 4, label: 'Evening' },
+      { value: 5, label: 'Late night' },
+    ];
+
+    const OPERATOR_OPTIONS: string[] = [
+      'Independent', 'Metro-only Chain', 'Regional Chain', 'National Chain',
+    ];
+
+    const PRICE_OPTIONS: { value: number; label: string }[] = [
+      { value: 1, label: '$' },
+      { value: 2, label: '$$' },
+      { value: 3, label: '$$$' },
+      { value: 4, label: '$$$$' },
+    ];
+
+    // -------------------- Building mix filter options --------------------
+    const OWNERSHIP_OPTIONS: { key: string; label: string; count: number }[] = [
+      { key: 'local',       label: 'Local owner',       count: 341 },
+      { key: 'out_of_area', label: 'Out-of-area owner', count: 170 },
+      { key: 'dollar_sale', label: '$1 sale',           count: 170 },
+    ];
+
+    const ZONE_OPTIONS: { value: string; count: number }[] = [
+      { value: 'CMX-1',   count: 23 },
+      { value: 'CMX-2',   count: 53 },
+      { value: 'CMX-2.5', count: 270 },
+      { value: 'CMX-3',   count: 95 },
+      { value: 'RM-1',    count: 25 },
+      { value: 'RSA-5',   count: 50 },
+      { value: 'CA-1',    count: 2 },
+      { value: 'SPPOA',   count: 1 },
+    ];
+
+    const YEARS_SINCE_SALE_FULL = { min: 0, max: 110 };
+    const BUILDING_HEIGHT_FULL  = { min: 0, max: 65 };
+
+    // Slider config table — generalized so updateRangeSliderUI and the input
+    // handler can dispatch by data-range-group id.
+    type SliderConfig = {
+      stateKey: 'yearsSinceSale' | 'buildingHeight';
+      full: { min: number; max: number };
+      formatLabel: (v: number) => string;
+    };
+    const SLIDER_CONFIGS: Record<string, SliderConfig> = {
+      'years-since-sale': {
+        stateKey: 'yearsSinceSale',
+        full: YEARS_SINCE_SALE_FULL,
+        formatLabel: (v) => `${v} years`,
+      },
+      'building-height': {
+        stateKey: 'buildingHeight',
+        full: BUILDING_HEIGHT_FULL,
+        formatLabel: (v) => `${v} ft`,
+      },
+    };
+
+    // Non-commercial zones — when any of these are checked in the Zone filter,
+    // the non-commercial layer becomes visible regardless of zoom.
+    const NON_COMMERCIAL_ZONES = new Set<string>(['RM-1', 'RSA-5', 'CA-1', 'SPPOA']);
+
+    // Segments excluded from the drill-down UI:
+    //   "Vacant" — redundant with vacancy_state filter
+    //   "Other" — 2-parcel catchall, not meaningful as a filter dimension
+    const EXCLUDED_SEGMENTS = new Set(['Vacant', 'Other']);
+
+    // -------------------- Filter state store --------------------
+    type CorridorChoice = 'all' | 'south-street' | 'east-passyunk';
+
+    type FilterState = {
+      corridor: CorridorChoice;    // single-select; default 'all'
+      vacancy: Set<string>;
+      category: Set<string>;       // selected business_category values (segment is implicit)
+      operator: Set<string>;
+      peak: Set<number>;
+      price: Set<number>;          // consumer_price_level values 1..4
+      outdoorOnly: boolean;
+      culturalLens: boolean;       // override: lens visualization overrides matchesAll
+      blockFilter: { corridor: string | null; block_number: number | null };
+      activeMetric: MetricKey;     // ribbon's active metric; drives metric-implied filter when block is selected
+      // Building mix
+      ownership: Set<string>;      // 'local' / 'out_of_area' / 'dollar_sale'; OR-internal
+      yearsSinceSale: { min: number; max: number };  // range slider 0..110
+      buildingHeight: { min: number; max: number };  // range slider 0..65 (ft)
+      zone: Set<string>;           // zone_type values e.g. 'CMX-2.5'
+    };
+
+    let allCategories: string[] = [];       // populated after parcels load
+    let segmentMap: Map<string, string[]> = new Map();
+    let categoryCount: Record<string, number> = {};
+    let segmentCount: Record<string, number> = {};
+    let vacancyCount: Record<string, number> = {};
+    let peakCount: Record<number, number> = {};
+    let operatorCount: Record<string, number> = {};
+    let priceCount: Record<number, number> = {};
+    let zoneCount: Record<string, number> = {};
+    let ownershipCount: Record<string, number> = { local: 0, out_of_area: 0, dollar_sale: 0 };
+
+    // ADDITIVE paradigm: every filter group starts empty (nothing selected =
+    // group inactive = every parcel passes). User clicks to narrow.
+    const filterState: FilterState = {
+      corridor: 'all',
+      vacancy: new Set(),
+      category: new Set(),
+      operator: new Set(),
+      peak: new Set(),
+      price: new Set(),
+      outdoorOnly: false,
+      culturalLens: false,
+      blockFilter: { corridor: null, block_number: null },
+      activeMetric: 'vacancy_rate',
+      ownership: new Set(),
+      yearsSinceSale: { min: 0, max: 110 },
+      buildingHeight: { min: 0, max: 65 },
+      zone: new Set(),
+    };
+
+    const subscribers = new Set<() => void>();
+
+    function subscribe(fn: () => void): () => void {
+      subscribers.add(fn);
+      return () => subscribers.delete(fn);
+    }
+
+    function setFilterState(updater: (s: FilterState) => void): void {
+      updater(filterState);
+      subscribers.forEach((fn) => fn());
+    }
+
+    // -------------------- Filter contract helpers --------------------
+    // ADDITIVE (discovery) paradigm: a filter group is *inactive* when
+    // nothing is selected (default). In that case every parcel passes,
+    // including nulls. Once the user selects any option, the group becomes
+    // active: only parcels whose value is in the selected set pass; nulls fail.
+    // Range sliders follow the same idea — inactive at full extent.
+
+    function passesFilter<T>(value: T | null, selectedSet: Set<T>): boolean {
+      if (selectedSet.size === 0) return true;
+      if (value === null) return false;
+      return selectedSet.has(value);
+    }
+
+    function passesRange(
+      value: number | null,
+      range: { min: number; max: number },
+      fullRange: { min: number; max: number },
+    ): boolean {
+      const isActive = range.min > fullRange.min || range.max < fullRange.max;
+      if (!isActive) return true;
+      if (value === null) return false;
+      return value >= range.min && value <= range.max;
+    }
+
+    // OR-internal helper for the Ownership pattern group: ANY selected
+    // predicate passing is enough.
+    function passesOwnership(parcel: ParcelProps, ownershipSet: Set<string>): boolean {
+      if (ownershipSet.size === 0) return true;
+      if (ownershipSet.has('local') && parcel.out_of_area_owner === 'No') return true;
+      if (ownershipSet.has('out_of_area') && parcel.out_of_area_owner === 'Yes') return true;
+      if (ownershipSet.has('dollar_sale') && Number(parcel.last_sale_price) === 1) return true;
+      return false;
+    }
+
+    // -------------------- Metric-implied filter (block + ribbon metric) --------------------
+    // When a block is selected, the active ribbon metric narrows the visible
+    // parcels to the subset that contributed to that metric's numerator. This
+    // runs AND with the sidebar filters, so a parcel must pass both.
+    // No-op when no block is selected. Lens mode bypasses matchesAll entirely
+    // so this never runs in lens mode.
+    function passesMetricImpliedFilter(p: ParcelProps): boolean {
+      const bf = filterState.blockFilter;
+      if (bf.corridor === null || bf.block_number === null) return true;
+      switch (filterState.activeMetric) {
+        case 'vacancy_rate':
+          return (
+            p.vacancy_state === 'short_term' ||
+            p.vacancy_state === 'under_renovation' ||
+            p.vacancy_state === 'long_term'
+          );
+        case 'outdoor_rate':
+          return p.outdoor_footprint === 'Yes';
+        case 'quick_service_rate':
+          return (p.business_category || '').indexOf('Quick Service') !== -1;
+        case 'nuisance_count':
+          return p.business_category !== null && NUISANCE_CATEGORIES.has(p.business_category);
+        case 'local_chain_count':
+          return p.operator_type !== null && LOCAL_CHAIN_OPERATORS.has(p.operator_type);
+      }
+      return true;
+    }
+
+    // -------------------- matchesAll --------------------
+    function matchesAll(p: ParcelProps): boolean {
+      // Corridor — single-select, fast short-circuit.
+      if (filterState.corridor !== 'all') {
+        const expected = filterState.corridor === 'south-street' ? 'South Street' : 'East Passyunk';
+        if (p.corridor !== expected) return false;
+      }
+      // Block filter — when set, parcel must match both corridor and block.
+      const bf = filterState.blockFilter;
+      if (bf.corridor !== null && bf.block_number !== null) {
+        if (p.corridor !== bf.corridor || p.block_number !== bf.block_number) return false;
+      }
+      // Metric-implied filter — only when block is selected.
+      if (!passesMetricImpliedFilter(p)) return false;
+      // Business mix groups: inactive (empty Set) -> passes everything (incl. nulls).
+      // Active (any selection) -> only matching values pass; nulls fail.
+      if (!passesFilter(p.vacancy_state,           filterState.vacancy))  return false;
+      if (!passesFilter(p.business_category,       filterState.category)) return false;
+      if (!passesFilter(p.operator_type,           filterState.operator)) return false;
+      if (!passesFilter(p.peak_activation_period,  filterState.peak))     return false;
+      if (!passesFilter(p.consumer_price_level,    filterState.price))    return false;
+      if (filterState.outdoorOnly && p.outdoor_footprint !== 'Yes')       return false;
+      // Building mix groups (AND across groups; ownership is OR-internal)
+      if (!passesOwnership(p, filterState.ownership))                                return false;
+      if (!passesRange(p.years_since_last_sale, filterState.yearsSinceSale, YEARS_SINCE_SALE_FULL)) return false;
+      if (!passesRange(p.building_height, filterState.buildingHeight, BUILDING_HEIGHT_FULL))       return false;
+      if (!passesFilter(p.zone_type, filterState.zone))                              return false;
+      return true;
+    }
+
+    // -------------------- Section dirty-count helpers --------------------
+    // A group is dirty when at least one option is selected (or the toggle is on).
+    function businessMixDirtyCount(): number {
+      let n = 0;
+      if (filterState.vacancy.size  > 0) n++;
+      if (filterState.category.size > 0) n++;
+      if (filterState.operator.size > 0) n++;
+      if (filterState.peak.size     > 0) n++;
+      if (filterState.price.size    > 0) n++;
+      if (filterState.outdoorOnly)       n++;
+      if (filterState.culturalLens)      n++;
+      return n;
+    }
+    const BUSINESS_MIX_GROUP_COUNT = 7;
+
+    function buildingMixDirtyCount(): number {
+      let n = 0;
+      if (filterState.ownership.size > 0) n++;
+      if (
+        filterState.yearsSinceSale.min > YEARS_SINCE_SALE_FULL.min ||
+        filterState.yearsSinceSale.max < YEARS_SINCE_SALE_FULL.max
+      ) {
+        n++;
+      }
+      if (filterState.zone.size > 0) n++;
+      if (
+        filterState.buildingHeight.min > BUILDING_HEIGHT_FULL.min ||
+        filterState.buildingHeight.max < BUILDING_HEIGHT_FULL.max
+      ) {
+        n++;
+      }
+      return n;
+    }
+    const BUILDING_MIX_GROUP_COUNT = 4;
+
+    function resetBusinessMix(): void {
+      filterState.vacancy = new Set();
+      filterState.category = new Set();
+      filterState.operator = new Set();
+      filterState.peak = new Set();
+      filterState.price = new Set();
+      filterState.outdoorOnly = false;
+      filterState.culturalLens = false;
+      resyncBusinessMixUI();
+    }
+
+    function resetBuildingMix(): void {
+      filterState.ownership = new Set();
+      filterState.yearsSinceSale = { min: 0, max: 110 };
+      filterState.buildingHeight = { min: 0, max: 65 };
+      filterState.zone = new Set();
+      // Reset chip aria-pressed for Building mix
+      document
+        .querySelectorAll<HTMLButtonElement>('[data-section="building-mix"] .chip')
+        .forEach((b) => b.setAttribute('aria-pressed', 'false'));
+      // Reset slider input values + UI for both sliders
+      updateRangeSliderUI('years-since-sale');
+      updateRangeSliderUI('building-height');
+    }
+
+    // -------------------- Segment structure (corridor-independent) --------------------
+    // Builds segmentMap + allCategories once from the full dataset; segment ordering
+    // is fixed by global counts so it stays stable when corridor scope changes.
+    function buildSegmentMap(parcelsGj: GeoJSON.FeatureCollection): void {
+      const segCats = new Map<string, Set<string>>();
+      const segGlobal: Record<string, number> = {};
+      for (const f of parcelsGj.features) {
+        const p = f.properties as ParcelProps;
+        const seg = p.business_segment;
+        const cat = p.business_category;
+        if (!seg || EXCLUDED_SEGMENTS.has(seg)) continue;
+        segGlobal[seg] = (segGlobal[seg] || 0) + 1;
+        if (cat) {
+          if (!segCats.has(seg)) segCats.set(seg, new Set());
+          segCats.get(seg)!.add(cat);
+        }
+      }
+      const sortedSegs = Array.from(segCats.keys()).sort(
+        (a, b) => (segGlobal[b] || 0) - (segGlobal[a] || 0),
+      );
+      segmentMap = new Map();
+      for (const s of sortedSegs) {
+        const cats = Array.from(segCats.get(s)!).sort();
+        segmentMap.set(s, cats);
+      }
+      allCategories = sortedSegs.flatMap((s) => segmentMap.get(s) || []);
+    }
+
+    // -------------------- Chip count tabulation (scope-aware) --------------------
+    // Re-runs on every state change. Each chip count reflects:
+    //   - parcels matching the chip's predicate
+    //   - within the current corridor scope
+    //   - within the current visible-layer scope (commercial+vacant always;
+    //     non-commercial included when the non-commercial layer is visible)
+    // Filters in OTHER chip groups do not affect a group's counts.
+    function recomputeChipCounts(): void {
+      if (!parcelsGjRef) return;
+      const corridor = filterState.corridor;
+      const includeNc = shouldShowNonCommercialLayer();
+
+      const segC: Record<string, number> = {};
+      const catC: Record<string, number> = {};
+      const vacC: Record<string, number> = {};
+      const peakC: Record<number, number> = {};
+      const opC: Record<string, number> = {};
+      const priceC: Record<number, number> = {};
+      const zoneC: Record<string, number> = {};
+      const ownC: Record<string, number> = { local: 0, out_of_area: 0, dollar_sale: 0 };
+
+      for (const f of parcelsGjRef.features) {
+        const p = f.properties as ParcelProps;
+        if (p.vacancy_state === 'non_commercial' && !includeNc) continue;
+        if (corridor === 'south-street'  && p.corridor !== 'South Street')  continue;
+        if (corridor === 'east-passyunk' && p.corridor !== 'East Passyunk') continue;
+
+        // Business mix counts (non-commercial parcels mostly skip via null/sentinel checks)
+        if (p.vacancy_state !== 'non_commercial') {
+          vacC[p.vacancy_state] = (vacC[p.vacancy_state] || 0) + 1;
+        }
+        if (typeof p.peak_activation_period === 'number') {
+          peakC[p.peak_activation_period] = (peakC[p.peak_activation_period] || 0) + 1;
+        }
+        if (typeof p.consumer_price_level === 'number') {
+          priceC[p.consumer_price_level] = (priceC[p.consumer_price_level] || 0) + 1;
+        }
+        if (p.operator_type && p.operator_type !== 'Vacant') {
+          opC[p.operator_type] = (opC[p.operator_type] || 0) + 1;
+        }
+        const seg = p.business_segment;
+        const cat = p.business_category;
+        if (seg && !EXCLUDED_SEGMENTS.has(seg)) {
+          segC[seg] = (segC[seg] || 0) + 1;
+          if (cat) catC[cat] = (catC[cat] || 0) + 1;
+        }
+
+        // Building mix counts
+        if (p.zone_type) zoneC[p.zone_type] = (zoneC[p.zone_type] || 0) + 1;
+        if (p.out_of_area_owner === 'No') ownC.local++;
+        if (p.out_of_area_owner === 'Yes') ownC.out_of_area++;
+        const lsp = p.last_sale_price;
+        if (lsp !== null && lsp !== undefined) {
+          const n = Number(lsp);
+          if (Number.isFinite(n) && n === 1) ownC.dollar_sale++;
+        }
+      }
+
+      // Non-commercial zone chips (RM-1, RSA-5, CA-1, SPPOA) reflect the full
+      // corridor-scoped universe regardless of layer visibility. The semantic
+      // is "this count is what becomes visible after the click." Without this
+      // second pass, those chips would read (0) when the layer is hidden,
+      // making them appear useless. Commercial zones (CMX-*) and all other
+      // chip groups keep the visible-scope semantic.
+      if (!includeNc) {
+        for (const f of parcelsGjRef.features) {
+          const p = f.properties as ParcelProps;
+          if (p.vacancy_state !== 'non_commercial') continue;
+          if (corridor === 'south-street'  && p.corridor !== 'South Street')  continue;
+          if (corridor === 'east-passyunk' && p.corridor !== 'East Passyunk') continue;
+          if (p.zone_type && NON_COMMERCIAL_ZONES.has(p.zone_type)) {
+            zoneC[p.zone_type] = (zoneC[p.zone_type] || 0) + 1;
+          }
+        }
+      }
+
+      segmentCount = segC;
+      categoryCount = catC;
+      vacancyCount = vacC;
+      peakCount = peakC;
+      operatorCount = opC;
+      priceCount = priceC;
+      zoneCount = zoneC;
+      ownershipCount = ownC;
+    }
+
+    // -------------------- Non-commercial layer visibility logic --------------------
+    function shouldShowNonCommercialLayer(): boolean {
+      if (!mapRef) return false;
+      if (mapRef.getZoom() >= NON_COMMERCIAL_MIN_ZOOM) return true;
+      for (const z of NON_COMMERCIAL_ZONES) {
+        if (filterState.zone.has(z)) return true;
+      }
+      return false;
+    }
+    const NON_COMMERCIAL_MIN_ZOOM = 18;
+
+    // -------------------- Sidebar count-span DOM updater --------------------
+    function updateAllCountSpans(): void {
+      document.querySelectorAll<HTMLElement>('[data-count-vacancy]').forEach((el) => {
+        const v = el.dataset.countVacancy!;
+        el.textContent = `(${vacancyCount[v] || 0})`;
+      });
+      document.querySelectorAll<HTMLElement>('[data-count-segment]').forEach((el) => {
+        const v = el.dataset.countSegment!;
+        el.textContent = `(${segmentCount[v] || 0})`;
+      });
+      document.querySelectorAll<HTMLElement>('[data-count-category]').forEach((el) => {
+        const v = el.dataset.countCategory!;
+        el.textContent = `(${categoryCount[v] || 0})`;
+      });
+      document.querySelectorAll<HTMLElement>('[data-count-operator]').forEach((el) => {
+        const v = el.dataset.countOperator!;
+        el.textContent = `(${operatorCount[v] || 0})`;
+      });
+      document.querySelectorAll<HTMLElement>('[data-count-peak]').forEach((el) => {
+        const v = Number(el.dataset.countPeak);
+        el.textContent = `(${peakCount[v] || 0})`;
+      });
+      document.querySelectorAll<HTMLElement>('[data-count-price]').forEach((el) => {
+        const v = Number(el.dataset.countPrice);
+        el.textContent = `(${priceCount[v] || 0})`;
+      });
+      document.querySelectorAll<HTMLElement>('[data-count-ownership]').forEach((el) => {
+        const v = el.dataset.countOwnership!;
+        el.textContent = `(${ownershipCount[v] || 0})`;
+      });
+      document.querySelectorAll<HTMLElement>('[data-count-zone]').forEach((el) => {
+        const v = el.dataset.countZone!;
+        el.textContent = `(${zoneCount[v] || 0})`;
+      });
+    }
+
+    // -------------------- Sidebar HTML rendering --------------------
+    function renderBusinessMixUI(): void {
+      // Vacancy checkboxes (default: unchecked)
+      const vacWrap = document.querySelector('.filter-vacancy-list') as HTMLElement | null;
+      if (vacWrap) {
+        vacWrap.innerHTML = VACANCY_OPTIONS.map((o) => `
+          <label class="filter-check">
+            <input type="checkbox" class="filter-vacancy" data-value="${o.value}" />
+            <span class="filter-swatch" style="background:${o.color}"></span>
+            <span class="filter-check-label">${escapeHtml(o.label)} <span class="count" data-count-vacancy="${o.value}">(${vacancyCount[o.value] || 0})</span></span>
+          </label>
+        `).join('');
+      }
+
+      // Segment drill-down (default: unchecked, collapsed)
+      const segWrap = document.getElementById('segment-list');
+      if (segWrap) {
+        const parts: string[] = [];
+        for (const [seg, cats] of segmentMap) {
+          parts.push(`
+            <div class="segment" data-segment="${escapeHtml(seg)}">
+              <div class="segment-header">
+                <button type="button" class="segment-chevron" aria-expanded="false" aria-label="Toggle ${escapeHtml(seg)}">▶</button>
+                <input type="checkbox" class="segment-parent" data-segment="${escapeHtml(seg)}" />
+                <button type="button" class="segment-label">${escapeHtml(seg)} <span class="count" data-count-segment="${escapeHtml(seg)}">(${segmentCount[seg] || 0})</span></button>
+              </div>
+              <div class="segment-children" hidden>
+                ${cats.map((c) => `
+                  <label class="filter-check">
+                    <input type="checkbox" class="filter-category" data-segment="${escapeHtml(seg)}" data-category="${escapeHtml(c)}" />
+                    <span class="filter-check-label">${escapeHtml(c)} <span class="count" data-count-category="${escapeHtml(c)}">(${categoryCount[c] || 0})</span></span>
+                  </label>
+                `).join('')}
+              </div>
+            </div>
+          `);
+        }
+        segWrap.innerHTML = parts.join('');
+      }
+
+      // Operator chips (default: unpressed)
+      const opWrap = document.querySelector('.chip-row[data-chip-group="operator"]') as HTMLElement | null;
+      if (opWrap) {
+        opWrap.innerHTML = OPERATOR_OPTIONS.map((o) => `
+          <button type="button" class="chip" data-value="${escapeHtml(o)}" aria-pressed="false">${escapeHtml(o)} <span class="count" data-count-operator="${escapeHtml(o)}">(${operatorCount[o] || 0})</span></button>
+        `).join('');
+      }
+
+      // Peak chips (default: unpressed)
+      const peakWrap = document.querySelector('.chip-row[data-chip-group="peak"]') as HTMLElement | null;
+      if (peakWrap) {
+        peakWrap.innerHTML = PEAK_OPTIONS.map((o) => `
+          <button type="button" class="chip" data-value="${o.value}" aria-pressed="false">${escapeHtml(o.label)} <span class="count" data-count-peak="${o.value}">(${peakCount[o.value] || 0})</span></button>
+        `).join('');
+      }
+
+      // Consumer price level chips (default: unpressed)
+      const priceWrap = document.querySelector('.chip-row[data-chip-group="price"]') as HTMLElement | null;
+      if (priceWrap) {
+        priceWrap.innerHTML = PRICE_OPTIONS.map((o) => `
+          <button type="button" class="chip" data-value="${o.value}" aria-pressed="false">${escapeHtml(o.label)} <span class="count" data-count-price="${o.value}">(${priceCount[o.value] || 0})</span></button>
+        `).join('');
+      }
+    }
+
+    // -------------------- Building mix UI --------------------
+    function renderRangeSlider(groupId: string, labelMinAria: string, labelMaxAria: string): void {
+      const cfg = SLIDER_CONFIGS[groupId];
+      if (!cfg) return;
+      const root = document.querySelector<HTMLElement>(
+        `.range-slider[data-range-group="${groupId}"]`,
+      );
+      if (!root) return;
+      root.innerHTML = `
+        <div class="range-slider-labels">
+          <span class="range-slider-value range-slider-value-min">${escapeHtml(cfg.formatLabel(cfg.full.min))}</span>
+          <span class="range-slider-value range-slider-value-max">${escapeHtml(cfg.formatLabel(cfg.full.max))}</span>
+        </div>
+        <div class="range-slider-track">
+          <div class="range-slider-fill"></div>
+          <input type="range" class="range-slider-handle range-slider-handle-min" min="${cfg.full.min}" max="${cfg.full.max}" step="1" value="${cfg.full.min}" aria-label="${escapeHtml(labelMinAria)}" />
+          <input type="range" class="range-slider-handle range-slider-handle-max" min="${cfg.full.min}" max="${cfg.full.max}" step="1" value="${cfg.full.max}" aria-label="${escapeHtml(labelMaxAria)}" />
+        </div>
+      `;
+      updateRangeSliderUI(groupId);
+    }
+
+    function renderBuildingMixUI(): void {
+      // Render order mirrors the section's visual order: Zone, Ownership,
+      // Building height, Years since last sale.
+
+      // Zone chips
+      const zoneWrap = document.querySelector<HTMLElement>(
+        '.chip-row[data-chip-group="zone"]',
+      );
+      if (zoneWrap) {
+        zoneWrap.innerHTML = ZONE_OPTIONS.map(
+          (z) => `
+          <button type="button" class="chip" data-value="${escapeHtml(z.value)}" aria-pressed="false">${escapeHtml(z.value)} <span class="count" data-count-zone="${escapeHtml(z.value)}">(${zoneCount[z.value] || 0})</span></button>
+        `,
+        ).join('');
+      }
+
+      // Ownership chips — initial counts filled by recomputeChipCounts + updateAllCountSpans
+      const ownWrap = document.querySelector<HTMLElement>(
+        '.chip-row[data-chip-group="ownership"]',
+      );
+      if (ownWrap) {
+        ownWrap.innerHTML = OWNERSHIP_OPTIONS.map(
+          (o) => `
+          <button type="button" class="chip" data-value="${o.key}" aria-pressed="false">${escapeHtml(o.label)} <span class="count" data-count-ownership="${o.key}">(${ownershipCount[o.key] || 0})</span></button>
+        `,
+        ).join('');
+      }
+
+      // Range sliders — markup + initial sync (building height first, then years)
+      renderRangeSlider('building-height', 'Minimum building height', 'Maximum building height');
+      renderRangeSlider('years-since-sale', 'Minimum years since last sale', 'Maximum years since last sale');
+    }
+
+    // Keeps a slider's two inputs, fill bar, and label text in sync with
+    // filterState[stateKey]. Generalized over groupId via SLIDER_CONFIGS.
+    function updateRangeSliderUI(groupId: string): void {
+      const cfg = SLIDER_CONFIGS[groupId];
+      if (!cfg) return;
+      const root = document.querySelector<HTMLElement>(
+        `.range-slider[data-range-group="${groupId}"]`,
+      );
+      if (!root) return;
+      const minInput = root.querySelector<HTMLInputElement>('.range-slider-handle-min');
+      const maxInput = root.querySelector<HTMLInputElement>('.range-slider-handle-max');
+      const fill = root.querySelector<HTMLElement>('.range-slider-fill');
+      const minLabel = root.querySelector<HTMLElement>('.range-slider-value-min');
+      const maxLabel = root.querySelector<HTMLElement>('.range-slider-value-max');
+      if (!minInput || !maxInput || !fill || !minLabel || !maxLabel) return;
+      const state = filterState[cfg.stateKey];
+      const { min, max } = state;
+      if (minInput.value !== String(min)) minInput.value = String(min);
+      if (maxInput.value !== String(max)) maxInput.value = String(max);
+      const range = cfg.full.max - cfg.full.min;
+      const leftPct = ((min - cfg.full.min) / range) * 100;
+      const rightPct = ((cfg.full.max - max) / range) * 100;
+      fill.style.left = `${leftPct}%`;
+      fill.style.right = `${rightPct}%`;
+      minLabel.textContent = cfg.formatLabel(min);
+      maxLabel.textContent = cfg.formatLabel(max);
+    }
+
+    function resyncBusinessMixUI(): void {
+      // Vacancy
+      document.querySelectorAll<HTMLInputElement>('.filter-vacancy').forEach((cb) => {
+        cb.checked = filterState.vacancy.has(cb.dataset.value || '');
+      });
+      // Categories + parent
+      document.querySelectorAll<HTMLInputElement>('.filter-category').forEach((cb) => {
+        cb.checked = filterState.category.has(cb.dataset.category || '');
+      });
+      for (const seg of segmentMap.keys()) syncSegmentParent(seg);
+      // Operator chips
+      document.querySelectorAll<HTMLButtonElement>('.chip-row[data-chip-group="operator"] .chip').forEach((b) => {
+        const v = b.dataset.value || '';
+        b.setAttribute('aria-pressed', filterState.operator.has(v) ? 'true' : 'false');
+      });
+      // Peak chips
+      document.querySelectorAll<HTMLButtonElement>('.chip-row[data-chip-group="peak"] .chip').forEach((b) => {
+        const v = Number(b.dataset.value);
+        b.setAttribute('aria-pressed', filterState.peak.has(v) ? 'true' : 'false');
+      });
+      // Price chips
+      document.querySelectorAll<HTMLButtonElement>('.chip-row[data-chip-group="price"] .chip').forEach((b) => {
+        const v = Number(b.dataset.value);
+        b.setAttribute('aria-pressed', filterState.price.has(v) ? 'true' : 'false');
+      });
+      // Outdoor
+      const outdoor = document.getElementById('filter-outdoor') as HTMLInputElement | null;
+      if (outdoor) outdoor.checked = filterState.outdoorOnly;
+      // Lens
+      const lens = document.getElementById('filter-lens') as HTMLInputElement | null;
+      if (lens) lens.checked = filterState.culturalLens;
+    }
+
+    function syncSegmentParent(seg: string): void {
+      const parent = document.querySelector<HTMLInputElement>(
+        `.segment-parent[data-segment="${CSS.escape(seg)}"]`,
+      );
+      if (!parent) return;
+      const cats = segmentMap.get(seg) || [];
+      const sel = cats.filter((c) => filterState.category.has(c)).length;
+      if (sel === 0) {
+        parent.checked = false;
+        parent.indeterminate = false;
+      } else if (sel === cats.length) {
+        parent.checked = true;
+        parent.indeterminate = false;
+      } else {
+        parent.checked = false;
+        parent.indeterminate = true;
+      }
+    }
+
+    function toggleSegmentExpand(segEl: Element): void {
+      const children = segEl.querySelector('.segment-children') as HTMLElement | null;
+      const chevron = segEl.querySelector('.segment-chevron');
+      if (!children || !chevron) return;
+      const collapsed = children.hasAttribute('hidden');
+      if (collapsed) {
+        children.removeAttribute('hidden');
+        chevron.setAttribute('aria-expanded', 'true');
+      } else {
+        children.setAttribute('hidden', '');
+        chevron.setAttribute('aria-expanded', 'false');
+      }
+    }
+
+    function updateSidebarChrome(): void {
+      // Business mix section
+      const dirty = businessMixDirtyCount();
+      const section = document.querySelector<HTMLElement>('[data-section="business-mix"]');
+      if (section) {
+        const badge = section.querySelector<HTMLElement>('.filter-section-badge');
+        const reset = section.querySelector<HTMLElement>('.filter-section-reset');
+        if (dirty > 0) {
+          if (badge) {
+            badge.textContent = `${dirty} of ${BUSINESS_MIX_GROUP_COUNT}`;
+            badge.removeAttribute('hidden');
+          }
+          reset?.removeAttribute('hidden');
+        } else {
+          badge?.setAttribute('hidden', '');
+          reset?.setAttribute('hidden', '');
+        }
+      }
+
+      // Building mix section
+      const bldgDirty = buildingMixDirtyCount();
+      const bldgSection = document.querySelector<HTMLElement>('[data-section="building-mix"]');
+      if (bldgSection) {
+        const badge = bldgSection.querySelector<HTMLElement>('.filter-section-badge');
+        const reset = bldgSection.querySelector<HTMLElement>('.filter-section-reset');
+        if (bldgDirty > 0) {
+          if (badge) {
+            badge.textContent = `${bldgDirty} of ${BUILDING_MIX_GROUP_COUNT}`;
+            badge.removeAttribute('hidden');
+          }
+          reset?.removeAttribute('hidden');
+        } else {
+          badge?.setAttribute('hidden', '');
+          reset?.setAttribute('hidden', '');
+        }
+      }
+
+      // Corridor section — badge + Reset only when a block is selected
+      const corrSection = document.querySelector<HTMLElement>('[data-section="corridor"]');
+      if (corrSection) {
+        const badge = corrSection.querySelector<HTMLElement>('.filter-section-badge');
+        const reset = corrSection.querySelector<HTMLElement>('.filter-section-reset');
+        const bf = filterState.blockFilter;
+        const blockActive = bf.corridor !== null && bf.block_number !== null;
+        if (blockActive) {
+          if (badge) {
+            badge.textContent = `Block ${bf.block_number}`;
+            badge.removeAttribute('hidden');
+          }
+          reset?.removeAttribute('hidden');
+        } else {
+          badge?.setAttribute('hidden', '');
+          reset?.setAttribute('hidden', '');
+        }
+      }
+    }
+
+    // -------------------- Block-level metric aggregation --------------------
+    // Cached once at page load. Used by the block-level heat ribbon UI below
+    // the map. Aggregation is corridor + block_number, with five metrics per
+    // block. Sidebar filters do NOT affect these numbers — the ribbon is a
+    // stable "block character" view independent of parcel-level exploration.
+
+    type BlockStat = {
+      corridor: string;             // 'South Street' or 'East Passyunk'
+      block_number: number;         // e.g., 300, 1600
+      totals: { all: number; commercial: number; occupied: number };
+      metrics: {
+        vacancy_rate: number;       // 0-100 integer (vacant / commercial)
+        outdoor_rate: number;       // 0-100 integer (outdoor=Yes / occupied)
+        quick_service_rate: number; // 0-100 integer (quick service / occupied)
+        nuisance_count: number;     // raw count
+        local_chain_count: number;  // raw count
+      };
+      // Auxiliary detail for hover tooltips (Sub-phase C)
+      vacant_count: number;
+      outdoor_yes_count: number;
+      quick_service_count: number;
+      nuisance_addresses: string[];
+      local_chain_addresses: string[];
+      // Tooltip breakdowns
+      nuisance_categories: string[];      // category per nuisance parcel
+      local_chain_categories: string[];   // business_category per chain parcel
+    };
+
+    const NUISANCE_CATEGORIES = new Set<string>([
+      'Smoke Shop',
+      'Alternative Financial Services (AFS)',
+    ]);
+    const LOCAL_CHAIN_OPERATORS = new Set<string>([
+      'Metro-only Chain',
+      'Regional Chain',
+    ]);
+
+    let blockStats: BlockStat[] = [];
+
+    function buildBlockStats(parcelsGj: GeoJSON.FeatureCollection): void {
+      type Bucket = {
+        all: number; commercial: number; occupied: number;
+        vacant_count: number; outdoor_yes: number; quick_service: number;
+        nuisance_addresses: string[]; local_chain_addresses: string[];
+        nuisance_categories: string[]; local_chain_categories: string[];
+      };
+      const buckets = new Map<string, Bucket>();
+
+      for (const f of parcelsGj.features) {
+        const p = f.properties as ParcelProps;
+        const bn = p.block_number;
+        const corr = p.corridor;
+        if (bn === null || bn === undefined || !corr) continue;
+        const key = `${corr}|${bn}`;
+        let b = buckets.get(key);
+        if (!b) {
+          b = {
+            all: 0, commercial: 0, occupied: 0,
+            vacant_count: 0, outdoor_yes: 0, quick_service: 0,
+            nuisance_addresses: [], local_chain_addresses: [],
+            nuisance_categories: [], local_chain_categories: [],
+          };
+          buckets.set(key, b);
+        }
+        b.all++;
+        if (p.vacancy_state !== 'non_commercial') {
+          b.commercial++;
+          if (
+            p.vacancy_state === 'short_term' ||
+            p.vacancy_state === 'under_renovation' ||
+            p.vacancy_state === 'long_term'
+          ) {
+            b.vacant_count++;
+          }
+          if (p.vacancy_state === 'active') {
+            b.occupied++;
+            if (p.outdoor_footprint === 'Yes') b.outdoor_yes++;
+            const cat = p.business_category || '';
+            // Match 'Quick Service' substring — handles the en-dash that breaks
+            // exact-equality matches across encodings.
+            if (cat.indexOf('Quick Service') !== -1) b.quick_service++;
+          }
+        }
+        const cat = p.business_category;
+        if (cat && NUISANCE_CATEGORIES.has(cat)) {
+          b.nuisance_addresses.push(p.address || '');
+          b.nuisance_categories.push(cat);
+        }
+        if (p.operator_type && LOCAL_CHAIN_OPERATORS.has(p.operator_type)) {
+          b.local_chain_addresses.push(p.address || '');
+          b.local_chain_categories.push(cat || '');
+        }
+      }
+
+      const pct = (n: number, d: number): number =>
+        d > 0 ? Math.round((n / d) * 100) : 0;
+
+      blockStats = [];
+      for (const [key, b] of buckets) {
+        const [corr, bnStr] = key.split('|');
+        blockStats.push({
+          corridor: corr,
+          block_number: Number(bnStr),
+          totals: { all: b.all, commercial: b.commercial, occupied: b.occupied },
+          metrics: {
+            vacancy_rate: pct(b.vacant_count, b.commercial),
+            outdoor_rate: pct(b.outdoor_yes, b.occupied),
+            quick_service_rate: pct(b.quick_service, b.occupied),
+            nuisance_count: b.nuisance_addresses.length,
+            local_chain_count: b.local_chain_addresses.length,
+          },
+          vacant_count: b.vacant_count,
+          outdoor_yes_count: b.outdoor_yes,
+          quick_service_count: b.quick_service,
+          nuisance_addresses: b.nuisance_addresses,
+          local_chain_addresses: b.local_chain_addresses,
+          nuisance_categories: b.nuisance_categories,
+          local_chain_categories: b.local_chain_categories,
+        });
+      }
+      blockStats.sort(
+        (a, b) => a.corridor.localeCompare(b.corridor) || a.block_number - b.block_number,
+      );
+    }
+
+    // -------------------- Block-level ribbon: colors + render --------------------
+    type MetricKey =
+      | 'vacancy_rate' | 'outdoor_rate' | 'quick_service_rate'
+      | 'nuisance_count' | 'local_chain_count';
+
+    const RAMP_CORAL = ['#FAECE7', '#F5C4B3', '#F0997B', '#D85A30', '#993C1D'];
+    const RAMP_GREEN = ['#EAF3DE', '#C0DD97', '#97C459', '#639922', '#3B6D11'];
+    const RAMP_AMBER = ['#FAEEDA', '#FAC775', '#EF9F27', '#BA7517', '#854F0B'];
+
+    type MetricConfig = {
+      label: string;
+      ramp: string[];
+      isPercent: boolean;
+      // Returns the denominator value (or null for count metrics). Used for
+      // the low-confidence check on percentage metrics.
+      denominator: (s: BlockStat) => number | null;
+    };
+    const METRIC_CONFIGS: Record<MetricKey, MetricConfig> = {
+      vacancy_rate:       { label: 'Vacancy rate',       ramp: RAMP_CORAL, isPercent: true,  denominator: (s) => s.totals.commercial },
+      outdoor_rate:       { label: 'Outdoor footprint',  ramp: RAMP_GREEN, isPercent: true,  denominator: (s) => s.totals.occupied   },
+      quick_service_rate: { label: 'Quick service',      ramp: RAMP_AMBER, isPercent: true,  denominator: (s) => s.totals.occupied   },
+      nuisance_count:     { label: 'Nuisance retail',    ramp: RAMP_CORAL, isPercent: false, denominator: () => null                },
+      local_chain_count:  { label: 'Local chains',       ramp: RAMP_GREEN, isPercent: false, denominator: () => null                },
+    };
+    const LOW_CONFIDENCE_THRESHOLD = 5;
+
+    // Phrases used in the counter when a block is selected, appended in parens.
+    const METRIC_PHRASES: Record<MetricKey, string> = {
+      vacancy_rate: 'vacant',
+      outdoor_rate: 'with outdoor footprint',
+      quick_service_rate: 'quick service',
+      nuisance_count: 'nuisance retail',
+      local_chain_count: 'locally-grown chains',
+    };
+
+    function mixHexColors(a: string, b: string, t: number): string {
+      const parseHex = (h: string): [number, number, number] => [
+        parseInt(h.slice(1, 3), 16),
+        parseInt(h.slice(3, 5), 16),
+        parseInt(h.slice(5, 7), 16),
+      ];
+      const [ar, ag, ab] = parseHex(a);
+      const [br, bg, bb] = parseHex(b);
+      const r = Math.round(ar + (br - ar) * t);
+      const g = Math.round(ag + (bg - ag) * t);
+      const bl = Math.round(ab + (bb - ab) * t);
+      return `rgb(${r}, ${g}, ${bl})`;
+    }
+    function colorForValue(value: number, max: number, ramp: string[]): string {
+      // Zero = pure white (visually distinct "no presence" vs. tiny presence).
+      if (value <= 0) return '#FFFFFF';
+      if (max <= 1) return ramp[0];
+      // Interpolate from ramp[0] at value=1 to ramp[N-1] at value=max.
+      const ratio = (value - 1) / (max - 1);
+      const clamped = Math.max(0, Math.min(1, ratio));
+      const pos = clamped * (ramp.length - 1);
+      const lower = Math.floor(pos);
+      const upper = Math.min(ramp.length - 1, lower + 1);
+      return mixHexColors(ramp[lower], ramp[upper], pos - lower);
+    }
+    function textColorForValue(value: number, max: number, ramp: string[]): string {
+      // Zero cells use muted gray on white for readability.
+      if (value <= 0) return '#57534e';
+      if (max <= 1) return ramp[ramp.length - 1];
+      const ratio = (value - 1) / (max - 1);
+      // White text on the upper 40% of the ramp (where the cell is dark enough
+      // that the darkest-stop text would have poor contrast).
+      if (ratio >= 0.6) return '#FFFFFF';
+      return ramp[ramp.length - 1];
+    }
+    function maxForMetric(metric: MetricKey): number {
+      let m = 0;
+      for (const s of blockStats) {
+        const v = s.metrics[metric];
+        if (v > m) m = v;
+      }
+      return m;
+    }
+    function formatValue(metric: MetricKey, value: number, lowConfidence: boolean): string {
+      const cfg = METRIC_CONFIGS[metric];
+      const base = cfg.isPercent ? `${value}%` : `${value}`;
+      return lowConfidence ? base + '*' : base;
+    }
+    function isLowConfidenceForMetric(stat: BlockStat, metric: MetricKey): boolean {
+      const cfg = METRIC_CONFIGS[metric];
+      if (!cfg.isPercent) return false;
+      const denom = cfg.denominator(stat);
+      return denom !== null && denom < LOW_CONFIDENCE_THRESHOLD;
+    }
+
+    function renderRibbon(): void {
+      if (blockStats.length === 0) return;
+      const max = maxForMetric(filterState.activeMetric);
+      const cfg = METRIC_CONFIGS[filterState.activeMetric];
+
+      // Two corridor block lists, in fixed east->west order
+      for (const corr of ['South Street', 'East Passyunk']) {
+        const container = document.querySelector<HTMLElement>(
+          `.ribbon-blocks[data-blocks-for="${corr}"]`,
+        );
+        if (!container) continue;
+        const corrBlocks = blockStats
+          .filter((b) => b.corridor === corr)
+          .sort((a, b) => a.block_number - b.block_number);
+        container.setAttribute('data-block-count', String(corrBlocks.length));
+
+        const html: string[] = [];
+        const bf = filterState.blockFilter;
+        for (const stat of corrBlocks) {
+          const v = stat.metrics[filterState.activeMetric];
+          const bg = colorForValue(v, max, cfg.ramp);
+          const fg = textColorForValue(v, max, cfg.ramp);
+          const lowConf = isLowConfidenceForMetric(stat, filterState.activeMetric);
+          const lowConfClass = lowConf ? ' is-low-conf' : '';
+          const isSel =
+            bf.corridor === stat.corridor && bf.block_number === stat.block_number;
+          const selClass = isSel ? ' is-selected' : '';
+          const valStr = formatValue(filterState.activeMetric, v, lowConf);
+          html.push(
+            `<div class="ribbon-block${lowConfClass}${selClass}" ` +
+              `data-corridor="${escapeHtml(stat.corridor)}" ` +
+              `data-block="${stat.block_number}" ` +
+              `style="background:${bg}; color:${fg};">` +
+              `<div class="ribbon-block-num">${stat.block_number}</div>` +
+              `<div class="ribbon-block-val">${escapeHtml(valStr)}</div>` +
+              `</div>`,
+          );
+        }
+        container.innerHTML = html.join('');
+      }
+
+      // Legend gradient: full ramp left-to-right.
+      const legendBar = document.getElementById('ribbon-legend-bar');
+      if (legendBar) {
+        const stops = cfg.ramp
+          .map((c, i) => `${c} ${Math.round((i / (cfg.ramp.length - 1)) * 100)}%`)
+          .join(', ');
+        legendBar.style.background = `linear-gradient(90deg, ${stops})`;
+      }
+    }
+
+    function wireRibbonControls(): void {
+      const select = document.getElementById('ribbon-metric-select') as HTMLSelectElement | null;
+      if (select) {
+        select.addEventListener('change', () => {
+          const v = select.value as MetricKey;
+          if (METRIC_CONFIGS[v]) {
+            filterState.activeMetric = v;
+            renderRibbon();
+            // Metric-implied filter changes when metric changes (only matters if
+            // a block is selected, but always fire so the counter phrase updates).
+            subscribers.forEach((fn) => fn());
+          }
+        });
+      }
+      wireRibbonToggle();
+      wireRibbonBlockInteractions();
+    }
+
+    // -------------------- Ribbon: click + hover interactions --------------------
+    function statForCell(cell: HTMLElement): BlockStat | null {
+      const corridor = cell.dataset.corridor;
+      const block = Number(cell.dataset.block);
+      if (!corridor || !block) return null;
+      return blockStats.find((s) => s.corridor === corridor && s.block_number === block) || null;
+    }
+
+    function boundsForBlock(corridor: string, blockNumber: number): L.LatLngBounds | null {
+      if (!parcelsGjRef) return null;
+      const pts: L.LatLng[] = [];
+      for (const f of parcelsGjRef.features) {
+        const p = f.properties as ParcelProps;
+        if (p.corridor !== corridor || p.block_number !== blockNumber) continue;
+        const coords = f.geometry && (f.geometry as GeoJSON.Point).coordinates;
+        if (!coords) continue;
+        const [lng, lat] = coords as [number, number];
+        if (typeof lat === 'number' && typeof lng === 'number') {
+          pts.push(L.latLng(lat, lng));
+        }
+      }
+      return pts.length === 0 ? null : L.latLngBounds(pts);
+    }
+
+    function handleBlockClick(cell: HTMLElement): void {
+      const corridor = cell.dataset.corridor || '';
+      const block = Number(cell.dataset.block);
+      if (!corridor || !block) return;
+      const bf = filterState.blockFilter;
+      const alreadySelected = bf.corridor === corridor && bf.block_number === block;
+      if (alreadySelected) {
+        // Clear: fly back to current corridor scope
+        filterState.blockFilter = { corridor: null, block_number: null };
+        flyToCorridor(filterState.corridor);
+      } else {
+        filterState.blockFilter = { corridor, block_number: block };
+        const bounds = boundsForBlock(corridor, block);
+        if (bounds && bounds.isValid() && mapRef) {
+          mapRef.flyToBounds(bounds, { padding: [30, 30], duration: 0.9, maxZoom: 18 });
+        }
+      }
+      updateRibbonSelection();
+      subscribers.forEach((fn) => fn());
+    }
+
+    function updateRibbonSelection(): void {
+      // Strip is-selected from any previously selected segment.
+      document.querySelectorAll('.ribbon-block.is-selected').forEach((el) => {
+        el.classList.remove('is-selected');
+      });
+      const bf = filterState.blockFilter;
+      if (bf.corridor && bf.block_number !== null) {
+        const sel = document.querySelector(
+          `.ribbon-block[data-corridor="${CSS.escape(bf.corridor)}"][data-block="${bf.block_number}"]`,
+        );
+        if (sel) sel.classList.add('is-selected');
+      }
+    }
+
+    function updateRibbonCorridorDimming(): void {
+      const ssRow = document.querySelector('[data-corridor-row="south_street"]');
+      const epRow = document.querySelector('[data-corridor-row="east_passyunk"]');
+      if (!ssRow || !epRow) return;
+      const c = filterState.corridor;
+      ssRow.classList.toggle('is-dimmed', c === 'east-passyunk');
+      epRow.classList.toggle('is-dimmed', c === 'south-street');
+    }
+
+    // -------------------- Ribbon: hover tooltip --------------------
+    function buildTooltipHtml(stat: BlockStat, metric: MetricKey): string {
+      const header =
+        `<div class="ribbon-tooltip-header">${escapeHtml(stat.corridor)}, ${stat.block_number} block</div>`;
+      const bodies: string[] = [];
+      if (metric === 'vacancy_rate') {
+        const v = stat.vacant_count;
+        const c = stat.totals.commercial;
+        bodies.push(
+          `${v} of ${c} commercial parcel${c === 1 ? '' : 's'} vacant (${stat.metrics.vacancy_rate}%)`,
+        );
+        if (isLowConfidenceForMetric(stat, metric)) {
+          bodies.push(`Small sample size (n=${c})`);
+        }
+      } else if (metric === 'outdoor_rate') {
+        const o = stat.outdoor_yes_count;
+        const occ = stat.totals.occupied;
+        bodies.push(
+          `${o} of ${occ} occupied parcel${occ === 1 ? '' : 's'} have outdoor footprint (${stat.metrics.outdoor_rate}%)`,
+        );
+        if (isLowConfidenceForMetric(stat, metric)) {
+          bodies.push(`Small sample size (n=${occ})`);
+        }
+      } else if (metric === 'quick_service_rate') {
+        const q = stat.quick_service_count;
+        const occ = stat.totals.occupied;
+        bodies.push(
+          `${q} of ${occ} occupied parcel${occ === 1 ? '' : 's'} are quick service (${stat.metrics.quick_service_rate}%)`,
+        );
+        if (isLowConfidenceForMetric(stat, metric)) {
+          bodies.push(`Small sample size (n=${occ})`);
+        }
+      } else if (metric === 'nuisance_count') {
+        const n = stat.metrics.nuisance_count;
+        bodies.push(`${n} nuisance parcel${n === 1 ? '' : 's'}`);
+        if (n > 0) {
+          let smoke = 0, afs = 0;
+          for (const c of stat.nuisance_categories) {
+            if (c === 'Smoke Shop') smoke++;
+            else if (c === 'Alternative Financial Services (AFS)') afs++;
+          }
+          const parts: string[] = [];
+          if (smoke) parts.push(`${smoke} Smoke Shop${smoke === 1 ? '' : 's'}`);
+          if (afs) parts.push(`${afs} Alternative Financial Service${afs === 1 ? '' : 's'}`);
+          if (parts.length) bodies.push(parts.join(', '));
+        }
+      } else if (metric === 'local_chain_count') {
+        const n = stat.metrics.local_chain_count;
+        bodies.push(`${n} locally-grown chain${n === 1 ? '' : 's'}`);
+        if (n > 0 && n <= 3) {
+          const cats = stat.local_chain_categories.filter((c) => c && c.length > 0);
+          if (cats.length) bodies.push(cats.join(', '));
+        }
+      }
+      return (
+        header +
+        bodies.map((b) => `<div class="ribbon-tooltip-body">${escapeHtml(b)}</div>`).join('')
+      );
+    }
+
+    function showBlockTooltip(cell: HTMLElement): void {
+      const stat = statForCell(cell);
+      const tt = document.getElementById('ribbon-tooltip');
+      if (!stat || !tt) return;
+      tt.innerHTML = buildTooltipHtml(stat, filterState.activeMetric);
+      tt.hidden = false;
+      const cellRect = cell.getBoundingClientRect();
+      const ttRect = tt.getBoundingClientRect();
+      let arrow: 'down' | 'up' = 'down';
+      let top = cellRect.top - ttRect.height - 10;
+      if (top < 10) {
+        arrow = 'up';
+        top = cellRect.bottom + 10;
+      }
+      let left = cellRect.left + cellRect.width / 2 - ttRect.width / 2;
+      left = Math.max(8, Math.min(left, window.innerWidth - ttRect.width - 8));
+      tt.setAttribute('data-arrow', arrow);
+      tt.style.top = `${top}px`;
+      tt.style.left = `${left}px`;
+    }
+    function hideBlockTooltip(): void {
+      const tt = document.getElementById('ribbon-tooltip');
+      if (tt) tt.hidden = true;
+    }
+
+    function wireRibbonBlockInteractions(): void {
+      const ribbon = document.getElementById('block-ribbon');
+      if (!ribbon) return;
+      ribbon.addEventListener('click', (e) => {
+        const cell = (e.target as HTMLElement).closest<HTMLElement>('.ribbon-block');
+        if (cell) handleBlockClick(cell);
+      });
+      ribbon.addEventListener('mouseover', (e) => {
+        const cell = (e.target as HTMLElement).closest<HTMLElement>('.ribbon-block');
+        if (cell) showBlockTooltip(cell);
+      });
+      ribbon.addEventListener('mouseout', (e) => {
+        const cell = (e.target as HTMLElement).closest<HTMLElement>('.ribbon-block');
+        if (!cell) return;
+        const related = e.relatedTarget as HTMLElement | null;
+        if (related && cell.contains(related)) return;
+        hideBlockTooltip();
+      });
+    }
+
+    // Block-ribbon collapse state lives at module scope so both the manual
+    // toggle button and the corridor filter can drive it.
+    let ribbonCollapsed = false;
+    function applyRibbonState(collapsed: boolean): void {
+      const wrapper = document.getElementById('block-ribbon-wrapper');
+      const btn = document.getElementById('ribbon-toggle');
+      if (!wrapper || !btn) return;
+      ribbonCollapsed = collapsed;
+      wrapper.classList.toggle('is-collapsed', collapsed);
+      btn.setAttribute('aria-expanded', collapsed ? 'false' : 'true');
+      btn.setAttribute('aria-label', collapsed ? 'Expand ribbon' : 'Collapse ribbon');
+      // Let the CSS height transition finish, then ask Leaflet to recompute its
+      // container size so tiles render at the new map height.
+      window.setTimeout(() => {
+        if (mapRef) mapRef.invalidateSize();
+      }, 280);
+    }
+
+    // Corridor filter drives the ribbon: All Corridors collapses it; selecting a
+    // single corridor auto-expands it. Manual toggling works between changes.
+    function syncRibbonToCorridor(): void {
+      applyRibbonState(filterState.corridor === 'all');
+    }
+
+    function wireRibbonToggle(): void {
+      const btn = document.getElementById('ribbon-toggle');
+      if (!btn) return;
+      btn.addEventListener('click', () => {
+        applyRibbonState(!ribbonCollapsed);
+      });
+    }
+
+    // -------------------- Cultural anchor lens --------------------
+    type LensState = 'active' | 'former' | 'policy' | 'other';
+
+    // Halos and tooltips owned by the lens. Cleaned up on every render to
+    // avoid stale visuals when corridor / sub-toggle changes mid-lens.
+    let lensHaloLayers: L.CircleMarker[] = [];
+
+    function classifyLens(p: ParcelProps): LensState {
+      if (p.cultural_status === 'Active') return 'active';
+      if (p.cultural_status === 'Former') return 'former';
+      if (
+        p.vacancy_state === 'long_term' &&
+        (p.zone_type || '').startsWith('CMX') &&
+        p.corridor === 'South Street'
+      ) {
+        return 'policy';
+      }
+      return 'other';
+    }
+
+    function cleanupLensVisuals(): void {
+      // Remove halos
+      for (const halo of lensHaloLayers) {
+        if (mapRef && mapRef.hasLayer(halo)) mapRef.removeLayer(halo);
+      }
+      lensHaloLayers = [];
+      // Unbind tooltips on parcel markers
+      for (const { layer } of markerIndex.values()) {
+        if (layer.getTooltip()) layer.unbindTooltip();
+      }
+    }
+
+    function applyNormalMarkerStyle(layer: L.CircleMarker, p: ParcelProps): void {
+      const vc = VACANCY_COLORS[p.vacancy_state] || '#888';
+      layer.setStyle({
+        radius: 7,
+        fillColor: vc,
+        color: '#ffffff',
+        weight: 1,
+        opacity: 1,
+        fillOpacity: 0.9,
+        dashArray: undefined,
+      });
+    }
+
+    function applyLensStyle(layer: L.CircleMarker, p: ParcelProps, state: LensState): void {
+      if (!mapRef) return;
+      const vc = VACANCY_COLORS[p.vacancy_state] || '#888';
+      if (state === 'active') {
+        layer.setStyle({
+          radius: 7,
+          fillColor: vc,
+          color: '#ffffff',
+          weight: 1,
+          opacity: 1,
+          fillOpacity: 0.9,
+          dashArray: undefined,
+        });
+        const halo = L.circleMarker(layer.getLatLng(), {
+          radius: 12, fill: false, color: '#534AB7',
+          weight: 2, opacity: 1, interactive: false,
+        });
+        halo.addTo(mapRef);
+        lensHaloLayers.push(halo);
+        if (p.cultural_tenant) {
+          layer.bindTooltip(p.cultural_tenant, {
+            permanent: true, direction: 'right', offset: [8, 0],
+            className: 'cultural-label',
+          });
+        }
+      } else if (state === 'former') {
+        layer.setStyle({
+          radius: 7,
+          fillColor: vc,
+          color: vc,
+          weight: 2,
+          opacity: 1,
+          fillOpacity: 0,           // hollow
+          dashArray: undefined,
+        });
+        const halo = L.circleMarker(layer.getLatLng(), {
+          radius: 12, fill: false, color: '#534AB7',
+          weight: 1.5, dashArray: '3,3', opacity: 1, interactive: false,
+        });
+        halo.addTo(mapRef);
+        lensHaloLayers.push(halo);
+        if (p.cultural_tenant) {
+          layer.bindTooltip(p.cultural_tenant, {
+            permanent: true, direction: 'right', offset: [8, 0],
+            className: 'cultural-label cultural-label-faded',
+          });
+        }
+      } else if (state === 'policy') {
+        layer.setStyle({
+          radius: 7,
+          fillColor: '#BA7517',
+          color: '#BA7517',
+          weight: 1.5,
+          opacity: 1,
+          fillOpacity: 0.2,
+          dashArray: '2,3',
+        });
+      } else {
+        // Other — dimmed
+        layer.setStyle({
+          radius: 7,
+          fillColor: vc,
+          color: '#ffffff',
+          weight: 1,
+          opacity: 0.25,
+          fillOpacity: 0.25,
+          dashArray: undefined,
+        });
+      }
+    }
+
+    function applyNormalNonCommercialStyle(layer: L.CircleMarker): void {
+      layer.setStyle({
+        radius: 7,
+        fillColor: VACANCY_COLORS.non_commercial,
+        color: '#ffffff',
+        weight: 1,
+        opacity: 0.4,
+        fillOpacity: 0.35,
+        dashArray: undefined,
+      });
+    }
+
+    function renderLensMode(): void {
+      if (!mapRef) return;
+      cleanupLensVisuals();
+      const choice = filterState.corridor;
+      const bf = filterState.blockFilter;
+      const ncVisible = shouldShowNonCommercialLayer();
+      const inScope = (props: ParcelProps): boolean => {
+        const inCorridor =
+          choice === 'all' ||
+          (choice === 'south-street'  && props.corridor === 'South Street') ||
+          (choice === 'east-passyunk' && props.corridor === 'East Passyunk');
+        const inBlock =
+          bf.corridor === null || bf.block_number === null ||
+          (props.corridor === bf.corridor && props.block_number === bf.block_number);
+        return inCorridor && inBlock;
+      };
+      // Commercial + vacant
+      for (const { layer, props } of markerIndex.values()) {
+        if (!inScope(props)) {
+          if (mapRef.hasLayer(layer)) mapRef.removeLayer(layer);
+          continue;
+        }
+        if (!mapRef.hasLayer(layer)) layer.addTo(mapRef);
+        applyLensStyle(layer, props, classifyLens(props));
+      }
+      // Non-commercial (only when layer should be visible)
+      for (const { layer, props } of nonCommercialMarkerIndex.values()) {
+        const show = ncVisible && inScope(props);
+        if (show) {
+          if (!mapRef.hasLayer(layer)) layer.addTo(mapRef);
+          applyLensStyle(layer, props, classifyLens(props));
+        } else {
+          if (mapRef.hasLayer(layer)) mapRef.removeLayer(layer);
+        }
+      }
+    }
+
+    function renderNormalMode(): void {
+      if (!mapRef) return;
+      cleanupLensVisuals();
+      const ncVisible = shouldShowNonCommercialLayer();
+      // Commercial + vacant
+      for (const { layer, props } of markerIndex.values()) {
+        applyNormalMarkerStyle(layer, props);
+        const visible = matchesAll(props);
+        if (visible) {
+          if (!mapRef.hasLayer(layer)) layer.addTo(mapRef);
+        } else {
+          if (mapRef.hasLayer(layer)) mapRef.removeLayer(layer);
+        }
+      }
+      // Non-commercial (only when layer should be visible; participates in matchesAll)
+      for (const { layer, props } of nonCommercialMarkerIndex.values()) {
+        applyNormalNonCommercialStyle(layer);
+        const visible = ncVisible && matchesAll(props);
+        if (visible) {
+          if (!mapRef.hasLayer(layer)) layer.addTo(mapRef);
+        } else {
+          if (mapRef.hasLayer(layer)) mapRef.removeLayer(layer);
+        }
+      }
+    }
+
+    // -------------------- Showing-N-of-M corridor counter --------------------
+    function updateCorridorCounter(): void {
+      const el = document.getElementById('corridor-counter');
+      if (!el || !parcelsGjRef) return;
+      const choice = filterState.corridor;
+      const scopeName = choice === 'south-street' ? 'South Street'
+                      : choice === 'east-passyunk' ? 'East Passyunk'
+                      : '';
+      const bf = filterState.blockFilter;
+      const blockActive = bf.corridor !== null && bf.block_number !== null;
+
+      const includeNc = shouldShowNonCommercialLayer();
+
+      // Block selected: report visible vs block scope total, with metric suffix
+      if (blockActive && !filterState.culturalLens) {
+        let visible = 0, scopeTotal = 0;
+        for (const f of parcelsGjRef.features) {
+          const p = f.properties as ParcelProps;
+          if (p.vacancy_state === 'non_commercial' && !includeNc) continue;
+          if (p.corridor !== bf.corridor || p.block_number !== bf.block_number) continue;
+          scopeTotal++;
+          if (matchesAll(p)) visible++;
+        }
+        const phrase = METRIC_PHRASES[filterState.activeMetric];
+        el.textContent =
+          `Showing ${visible} of ${scopeTotal} ${bf.corridor} ${bf.block_number} block parcels (${phrase})`;
+        return;
+      }
+
+      // Lens mode: report counts of the four lens states (active/former/policy).
+      if (filterState.culturalLens) {
+        let active = 0, former = 0, policy = 0;
+        for (const f of parcelsGjRef.features) {
+          const p = f.properties as ParcelProps;
+          if (p.vacancy_state === 'non_commercial' && !includeNc) continue;
+          const inScope =
+            choice === 'all' ||
+            (choice === 'south-street'  && p.corridor === 'South Street') ||
+            (choice === 'east-passyunk' && p.corridor === 'East Passyunk');
+          if (!inScope) continue;
+          if (blockActive && (p.corridor !== bf.corridor || p.block_number !== bf.block_number)) continue;
+          const s = classifyLens(p);
+          if (s === 'active') active++;
+          else if (s === 'former') former++;
+          else if (s === 'policy') policy++;
+        }
+        let tail = '';
+        if (blockActive) tail = ` in ${bf.corridor} ${bf.block_number} block`;
+        else if (scopeName) tail = ` on ${scopeName}`;
+        el.textContent = `Showing ${active} active anchor${active === 1 ? '' : 's'}, ${former} former, ${policy} policy candidate${policy === 1 ? '' : 's'}${tail}`;
+        return;
+      }
+
+      // Normal mode: visible vs scope total.
+      let visible = 0;
+      let scopeTotal = 0;
+      for (const f of parcelsGjRef.features) {
+        const p = f.properties as ParcelProps;
+        if (p.vacancy_state === 'non_commercial' && !includeNc) continue;
+        const inScope =
+          choice === 'all' ||
+          (choice === 'south-street'  && p.corridor === 'South Street') ||
+          (choice === 'east-passyunk' && p.corridor === 'East Passyunk');
+        if (!inScope) continue;
+        scopeTotal++;
+        if (matchesAll(p)) visible++;
+      }
+      if (choice === 'all') {
+        el.textContent = `Showing ${visible} parcels`;
+      } else {
+        el.textContent = `Showing ${visible} of ${scopeTotal} ${scopeName} parcels`;
+      }
+    }
+
+    // -------------------- Corridor section Reset (clears block filter) --------------------
+    function wireCorridorReset(): void {
+      const section = document.querySelector('[data-section="corridor"]');
+      if (!section) return;
+      section.addEventListener('click', (e) => {
+        const target = e.target as HTMLElement;
+        if (!target.matches('.filter-section-reset[data-reset="corridor"]')) return;
+        if (filterState.blockFilter.corridor === null) return;
+        filterState.blockFilter = { corridor: null, block_number: null };
+        flyToCorridor(filterState.corridor);
+        updateRibbonSelection();
+        subscribers.forEach((fn) => fn());
+      });
+    }
+
+    // -------------------- Corridor centerline dim/restore --------------------
+    // Opacity values:
+    //   selected (or 'all' = neither dimmed) -> 0.4 (the current full opacity)
+    //   unselected -> 0.12 (30% of 0.4) — "fades to 30% opacity" interpreted as
+    //   30% of the line's current presence so the visual differentiation is
+    //   clear rather than barely perceptible.
+    // Smooth transition handled by CSS on .corridor-line (stroke-opacity 300ms).
+    const CORRIDOR_LINE_FULL = 0.4;
+    const CORRIDOR_LINE_DIM = 0.12;
+
+    function updateCorridorLineOpacities(): void {
+      if (!streetsLayerRef) return;
+      const choice = filterState.corridor;
+      streetsLayerRef.eachLayer((layer) => {
+        const f = (layer as L.GeoJSON & { feature?: GeoJSON.Feature }).feature;
+        const key = f?.properties?.corridor as string | undefined;
+        let opacity = CORRIDOR_LINE_FULL;
+        if (choice !== 'all') {
+          const expectedKey = choice === 'south-street' ? 'south_street' : 'east_passyunk';
+          if (key !== expectedKey) opacity = CORRIDOR_LINE_DIM;
+        }
+        (layer as L.Path).setStyle({ opacity });
+      });
+    }
+
+    // -------------------- Sticky-state observer for the Corridor section --------------------
+    function wireStickyCorridorObserver(): void {
+      const sidebar = document.querySelector<HTMLElement>('.map-sidebar');
+      const sentinel = document.querySelector<HTMLElement>('.sticky-sentinel');
+      const corridorSec = document.querySelector<HTMLElement>('[data-section="corridor"]');
+      if (!sidebar || !sentinel || !corridorSec) return;
+      // The sentinel sits just above the Corridor section. When it scrolls
+      // out of the sidebar's viewport (entry.isIntersecting === false), the
+      // Corridor section is stuck.
+      const obs = new IntersectionObserver(
+        ([entry]) => {
+          corridorSec.classList.toggle('is-stuck', !entry.isIntersecting);
+        },
+        { root: sidebar, threshold: 0 },
+      );
+      obs.observe(sentinel);
+    }
+
+    // -------------------- Corridor segmented control --------------------
+    function flyToCorridor(choice: CorridorChoice): void {
+      if (!mapRef) return;
+      if (choice === 'all') {
+        if (combinedCorridorBounds && combinedCorridorBounds.isValid()) {
+          mapRef.flyToBounds(combinedCorridorBounds, { padding: [60, 60], duration: 0.9 });
+        } else if (initialView) {
+          mapRef.flyTo(initialView.center, initialView.zoom, { duration: 0.9 });
+        }
+        return;
+      }
+      const key = choice === 'south-street' ? 'south_street' : 'east_passyunk';
+      const bounds = corridorBounds[key];
+      if (bounds && bounds.isValid()) {
+        mapRef.flyToBounds(bounds, { padding: [40, 40], duration: 0.9 });
+      }
+    }
+
+    function wireCorridorSegmented(): void {
+      const wrap = document.querySelector<HTMLElement>(
+        '[data-section="corridor"] .corridor-segmented',
+      );
+      if (!wrap) return;
+      wrap.addEventListener('click', (e) => {
+        const btn = (e.target as HTMLElement).closest<HTMLButtonElement>('.corridor-segment');
+        if (!btn) return;
+        const value = btn.dataset.value as CorridorChoice | undefined;
+        if (!value || filterState.corridor === value) return;
+        filterState.corridor = value;
+        // Corridor change clears any block selection.
+        filterState.blockFilter = { corridor: null, block_number: null };
+        wrap.querySelectorAll<HTMLButtonElement>('.corridor-segment').forEach((b) => {
+          b.setAttribute('aria-pressed', b === btn ? 'true' : 'false');
+        });
+        flyToCorridor(value);
+        updateCorridorLineOpacities();
+        updateRibbonSelection();
+        updateRibbonCorridorDimming();
+        syncRibbonToCorridor();   // All → collapse, single corridor → expand
+        subscribers.forEach((fn) => fn());
+      });
+    }
+
+    // -------------------- Sidebar event wiring --------------------
+    function wireBusinessMixSidebar(): void {
+      const section = document.querySelector('[data-section="business-mix"]');
+      if (!section) return;
+
+      // change events: checkboxes + outdoor toggle
+      section.addEventListener('change', (e) => {
+        const t = e.target as HTMLInputElement;
+        if (!t || !(t instanceof HTMLInputElement)) return;
+
+        if (t.classList.contains('filter-vacancy')) {
+          const v = t.dataset.value || '';
+          if (t.checked) filterState.vacancy.add(v);
+          else filterState.vacancy.delete(v);
+          subscribers.forEach((fn) => fn());
+        } else if (t.classList.contains('segment-parent')) {
+          const seg = t.dataset.segment || '';
+          const cats = segmentMap.get(seg) || [];
+          if (t.checked) cats.forEach((c) => filterState.category.add(c));
+          else cats.forEach((c) => filterState.category.delete(c));
+          t.indeterminate = false;
+          // sync children checkboxes
+          document
+            .querySelectorAll<HTMLInputElement>(
+              `.filter-category[data-segment="${CSS.escape(seg)}"]`,
+            )
+            .forEach((c) => { c.checked = t.checked; });
+          subscribers.forEach((fn) => fn());
+        } else if (t.classList.contains('filter-category')) {
+          const cat = t.dataset.category || '';
+          const seg = t.dataset.segment || '';
+          if (t.checked) filterState.category.add(cat);
+          else filterState.category.delete(cat);
+          syncSegmentParent(seg);
+          subscribers.forEach((fn) => fn());
+        } else if (t.id === 'filter-outdoor') {
+          filterState.outdoorOnly = t.checked;
+          subscribers.forEach((fn) => fn());
+        } else if (t.id === 'filter-lens') {
+          filterState.culturalLens = t.checked;
+          subscribers.forEach((fn) => fn());
+        }
+      });
+
+      // click events: chips + segment expand toggle
+      section.addEventListener('click', (e) => {
+        const t = e.target as HTMLElement;
+        if (!t) return;
+
+        // Chip toggle
+        const chip = t.closest('.chip') as HTMLButtonElement | null;
+        if (chip) {
+          const groupEl = chip.closest('.chip-row');
+          const group = groupEl?.getAttribute('data-chip-group');
+          const val = chip.dataset.value || '';
+          const pressed = chip.getAttribute('aria-pressed') === 'true';
+          chip.setAttribute('aria-pressed', pressed ? 'false' : 'true');
+          if (group === 'operator') {
+            if (pressed) filterState.operator.delete(val);
+            else filterState.operator.add(val);
+          } else if (group === 'peak') {
+            const n = Number(val);
+            if (pressed) filterState.peak.delete(n);
+            else filterState.peak.add(n);
+          } else if (group === 'price') {
+            const n = Number(val);
+            if (pressed) filterState.price.delete(n);
+            else filterState.price.add(n);
+          }
+          subscribers.forEach((fn) => fn());
+          return;
+        }
+
+        // Segment expand/collapse: clicks on chevron or label (not checkbox)
+        const headerEl = t.closest('.segment-header');
+        if (headerEl && !t.closest('.segment-parent')) {
+          const segEl = headerEl.closest('.segment');
+          if (segEl) toggleSegmentExpand(segEl);
+        }
+
+        // Reset link
+        if (t.matches('.filter-section-reset[data-reset="business-mix"]')) {
+          resetBusinessMix();
+          subscribers.forEach((fn) => fn());
+        }
+      });
+    }
+
+    // -------------------- Building mix wiring --------------------
+    function wireBuildingMixSidebar(): void {
+      const section = document.querySelector('[data-section="building-mix"]');
+      if (!section) return;
+
+      // Chip toggles + Reset link
+      section.addEventListener('click', (e) => {
+        const t = e.target as HTMLElement;
+        if (!t) return;
+
+        const chip = t.closest('.chip') as HTMLButtonElement | null;
+        if (chip) {
+          const groupEl = chip.closest('.chip-row');
+          const group = groupEl?.getAttribute('data-chip-group');
+          const val = chip.dataset.value || '';
+          const pressed = chip.getAttribute('aria-pressed') === 'true';
+          chip.setAttribute('aria-pressed', pressed ? 'false' : 'true');
+          if (group === 'ownership') {
+            if (pressed) filterState.ownership.delete(val);
+            else filterState.ownership.add(val);
+          } else if (group === 'zone') {
+            if (pressed) filterState.zone.delete(val);
+            else filterState.zone.add(val);
+          }
+          subscribers.forEach((fn) => fn());
+          return;
+        }
+
+        if (t.matches('.filter-section-reset[data-reset="building-mix"]')) {
+          resetBuildingMix();
+          subscribers.forEach((fn) => fn());
+        }
+      });
+
+      // Range slider drag events — dispatch by data-range-group on the wrapper
+      section.addEventListener('input', (e) => {
+        const t = e.target as HTMLInputElement;
+        if (!t) return;
+        const sliderEl = t.closest<HTMLElement>('.range-slider');
+        const groupId = sliderEl?.getAttribute('data-range-group') || '';
+        const cfg = SLIDER_CONFIGS[groupId];
+        if (!cfg) return;
+        const state = filterState[cfg.stateKey];
+        const isMin = t.classList.contains('range-slider-handle-min');
+        const isMax = t.classList.contains('range-slider-handle-max');
+        if (!isMin && !isMax) return;
+        let newVal = Number(t.value);
+        if (isMin) {
+          if (newVal > state.max) { newVal = state.max; t.value = String(newVal); }
+          state.min = newVal;
+        } else {
+          if (newVal < state.min) { newVal = state.min; t.value = String(newVal); }
+          state.max = newVal;
+        }
+        updateRangeSliderUI(groupId);
+        subscribers.forEach((fn) => fn());
+      });
+    }
+
+    // -------------------- Marker index --------------------
+    // Captured during pointToLayer for the commercial+vacant layer so the
+    // subscribe callback can iterate without re-walking the GeoJSON.
+    const markerIndex = new Map<
+      number,
+      { layer: L.CircleMarker; props: ParcelProps }
+    >();
+    // Non-commercial markers tracked individually so they can participate in
+    // matchesAll / lens visibility instead of being a wholesale layer toggle.
+    const nonCommercialMarkerIndex = new Map<
+      number,
+      { layer: L.CircleMarker; props: ParcelProps }
+    >();
+
+    // -------------------- Module-scope references for corridor navigation --------------------
+    let parcelsGjRef: GeoJSON.FeatureCollection | null = null;
+    let mapRef: L.Map | null = null;
+    let initialView: { center: L.LatLng; zoom: number } | null = null;
+    const corridorBounds: Record<string, L.LatLngBounds> = {};
+    let combinedCorridorBounds: L.LatLngBounds | null = null;
+    let streetsLayerRef: L.GeoJSON | null = null;
+    // Boundary overlays (BID / RCO) — created lazily, default OFF, live in a
+    // dedicated low-z pane below the parcel dots.
+    let bidLayerRef: L.GeoJSON | null = null;
+    let rcoLayerRef: L.GeoJSON | null = null;
+    let zoningLayerRef: L.GeoJSON | null = null;
+    let densityLayerRef: L.GeoJSON | null = null;
+    let ringLayerRef: L.GeoJSON | null = null;
+
+    function line(label: string, value: string | number): string {
+      return `<p><span class="popup-label">${label}:</span> ${value}</p>`;
+    }
+
+    function buildPopup(p: ParcelProps): string {
+      const isNonCommercial = p.vacancy_state === 'non_commercial';
+      const isVacant =
+        p.vacancy_state === 'short_term' ||
+        p.vacancy_state === 'long_term' ||
+        p.vacancy_state === 'under_renovation';
+
+      // ---------- Header block ----------
+      const header: string[] = [];
+      header.push(`<h3 class="popup-address">${escapeHtml(p.address)}</h3>`);
+
+      if (p.cultural_tenant && p.cultural_status) {
+        const label =
+          p.cultural_status === 'Active'
+            ? 'Active Cultural Anchor'
+            : `${escapeHtml(p.cultural_status)} Cultural Anchor`;
+        header.push(
+          `<p class="popup-subheader">${escapeHtml(p.cultural_tenant)} (${label})</p>`,
+        );
+      }
+
+      if (isVacant && p.vacancy_type) {
+        const pillClass = `popup-pill popup-pill--${p.vacancy_state}`;
+        header.push(
+          `<div class="popup-pill-row"><span class="${pillClass}">${escapeHtml(p.vacancy_type)}</span></div>`,
+        );
+      }
+
+      // ---------- BUSINESS INFO section ----------
+      const businessInfo: string[] = [];
+      if (isVacant) {
+        if (p.vacancy_type) businessInfo.push(line('Vacancy', escapeHtml(p.vacancy_type)));
+        if (p.outdoor_footprint) businessInfo.push(line('Outdoor Footprint', escapeHtml(p.outdoor_footprint)));
+      } else if (!isNonCommercial) {
+        if (p.business_segment) businessInfo.push(line('Segment', escapeHtml(p.business_segment)));
+        if (p.business_category) businessInfo.push(line('Category', escapeHtml(p.business_category)));
+        if (p.operator_type && p.operator_type !== 'Vacant') {
+          businessInfo.push(line('Operator', escapeHtml(p.operator_type)));
+        }
+        if (p.outdoor_footprint) businessInfo.push(line('Outdoor Footprint', escapeHtml(p.outdoor_footprint)));
+      }
+
+      // ---------- BUILDING DETAILS section ----------
+      const buildingDetails: string[] = [];
+      if (p.owner) buildingDetails.push(line('Owner', escapeHtml(titleCaseOwner(p.owner))));
+      if (isNonCommercial && p.opa_property_use) {
+        buildingDetails.push(line('Type', escapeHtml(p.opa_property_use)));
+      }
+      if (p.year_built) {
+        buildingDetails.push(line('Year built', escapeHtml(p.year_built)));
+      }
+      if (p.zone_type) buildingDetails.push(line('Zone', escapeHtml(p.zone_type)));
+      if (p.building_footprint && p.building_footprint > 0) {
+        buildingDetails.push(
+          line('Footprint', `${p.building_footprint.toLocaleString('en-US')} sqft`),
+        );
+      }
+      if (p.building_height && p.building_height > 0) {
+        buildingDetails.push(line('Height', `${p.building_height} ft`));
+      }
+      if (p.open_violations && p.open_violations > 0) {
+        const valHtml = p.open_violations >= 3
+          ? `<span class="popup-violations-high">${p.open_violations}</span>`
+          : `${p.open_violations}`;
+        buildingDetails.push(line('Open violations', valHtml));
+      }
+      if (
+        p.last_sale_year &&
+        p.last_sale_price !== null &&
+        p.last_sale_price !== undefined
+      ) {
+        buildingDetails.push(
+          line('Last sale', `${p.last_sale_year} for ${formatPrice(p.last_sale_price)}`),
+        );
+        if (Number(p.last_sale_price) === 1) {
+          buildingDetails.push(
+            `<p class="popup-caveat">(non-arms-length transfer)</p>`,
+          );
+        }
+      }
+
+      // ---------- Assemble ----------
+      let html = header.join('');
+      if (businessInfo.length) {
+        html +=
+          `<div class="popup-section">` +
+          `<div class="popup-section-title">Business Info</div>` +
+          businessInfo.join('') +
+          `</div>`;
+      }
+      if (buildingDetails.length) {
+        html +=
+          `<div class="popup-section">` +
+          `<div class="popup-section-title">Building Details</div>` +
+          buildingDetails.join('') +
+          `</div>`;
+      }
+      return html;
+    }
+
+    // Build the BID + RCO boundary layers (default OFF) and wire their sidebar
+    // checkboxes. Layers live in the 'boundaries' pane so they sit below dots.
+    async function initBoundaryOverlays(map: L.Map): Promise<void> {
+      // At/above this zoom a single block roughly fills the viewport, so RCO
+      // hover labels are suppressed to avoid interfering with block inspection.
+      const RCO_HOVER_DISABLE_ZOOM = 18;
+      const rcoHoverDisabled = () => map.getZoom() >= RCO_HOVER_DISABLE_ZOOM;
+
+      // ================= Neighborhood demographic card =================
+      // Maps between demographic neighborhood names and RCO shape names. Only
+      // the five with both data AND a shape are clickable on the map; East
+      // Passyunk Crossing has a shape but no data (boundary only), and Pennsport
+      // has data but no shape (sidebar trigger only).
+      type DecadeRec = Record<string, number | null>;
+      type NbhdRec = {
+        corridor: string;
+        decades: Record<string, DecadeRec>;
+        note?: string;
+        partial?: boolean;
+      };
+      // RCO shape name -> demographic card key. Five shapes carry data; the EPX
+      // shape shares the Passyunk Square (East Passyunk catchment) card. Shapes
+      // not listed here (South Street/Headhouse District) stay boundary-only.
+      const RCO_TO_NBHD: Record<string, string> = {
+        'Society Hill Civic Association': 'Society Hill',
+        'Washington Square West Civic Association': 'Washington Square West',
+        'Queen Village Neighbors Association': 'Queen Village',
+        'Bella Vista Neighbors Association': 'Bella Vista',
+        'Passyunk Square Civic Association': 'Passyunk Square',
+        'East Passyunk Crossing Civic Association (EPX)': 'Passyunk Square',
+      };
+      // Card key -> every RCO shape it should highlight. Passyunk Square covers
+      // both the Passyunk Square and EPX shapes. WSW highlights a tract instead
+      // (handled separately), so it lists no RCO shapes.
+      const NBHD_TO_SHAPES: Record<string, string[]> = {
+        'Society Hill': ['Society Hill Civic Association'],
+        'Washington Square West': [],
+        'Queen Village': ['Queen Village Neighbors Association'],
+        'Bella Vista': ['Bella Vista Neighbors Association'],
+        'Passyunk Square': [
+          'Passyunk Square Civic Association',
+          'East Passyunk Crossing Civic Association (EPX)',
+        ],
+        'Pennsport': [],
+      };
+      const TRACT_CARDS = new Set(['Washington Square West']);
+
+      let demographics: Record<string, NbhdRec> = {};
+      try {
+        const resp = await fetch('/data/neighborhood_demographics.json');
+        demographics = await resp.json();
+      } catch (err) {
+        console.error('Failed to load neighborhood_demographics.json', err);
+      }
+
+      // Highlight state: a set of RCO sublayers (one or two) and/or the WSW tract
+      // layer. activeShapeNames lets us restore the RCO highlight if the layer is
+      // toggled off and back on while the card is open.
+      let highlightedRcoLayers: L.Path[] = [];
+      let wswTractLayer: L.GeoJSON | null = null;
+      let activeShapeNames: string[] = [];
+      let activeNbhd: string | null = null;
+      // Map view captured before flying to a neighborhood, restored on card close.
+      let preCardView: { center: L.LatLng; zoom: number } | null = null;
+
+      const INC = 'Median Household Income (2020$)';
+      const HOME = 'Median Home Value (2020$)';
+
+      // --- formatting helpers ---
+      const fmtInt = (v: number | null) =>
+        v == null ? '—' : Math.round(v).toLocaleString('en-US');
+      const fmtMoney = (v: number | null) =>
+        v == null ? '—' : '$' + Math.round(v).toLocaleString('en-US');
+      const fmtPct = (frac: number | null) =>
+        frac == null ? '—' : Math.round(frac * 100) + '%';
+      const fmtAge = (v: number | null) =>
+        v == null ? '—' : Number.isInteger(v) ? String(v) : v.toFixed(1);
+      const pctChange = (oldV: number | null, newV: number | null): string => {
+        if (oldV == null || newV == null || oldV === 0) return '';
+        const p = Math.round(((newV - oldV) / oldV) * 100);
+        return (p >= 0 ? '+' : '') + p + '% since 1970';
+      };
+      const yearsChange = (oldV: number | null, newV: number | null): string => {
+        if (oldV == null || newV == null) return '';
+        const n = Math.round(newV - oldV);
+        return (n >= 0 ? '+' : '') + n + ' yrs since 1970';
+      };
+      const ppChange = (oldV: number | null, newV: number | null): string => {
+        if (oldV == null || newV == null) return '';
+        const n = Math.round((newV - oldV) * 100);
+        return (n >= 0 ? '+' : '') + n + ' pts since 1970';
+      };
+      // mode 'neutral' → always grey (median age in years). mode 'signed' →
+      // green up / red down, with an exact-zero change shown grey (neither).
+      const deltaSpan = (s: string, mode: 'signed' | 'neutral'): string => {
+        if (!s) return '';
+        let cls = 'nbhd-delta';
+        if (mode === 'neutral') {
+          cls += ' is-neutral';
+        } else {
+          const m = s.match(/^([+-]?)(\d+)/);
+          const num = m ? Number(m[1] + m[2]) : 0;
+          if (num < 0) cls += ' is-negative';
+          else if (num === 0) cls += ' is-neutral';
+        }
+        return `<span class="${cls}">${s}</span>`;
+      };
+
+      // Build the card body HTML for one neighborhood.
+      const buildCardHtml = (name: string): string => {
+        const rec = demographics[name];
+        if (!rec) return '';
+        const a: DecadeRec = rec.decades['1970'] || {};
+        const b: DecadeRec = rec.decades['2020'] || {};
+        const isEast = rec.corridor === 'East Passyunk';
+        const stat = (label: string, value: string, delta = '') =>
+          `<div class="nbhd-stat"><dt>${label}</dt><dd>${value}${delta}</dd></div>`;
+        // Corridor vacancy line: South Street only, pairing current vs. the 1995
+        // trough. East Passyunk cards show no vacancy line.
+        const vacancyLine = isEast
+          ? ''
+          : `<p class="nbhd-card-vacancy">South Street corridor: ` +
+            `<span class="nbhd-vacancy-now">${SOUTH_ST_VACANCY_CURRENT}% vacant</span>` +
+            `<span class="nbhd-vacancy-base">, up from ${SOUTH_ST_VACANCY_1995}% in 1995</span></p>`;
+        return (
+          `<button class="nbhd-card-close" type="button" aria-label="Close">&times;</button>` +
+          `<h3 class="nbhd-card-title">${escapeHtml(name)}</h3>` +
+          `<p class="nbhd-card-subtitle${isEast ? ' is-east' : ''}">${escapeHtml(rec.corridor)} corridor</p>` +
+          `<dl class="nbhd-stats">` +
+            stat('Population (2020)', fmtInt(b['Total Population'])) +
+            stat('Median household income', fmtMoney(b[INC]), deltaSpan(pctChange(a[INC], b[INC]), 'signed')) +
+            stat('Median home value', fmtMoney(b[HOME]), deltaSpan(pctChange(a[HOME], b[HOME]), 'signed')) +
+            stat('Owner-occupied', fmtPct(b['% Owner-Occupied']), deltaSpan(ppChange(a['% Owner-Occupied'], b['% Owner-Occupied']), 'signed')) +
+            stat('Median age', fmtAge(b['Median Age']), deltaSpan(yearsChange(a['Median Age'], b['Median Age']), 'neutral')) +
+            stat('Age 18–34', fmtPct(b['% 18-34']), deltaSpan(ppChange(a['% 18-34'], b['% 18-34']), 'signed')) +
+          `</dl>` +
+          vacancyLine +
+          (rec.note ? `<p class="nbhd-card-note">${escapeHtml(rec.note)}</p>` : '') +
+          `<p class="nbhd-card-footnote">Dollar figures inflation-adjusted to 2020.</p>`
+        );
+      };
+
+      // Card lives in a Leaflet control docked top-right; hidden until selected.
+      let cardEl: HTMLElement | null = null;
+      const cardControl = new L.Control({ position: 'topright' });
+      cardControl.onAdd = () => {
+        const div = L.DomUtil.create('div', 'nbhd-card');
+        div.style.position = 'relative';
+        div.style.display = 'none';
+        L.DomEvent.disableClickPropagation(div);
+        L.DomEvent.disableScrollPropagation(div);
+        div.addEventListener('click', (e) => {
+          if ((e.target as HTMLElement).closest('.nbhd-card-close')) closeCard();
+        });
+        cardEl = div;
+        return div;
+      };
+      cardControl.addTo(map);
+
+      const featName = (l: L.Layer) =>
+        (l as L.GeoJSON & { feature?: GeoJSON.Feature }).feature?.properties?.name as
+          | string
+          | undefined;
+
+      // Clear any active highlight (RCO sublayers reset + WSW tract removed).
+      const clearHighlight = (): void => {
+        if (rcoLayerRef) highlightedRcoLayers.forEach((p) => rcoLayerRef!.resetStyle(p));
+        highlightedRcoLayers = [];
+        activeShapeNames = [];
+        if (wswTractLayer && map.hasLayer(wswTractLayer)) map.removeLayer(wswTractLayer);
+      };
+
+      // Highlight one or more RCO shapes by name, flying to their combined bounds.
+      const highlightShapes = (rcoNames: string[], fly: boolean): void => {
+        activeShapeNames = rcoNames;
+        if (!rcoLayerRef || rcoNames.length === 0) return;
+        const bounds = L.latLngBounds([]);
+        rcoLayerRef.eachLayer((l) => {
+          if (rcoNames.includes(featName(l) ?? '')) {
+            const path = l as L.Path;
+            path.setStyle({ weight: 3, fillOpacity: 0.18, dashArray: '' });
+            path.bringToFront();
+            highlightedRcoLayers.push(path);
+            const b = (path as L.Polygon).getBounds();
+            if (b && b.isValid()) bounds.extend(b);
+          }
+        });
+        if (fly && bounds.isValid()) map.flyToBounds(bounds, { padding: [40, 40], maxZoom: 16 });
+      };
+
+      // Washington Square West highlights/zooms census tract 11.02, not the large
+      // WSW RCO polygon. The tract layer is its own (non-RCO) overlay.
+      const highlightTract = async (fly: boolean): Promise<void> => {
+        if (!wswTractLayer) {
+          try {
+            const resp = await fetch('/data/wsw_tract.geojson');
+            const gj = await resp.json();
+            wswTractLayer = L.geoJSON(gj, {
+              pane: 'boundaries',
+              interactive: false,
+              style: {
+                color: '#9333EA',
+                weight: 3,
+                opacity: 0.95,
+                fill: true,
+                fillColor: '#9333EA',
+                fillOpacity: 0.18,
+              },
+            });
+          } catch (err) {
+            console.error('Failed to load wsw_tract.geojson', err);
+            return;
+          }
+        }
+        wswTractLayer.addTo(map);
+        if (fly) {
+          const bounds = wswTractLayer.getBounds();
+          if (bounds.isValid()) map.flyToBounds(bounds, { padding: [40, 40], maxZoom: 16 });
+        }
+      };
+
+      // Turn the RCO overlay on if it is currently off (keeps the checkbox synced).
+      const ensureRcoOn = (): void => {
+        const box = document.getElementById('overlay-rcos') as HTMLInputElement | null;
+        if (box && rcoLayerRef && !box.checked) {
+          box.checked = true;
+          rcoLayerRef.addTo(map);
+        }
+      };
+
+      const setActiveTriggerEl = (el: Element | null): void => {
+        document.querySelectorAll('.nbhd-trigger').forEach((b) => {
+          b.classList.toggle('is-active', b === el);
+        });
+      };
+
+      function renderCard(name: string, activeEl: Element | null): void {
+        if (!cardEl || !demographics[name]) return;
+        activeNbhd = name;
+        cardEl.innerHTML = buildCardHtml(name);
+        cardEl.style.display = 'block';
+        setActiveTriggerEl(activeEl);
+      }
+
+      function closeCard(): void {
+        if (cardEl) cardEl.style.display = 'none';
+        activeNbhd = null;
+        setActiveTriggerEl(null);
+        clearHighlight();
+        // Return the visitor to wherever they were before exploring a neighborhood.
+        if (preCardView) {
+          map.flyTo(preCardView.center, preCardView.zoom);
+          preCardView = null;
+        }
+      }
+
+      // Shared selection path. Highlights ALL shapes the card covers (so the
+      // Passyunk Square card lights both the Passyunk Square and EPX shapes),
+      // or the WSW tract. `fly`/`ensureOn` differ for sidebar vs map clicks.
+      function selectNeighborhood(
+        card: string,
+        activeEl: Element | null,
+        opts: { fly: boolean; ensureOn: boolean },
+      ): void {
+        if (!demographics[card]) return;
+        // Capture the current view to restore on close — but only when opening
+        // fresh (card not already up), so swapping neighborhoods doesn't lose the
+        // original framing. Only when we actually fly.
+        const cardOpen = cardEl?.style.display === 'block';
+        if (opts.fly && !cardOpen) {
+          preCardView = { center: map.getCenter(), zoom: map.getZoom() };
+        }
+        renderCard(card, activeEl);
+        clearHighlight();
+        if (opts.ensureOn) ensureRcoOn();
+        if (TRACT_CARDS.has(card)) {
+          void highlightTract(opts.fly);
+          return;
+        }
+        const shapes = NBHD_TO_SHAPES[card] || [];
+        if (shapes.length) highlightShapes(shapes, opts.fly);
+      }
+
+      // Map shape click: open the card and highlight in place (no fly), marking
+      // the clicked shape's sidebar row active.
+      function openFromMapShape(rcoName: string): void {
+        const card = RCO_TO_NBHD[rcoName];
+        if (!card) return;
+        const btn = document.querySelector(`.nbhd-trigger[data-shape="${rcoName}"]`);
+        selectNeighborhood(card, btn, { fly: false, ensureOn: false });
+      }
+
+      // Sidebar trigger: open the card, turn RCO on, fly to + highlight the
+      // shape(s) or the WSW tract. Pennsport (no shape) opens the card only.
+      document.getElementById('nbhd-trigger-list')?.addEventListener('click', (e) => {
+        const btn = (e.target as HTMLElement).closest<HTMLButtonElement>('.nbhd-trigger');
+        if (!btn || !btn.dataset.nbhd) return;
+        selectNeighborhood(btn.dataset.nbhd, btn, { fly: true, ensureOn: true });
+      });
+
+      // ---- BID layer: 2px teal outline, very light fill, permanent labels ----
+      try {
+        const resp = await fetch('/data/bids.geojson');
+        const gj = await resp.json();
+        bidLayerRef = L.geoJSON(gj, {
+          pane: 'boundaries',
+          interactive: false, // labels carry the meaning; never grab clicks
+          style: () => ({
+            color: '#0e7490',
+            weight: 2,
+            opacity: 0.9,
+            fill: true,
+            fillColor: '#0e7490',
+            fillOpacity: 0.08,
+          }),
+          onEachFeature: (feature, layer) => {
+            const name = (feature.properties as { name?: string })?.name;
+            if (name) {
+              layer.bindTooltip(name, {
+                permanent: true,
+                direction: 'center',
+                className: 'bid-label',
+              });
+            }
+          },
+        });
+      } catch (err) {
+        console.error('Failed to load bids.geojson', err);
+      }
+
+      // ---- RCO layer: thin dashed amber outline, name on hover ----
+      try {
+        const resp = await fetch('/data/rcos.geojson');
+        const gj = await resp.json();
+        // South Street RCOs get a distinct magenta-purple (#9333EA) — kept clear
+        // of the muted #7B3F99 South Street centerline so the two don't blend.
+        // East Passyunk RCOs keep the amber.
+        const SOUTH_ST_RCOS = new Set([
+          'Queen Village Neighbors Association',
+          'Society Hill Civic Association',
+          'Bella Vista Neighbors Association',
+          'Washington Square West Civic Association',
+          'South Street/Headhouse District',
+        ]);
+        const rcoColor = (name?: string) =>
+          name && SOUTH_ST_RCOS.has(name) ? '#9333EA' : '#b45309';
+        rcoLayerRef = L.geoJSON(gj, {
+          pane: 'boundaries',
+          style: (feature) => {
+            const c = rcoColor((feature?.properties as { name?: string })?.name);
+            return {
+              color: c,
+              weight: 1.5,
+              opacity: 0.85,
+              dashArray: '4 3',
+              fill: true,
+              fillColor: c,
+              fillOpacity: 0,
+              className: 'rco-shape', // CSS gives this pointer-events:auto for hover
+            };
+          },
+          onEachFeature: (feature, layer) => {
+            const name = (feature.properties as { name?: string })?.name;
+            if (name) {
+              // Label text matches the boundary color: purple for South Street
+              // RCOs, amber (default) for East Passyunk.
+              const isSouth = SOUTH_ST_RCOS.has(name);
+              layer.bindTooltip(name, {
+                sticky: true,
+                direction: 'top',
+                className: isSouth ? 'rco-label rco-label-south' : 'rco-label',
+              });
+            }
+            // Light fill flash on hover so the hovered ring reads at a glance —
+            // skipped past the block-zoom threshold (hover is disabled there) and
+            // for the currently-highlighted shape (so its highlight fill stays).
+            layer.on('mouseover', () => {
+              if (rcoHoverDisabled() || highlightedRcoLayers.includes(layer as L.Path)) return;
+              (layer as L.Path).setStyle({ fillOpacity: 0.1 });
+            });
+            layer.on('mouseout', () => {
+              if (highlightedRcoLayers.includes(layer as L.Path)) return;
+              (layer as L.Path).setStyle({ fillOpacity: 0 });
+            });
+            // Click opens the demographic card and highlights every shape the
+            // card covers (Passyunk Square + EPX together). EPX shares the
+            // Passyunk Square card; South Street/Headhouse District has no
+            // record, so it stays boundary-only (no-op).
+            if (name && RCO_TO_NBHD[name]) {
+              layer.on('click', () => openFromMapShape(name));
+            }
+          },
+        });
+      } catch (err) {
+        console.error('Failed to load rcos.geojson', err);
+      }
+
+      // ---- Base zoning: light fill colored by zoning family ----
+      // Per-code colors approximating a standard Philadelphia zoning map.
+      const ZONING_COLORS: Record<string, string> = {
+        SPPOA: '#6BAF6B',                                   // green — recreation / open space
+        CMX1: '#FCAE91', CMX2: '#FCAE91', 'CMX2.5': '#FCAE91', // salmon — low commercial mixed-use
+        CMX3: '#EF3B2C', CMX4: '#EF3B2C',                   // red — mid commercial mixed-use
+        CMX5: '#99000D',                                    // dark red — high commercial mixed-use
+        RSA3: '#F5F0A9', RSA5: '#F5F0A9',                   // pale yellow — single-family residential
+        RM1: '#FDD0A2', RM2: '#FDD0A2', RM4: '#FDD0A2',     // light orange — multi-family residential
+        RMX2: '#FD8D3C', RMX3: '#FD8D3C',                   // orange — residential mixed-use
+        CA1: '#9E9AC8', CA2: '#9E9AC8',                     // muted purple — auto-oriented commercial
+        I2: '#999999', ICMX: '#999999', IP: '#999999', IRMX: '#999999', // gray — industrial
+      };
+      // Legend groupings (family label + the codes that map to each color).
+      const ZONING_FAMILIES: { name: string; codes: string; color: string }[] = [
+        { name: 'Open space', codes: 'SPPOA', color: '#6BAF6B' },
+        { name: 'Commercial mixed-use (low)', codes: 'CMX-1/2/2.5', color: '#FCAE91' },
+        { name: 'Commercial mixed-use (mid)', codes: 'CMX-3/4', color: '#EF3B2C' },
+        { name: 'Commercial mixed-use (high)', codes: 'CMX-5', color: '#99000D' },
+        { name: 'Single-family residential', codes: 'RSA-3/5', color: '#F5F0A9' },
+        { name: 'Multi-family residential', codes: 'RM-1/2/4', color: '#FDD0A2' },
+        { name: 'Residential mixed-use', codes: 'RMX-2/3', color: '#FD8D3C' },
+        { name: 'Auto-oriented commercial', codes: 'CA-1/2', color: '#9E9AC8' },
+        { name: 'Industrial', codes: 'I-2 / ICMX / IP / IRMX', color: '#999999' },
+      ];
+      try {
+        const resp = await fetch('/data/zoning_base.geojson');
+        const gj = await resp.json();
+        zoningLayerRef = L.geoJSON(gj, {
+          pane: 'zoning',
+          interactive: false, // pure backdrop — never intercept clicks
+          style: (feature) => {
+            const code = (feature?.properties as { code?: string })?.code ?? '';
+            return {
+              stroke: false,
+              fill: true,
+              fillColor: ZONING_COLORS[code] || '#cccccc',
+              fillOpacity: 0.28,
+            };
+          },
+        });
+      } catch (err) {
+        console.error('Failed to load zoning_base.geojson', err);
+      }
+
+      // Legend control — only on the map while base zoning is on.
+      const zoningLegend = new L.Control({ position: 'bottomleft' });
+      zoningLegend.onAdd = () => {
+        const div = L.DomUtil.create('div', 'zoning-legend');
+        div.innerHTML =
+          '<p class="zoning-legend-title">Base zoning</p>' +
+          ZONING_FAMILIES.map(
+            (f) =>
+              `<div class="zoning-legend-row">` +
+              `<span class="zoning-legend-swatch" style="background:${f.color}"></span>` +
+              `<span><span class="zoning-legend-name">${f.name}</span> ` +
+              `<span class="zoning-legend-codes">${f.codes}</span></span>` +
+              `</div>`,
+          ).join('');
+        return div;
+      };
+
+      // ================= Density score layer (South Street only) =================
+      // Teal density ramp, light (low) -> dark (high), matching the legend.
+      // Range tracks the 15-tract set (low tract 1.01 clipped to the circle,
+      // high tract 11.01).
+      const DENS_LOW = 19000, DENS_HIGH = 66000;
+      const LO_RGB = [0xd7, 0xf0, 0xee], HI_RGB = [0x0d, 0x4d, 0x4a];
+      const densityColor = (d: number): string => {
+        const t = Math.max(0, Math.min(1, (d - DENS_LOW) / (DENS_HIGH - DENS_LOW)));
+        const c = LO_RGB.map((lo, i) => Math.round(lo + (HI_RGB[i] - lo) * t));
+        return `rgb(${c[0]}, ${c[1]}, ${c[2]})`;
+      };
+
+      const RETAIL_SQFT = 300000;   // estimated sq ft of corridor retail (denominator)
+      const BENCHMARK = 400;        // residents per 2,000 sq ft target
+      const PER = 2000;
+      // Three-quarter-mile (15-min) circle catchment total = Σ full pop across the
+      // 15 overlapping tracts (verified = 46,201).
+      const CATCHMENT_TOTAL = 46201;
+      // Residents needed to hit the 400 benchmark (slider runs 0–20,000, enough
+      // to drag past critical mass).
+      const residentsForBench = Math.ceil((BENCHMARK * RETAIL_SQFT) / PER); // 60,000
+      const SLIDER_MAX = 20000;
+
+      // Catchment ring (dashed purple, no fill) + its one-time label.
+      let ringLabelMarker: L.Marker | null = null;
+      try {
+        const resp = await fetch('/data/catchment_southst.geojson');
+        const gj = await resp.json();
+        ringLayerRef = L.geoJSON(gj, {
+          pane: 'boundaries',
+          interactive: false,
+          style: { color: '#6d28d9', weight: 2, opacity: 0.9, dashArray: '6 5', fill: false },
+        });
+        const rb = ringLayerRef.getBounds();
+        if (rb.isValid()) {
+          const north = L.latLng(rb.getNorth(), (rb.getWest() + rb.getEast()) / 2);
+          ringLabelMarker = L.marker(north, {
+            interactive: false,
+            icon: L.divIcon({ className: 'ring-label', html: '¾-mile walk · 15 min', iconSize: null }),
+          });
+        }
+      } catch (err) {
+        console.error('Failed to load catchment_southst.geojson', err);
+      }
+
+      // Choropleth, colored by per-tract density (people / sq mi).
+      try {
+        const resp = await fetch('/data/tracts_density_southst.geojson');
+        const gj = await resp.json();
+        densityLayerRef = L.geoJSON(gj, {
+          pane: 'density',
+          interactive: false, // pure backdrop — dots stay clickable
+          style: (feature) => ({
+            stroke: true,
+            color: '#ffffff',
+            weight: 0.8,
+            fill: true,
+            fillColor: densityColor((feature?.properties as { density?: number })?.density ?? DENS_LOW),
+            fillOpacity: 0.82,
+          }),
+        });
+      } catch (err) {
+        console.error('Failed to load tracts_density_southst.geojson', err);
+      }
+
+      // Critical-mass panel (top-left so it never overlaps the top-right card).
+      const fmtR = (n: number) => Math.round(n).toLocaleString('en-US');
+      const densityPanel = new L.Control({ position: 'topleft' });
+      densityPanel.onAdd = () => {
+        const div = L.DomUtil.create('div', 'density-panel');
+        L.DomEvent.disableClickPropagation(div);
+        L.DomEvent.disableScrollPropagation(div);
+        div.innerHTML =
+          `<h4 class="density-panel-title">15-minute walk catchment</h4>` +
+          `<p class="density-panel-row"><b>${fmtR(CATCHMENT_TOTAL)}</b> residents in the ¾-mi ring</p>` +
+          `<p class="density-panel-row">~<b>${fmtR(RETAIL_SQFT)}</b> sq ft of retail <span class="density-est">(est.)</span></p>` +
+          `<div class="density-ratio">` +
+            `<div class="density-ratio-head"><b id="dp-ratio">—</b> residents per 2,000 sq ft <span class="density-est">(est.)</span></div>` +
+            `<div class="density-bar"><div class="density-bar-fill" id="dp-bar"></div></div>` +
+            `<div class="density-ratio-label" id="dp-label">—</div>` +
+          `</div>` +
+          `<label class="density-slider-label">Add residents to the ring: <b id="dp-added">0</b></label>` +
+          `<input type="range" id="dp-slider" min="0" max="${SLIDER_MAX}" step="500" value="0">` +
+          `<p class="density-hint" id="dp-hint">—</p>` +
+          `<div class="density-legend">` +
+            `<span class="density-legend-cap">Resident density (per sq mi)</span>` +
+            `<div class="density-legend-bar"></div>` +
+            `<div class="density-legend-ends"><span>19k</span><span>66k</span></div>` +
+          `</div>` +
+          `<p class="density-note">Catchment: census tracts overlapping the corridor. Retail floor area is an estimate.</p>`;
+        return div;
+      };
+
+      // Live recompute of the ratio bar from the slider.
+      const updateRatioUI = (added: number): void => {
+        const ratioEl = document.getElementById('dp-ratio');
+        const barEl = document.getElementById('dp-bar');
+        const labelEl = document.getElementById('dp-label');
+        const hintEl = document.getElementById('dp-hint');
+        const addedEl = document.getElementById('dp-added');
+        if (!ratioEl || !barEl || !labelEl || !hintEl || !addedEl) return;
+        const total = CATCHMENT_TOTAL + added;
+        const ratio = (total / RETAIL_SQFT) * PER;
+        ratioEl.textContent = String(Math.round(ratio));
+        addedEl.textContent = fmtR(added);
+        barEl.style.width = Math.min(100, (ratio / BENCHMARK) * 100) + '%';
+        if (ratio >= BENCHMARK) {
+          barEl.classList.add('is-reached');
+          labelEl.textContent = 'critical mass reached';
+          labelEl.classList.add('is-reached');
+          hintEl.textContent = '';
+        } else {
+          barEl.classList.remove('is-reached');
+          labelEl.classList.remove('is-reached');
+          labelEl.textContent = Math.round((1 - ratio / BENCHMARK) * 100) + '% below the 400 benchmark';
+          const need = residentsForBench - total;
+          hintEl.textContent = `needs about ${fmtR(need)} more to reach critical mass`;
+        }
+      };
+
+      // BID permanent labels hide while a single corridor is selected; they show
+      // only under "All Corridors". The outlines themselves are never affected.
+      const updateBidLabelVisibility = () => {
+        map.getContainer().classList.toggle(
+          'bid-labels-hidden',
+          filterState.corridor !== 'all',
+        );
+      };
+      // Re-evaluate on every filter change (corridor switches fire subscribers).
+      subscribe(updateBidLabelVisibility);
+
+      // Suppress RCO hover labels once zoomed to block level (see threshold).
+      const updateRcoHoverForZoom = () => {
+        map.getContainer().classList.toggle('rco-hover-off', rcoHoverDisabled());
+      };
+      map.on('zoomend', updateRcoHoverForZoom);
+      updateRcoHoverForZoom();
+
+      // ---- Wire sidebar checkboxes ----
+      // BID defaults ON; RCO defaults OFF (toggle adds it on demand).
+      const bidBox = document.getElementById('overlay-bids') as HTMLInputElement | null;
+      const rcoBox = document.getElementById('overlay-rcos') as HTMLInputElement | null;
+      if (bidBox && bidLayerRef) {
+        bidBox.checked = true;
+        bidLayerRef.addTo(map);
+        bidBox.addEventListener('change', () => {
+          if (!bidLayerRef) return;
+          if (bidBox.checked) bidLayerRef.addTo(map);
+          else map.removeLayer(bidLayerRef);
+        });
+      }
+      if (rcoBox && rcoLayerRef) {
+        rcoBox.checked = false; // default OFF — not added to the map on load
+        rcoBox.addEventListener('change', () => {
+          if (!rcoLayerRef) return;
+          if (rcoBox.checked) {
+            rcoLayerRef.addTo(map);
+            // Re-apply the highlight for the open card's shape(s), if any.
+            if (activeShapeNames.length) highlightShapes(activeShapeNames, false);
+          } else {
+            highlightedRcoLayers = []; // layers leaving the map; drop stale refs
+            map.removeLayer(rcoLayerRef);
+          }
+        });
+      }
+      const zoningBox = document.getElementById('overlay-zoning') as HTMLInputElement | null;
+      if (zoningBox && zoningLayerRef) {
+        zoningBox.checked = false; // default OFF
+        zoningBox.addEventListener('change', () => {
+          if (!zoningLayerRef) return;
+          if (zoningBox.checked) {
+            zoningLayerRef.addTo(map);
+            zoningLegend.addTo(map);   // legend appears only with the layer
+          } else {
+            map.removeLayer(zoningLayerRef);
+            zoningLegend.remove();
+          }
+        });
+      }
+      // Density score: choropleth + ring + panel toggle together (default OFF).
+      const showDensity = (): void => {
+        if (densityLayerRef) densityLayerRef.addTo(map);
+        if (ringLayerRef) ringLayerRef.addTo(map);
+        if (ringLabelMarker) ringLabelMarker.addTo(map);
+        densityPanel.addTo(map);
+        updateRatioUI(0);
+        const slider = document.getElementById('dp-slider') as HTMLInputElement | null;
+        slider?.addEventListener('input', () => updateRatioUI(Number(slider.value)));
+      };
+      const hideDensity = (): void => {
+        if (densityLayerRef) map.removeLayer(densityLayerRef);
+        if (ringLayerRef) map.removeLayer(ringLayerRef);
+        if (ringLabelMarker) map.removeLayer(ringLabelMarker);
+        densityPanel.remove();
+      };
+      const densityBox = document.getElementById('overlay-density') as HTMLInputElement | null;
+      if (densityBox) {
+        densityBox.checked = false;
+        densityBox.addEventListener('change', () => {
+          if (densityBox.checked) showDensity();
+          else hideDensity();
+        });
+      }
+
+      // Density is a South Street measure: disable + gray the toggle on East
+      // Passyunk, and hide the layer if it was on. Re-enable on All / South St.
+      const updateDensityAvailability = (): void => {
+        if (!densityBox) return;
+        const isEP = filterState.corridor === 'east-passyunk';
+        densityBox.disabled = isEP;
+        densityBox.closest('.filter-group')?.classList.toggle('is-disabled', isEP);
+        if (isEP && densityBox.checked) {
+          densityBox.checked = false;
+          hideDensity();
+        }
+      };
+      subscribe(updateDensityAvailability);
+      updateDensityAvailability();
+
+      // Apply initial label visibility for the default corridor state.
+      updateBidLabelVisibility();
+    }
+
+    async function initMap() {
+      const map = L.map('map', {
+        center: [39.938, -75.155],
+        zoom: 16,
+        maxZoom: 19,
+        zoomControl: true,
+      });
+      // Capture the framing the visitor sees on arrival so "All Corridors"
+      // can fly back to it later.
+      mapRef = map;
+      initialView = { center: map.getCenter(), zoom: map.getZoom() };
+
+      L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+        attribution:
+          '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
+        subdomains: 'abcd',
+        maxZoom: 19,
+      }).addTo(map);
+
+      // Dedicated pane for BID/RCO boundary overlays. z-index 350 sits above the
+      // tile pane (200) but below the default overlayPane (400) where the street
+      // lines and parcel circleMarkers render — so boundaries always draw beneath
+      // the dots and the dots stay on top and clickable.
+      map.createPane('boundaries');
+      const boundaryPane = map.getPane('boundaries');
+      if (boundaryPane) boundaryPane.style.zIndex = '350';
+
+      // Base-zoning fill sits in its own pane at z-index 340 — above the tiles
+      // (200) but below the boundary outlines (350) and the parcel dots /
+      // streets in overlayPane (400), so dots and BID/RCO outlines stay on top.
+      map.createPane('zoning');
+      const zoningPane = map.getPane('zoning');
+      if (zoningPane) zoningPane.style.zIndex = '340';
+
+      // Density choropleth sits lowest of the overlays (z-index 330) — below the
+      // zoning fill, the boundary outlines, and the dots. Its catchment ring
+      // renders in the 'boundaries' pane (350), above the choropleth, below dots.
+      map.createPane('density');
+      const densityPane = map.getPane('density');
+      if (densityPane) densityPane.style.zIndex = '330';
+
+      // Streets layer — render below parcels
+      try {
+        const streetsResp = await fetch('/data/streets.geojson');
+        const streetsGj = await streetsResp.json();
+        streetsLayerRef = L.geoJSON(streetsGj, {
+          style: (feature) => {
+            const key = feature?.properties?.corridor as string | undefined;
+            const base = (key && STREET_STYLES[key]) || { color: '#888', weight: 3 };
+            return {
+              color: base.color,
+              weight: base.weight,
+              opacity: 0.4,
+              className: 'corridor-line',
+            };
+          },
+        }).addTo(map);
+        // Stash bounds per corridor for the corridor-segmented fly-to behavior.
+        for (const f of streetsGj.features) {
+          const key = f?.properties?.corridor as string | undefined;
+          if (key === 'south_street' || key === 'east_passyunk') {
+            const tempLayer = L.geoJSON(f);
+            const b = tempLayer.getBounds();
+            if (b.isValid()) corridorBounds[key] = b;
+          }
+        }
+        // Build a combined bounds box covering both corridors. Used by the
+        // "All Corridors" fly-target and as the initial map framing.
+        const ss = corridorBounds.south_street;
+        const ep = corridorBounds.east_passyunk;
+        if (ss && ep) {
+          combinedCorridorBounds = L.latLngBounds(ss.getSouthWest(), ss.getNorthEast());
+          combinedCorridorBounds.extend(ep);
+        } else if (ss) {
+          combinedCorridorBounds = ss;
+        } else if (ep) {
+          combinedCorridorBounds = ep;
+        }
+        // Initial framing: fit both corridors centered between them. Overrides
+        // the static L.map center/zoom set above. Then re-capture initialView
+        // so the existing flyTo('all') logic falls back to this same framing.
+        if (combinedCorridorBounds && combinedCorridorBounds.isValid()) {
+          map.fitBounds(combinedCorridorBounds, { padding: [60, 60] });
+          initialView = { center: map.getCenter(), zoom: map.getZoom() };
+        }
+      } catch (err) {
+        console.error('Failed to load streets.geojson', err);
+      }
+
+      // Parcels layer — split so non-commercial dots can be toggled by zoom
+      try {
+        const parcelsResp = await fetch('/data/parcels.geojson');
+        const parcelsGj = await parcelsResp.json();
+
+        const bindPopupTo = (feature: GeoJSON.Feature, layer: L.Layer) => {
+          layer.bindPopup(buildPopup(feature.properties as ParcelProps), {
+            maxWidth: 280,
+          });
+        };
+
+        // Commercial + vacant dots: always visible at full opacity
+        L.geoJSON(parcelsGj, {
+          filter: (feature) =>
+            feature.properties?.vacancy_state !== 'non_commercial',
+          pointToLayer: (feature, latlng) => {
+            const props = feature.properties as ParcelProps;
+            const state = props.vacancy_state;
+            const marker = L.circleMarker(latlng, {
+              radius: 7,
+              fillColor: VACANCY_COLORS[state] || '#888',
+              color: '#ffffff',
+              weight: 1,
+              opacity: 1,
+              fillOpacity: 0.9,
+            });
+            markerIndex.set(props.id, { layer: marker, props });
+            return marker;
+          },
+          onEachFeature: bindPopupTo,
+        }).addTo(map);
+
+        // Non-commercial dots: created standalone (not added to map at init);
+        // the subscribe path manages add/remove per marker based on
+        // shouldShowNonCommercialLayer() + matchesAll() / lens scope.
+        L.geoJSON(parcelsGj, {
+          filter: (feature) =>
+            feature.properties?.vacancy_state === 'non_commercial',
+          pointToLayer: (feature, latlng) => {
+            const props = feature.properties as ParcelProps;
+            const marker = L.circleMarker(latlng, {
+              radius: 7,
+              fillColor: VACANCY_COLORS.non_commercial,
+              color: '#ffffff',
+              weight: 1,
+              opacity: 0.4,
+              fillOpacity: 0.35,
+            });
+            nonCommercialMarkerIndex.set(props.id, { layer: marker, props });
+            return marker;
+          },
+          onEachFeature: bindPopupTo,
+        });
+        // No .addTo(map) — markers are managed individually below.
+
+        // Zoom change feeds back into subscribers so non-commercial visibility
+        // recomputes alongside everything else (chip counts, etc.).
+        map.on('zoomend', () => {
+          subscribers.forEach((fn) => fn());
+        });
+
+        // -------------------- Wire Corridor section --------------------
+        wireCorridorSegmented();
+        wireStickyCorridorObserver();
+
+        // -------------------- Wire Map overlays section ----------------
+        await initBoundaryOverlays(map);
+
+        // -------------------- Wire Business mix section --------------------
+        parcelsGjRef = parcelsGj;
+        buildSegmentMap(parcelsGj);
+        buildBlockStats(parcelsGj);                          // ribbon data (Sub-phase A)
+        recomputeChipCounts();                                // initial counts (scope-aware)
+        renderBusinessMixUI();
+        wireBusinessMixSidebar();
+        renderBuildingMixUI();                                // Phase 5: Building mix chips + sliders
+        wireBuildingMixSidebar();
+        renderRibbon();                                       // initial paint (Sub-phase B)
+        wireRibbonControls();                                 // metric selector + block clicks
+        wireCorridorReset();                                  // Reset link in Corridor section header
+        updateRibbonCorridorDimming();                        // initial dimming state
+        syncRibbonToCorridor();                               // initial collapse (default corridor = All)
+
+        // -------------------- Subscribe path --------------------
+        subscribe(() => {
+          recomputeChipCounts();
+          updateAllCountSpans();
+          if (filterState.culturalLens) {
+            renderLensMode();
+          } else {
+            renderNormalMode();
+          }
+          updateSidebarChrome();
+          updateCorridorCounter();
+        });
+
+        // Initial chrome update (badge / reset visibility for default state).
+        updateAllCountSpans();
+        updateSidebarChrome();
+        updateCorridorCounter();
+        // Run subscribers once to perform the initial render (which also adds
+        // markers to the map based on current visibility logic).
+        subscribers.forEach((fn) => fn());
+
+        // Expose for manual console testing.
+        (window as unknown as Record<string, unknown>).__filterState = filterState;
+        (window as unknown as Record<string, unknown>).__setFilterState = setFilterState;
+        (window as unknown as Record<string, unknown>).__matchesAll = matchesAll;
+        (window as unknown as Record<string, unknown>).__blockStats = blockStats;
+      } catch (err) {
+        console.error('Failed to load parcels.geojson', err);
+      }
+    }
+
+    initMap();
+  </script>
+</Layout>

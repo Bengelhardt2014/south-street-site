@@ -9,9 +9,9 @@ interface Props {
 const { title = 'Saving South Street', fullBleed = false } = Astro.props;
 
 const navLinks = [
-  { href: '/', label: 'Map' },
-  { href: '/timeline', label: 'Timeline' },
-  { href: '/presentation', label: 'Presentation' },
+  { href: '/map', label: 'Map' },
+  { href: '/history', label: 'History' },
+  { href: '/findings', label: 'Findings' },
   { href: '/analysis', label: 'Policy Analysis' },
   { href: '/data', label: 'Data' },
 ];
@@ -28,7 +28,7 @@ const currentPath = Astro.url.pathname.replace(/\/$/, '') || '/';
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Anton&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Anton&family=Bebas+Neue&display=swap"
       rel="stylesheet"
     />
     <title>{title}</title>
@@ -39,6 +39,7 @@ const currentPath = Astro.url.pathname.replace(/\/$/, '') || '/';
         <a
           href="/"
           class="wordmark text-[1.5rem] text-stone-50 hover:text-stone-50"
+          style="font-family: 'Bebas Neue', 'Anton', sans-serif;"
         >
           Saving South Street
         </a>
