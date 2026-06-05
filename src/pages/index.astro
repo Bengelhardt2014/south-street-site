@@ -38,20 +38,67 @@ const problems = ['Governance Gridlock', 'Dormant Ownership', 'Declining Demand'
           <p class="credit">Brandon K. Engelhardt &middot; MS Urban Strategy &middot; Drexel 2026</p>
         </div>
 
-        <!-- 2. White changeable-letter board -->
+        <!-- 2. White changeable-letter board — two-sided 3D flip card -->
         <div class="board">
-          <div class="board-inner">
-            <div class="kicker">Now Playing</div>
-            <div class="board-lead">What's holding South Street back</div>
-            <div class="rows">
-              {problems.map((name) => (
-                <a class="row" href="/map">
-                  <span class="prob">{name}</span>
-                  <span class="cue">see the map &rarr;</span>
-                </a>
-              ))}
+          <!-- Only .flip (the two faces) rotates; the frame & bulbs stay put -->
+          <div class="flip-frame">
+            <div class="flip" data-flip>
+              <!-- FRONT: the problems -->
+              <div class="face face-front">
+                <div class="face-content">
+                  <div class="kicker">Now Playing</div>
+                  <div class="board-lead">What's holding South Street back</div>
+                  <div class="rows">
+                    {problems.map((name) => (
+                      <a class="row" href="/map">
+                        <span class="prob">{name}</span>
+                        <span class="cue">see the map &rarr;</span>
+                      </a>
+                    ))}
+                  </div>
+                </div>
+              </div>
+
+              <!-- BACK: the policy "bill" -->
+              <div class="face face-back">
+                <div class="face-content bill">
+                  <div class="kicker">The Main Event</div>
+                  <a class="headliner" href="/analysis">Full Policy<span class="headliner-arrow" aria-hidden="true">&rarr;</span></a>
+                  <div class="bill-sub">The integrated four-part package.</div>
+                  <div class="featuring-label">Featuring</div>
+                  <div class="acts">
+                    <a class="act" href="/findings">Creative District &amp; Overlay</a>
+                    <a class="act" href="/findings">Revitalization Corporation</a>
+                    <a class="act" href="/findings">CMX-3 Upzone</a>
+                    <a class="act" href="/findings">Pedestrianize the Core</a>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
+
+          <!-- Flip carets mounted on the stable frame (these do NOT rotate) -->
+          <button
+            type="button"
+            class="frame-caret frame-caret-right"
+            data-flip-to-back
+            aria-label="See the policy"
+          >
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <polyline points="9 5 16 12 9 19" />
+            </svg>
+          </button>
+          <button
+            type="button"
+            class="frame-caret frame-caret-left"
+            data-flip-to-front
+            aria-label="Back to the problems"
+          >
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <polyline points="15 5 8 12 15 19" />
+            </svg>
+          </button>
+
           <!-- 3. Strung warm bulbs along the bottom edge -->
           <div class="bulbs" aria-hidden="true">
             {bulbs.map((_, i) => (
@@ -72,6 +119,25 @@ const problems = ['Governance Gridlock', 'Dormant Ownership', 'Declining Demand'
     </div>
   </section>
 </Layout>
+
+<script>
+  // Flip the letter board between the "problems" front and the "bill" back.
+  const flip = document.querySelector('[data-flip]');
+  const board = flip && flip.closest('.board');
+  const setFlipped = (state) => {
+    if (!flip) return;
+    flip.classList.toggle('flipped', state);        // rotates the faces
+    if (board) board.classList.toggle('is-flipped', state); // swaps the frame carets
+  };
+  if (flip) {
+    document.querySelectorAll('[data-flip-to-back]').forEach((btn) =>
+      btn.addEventListener('click', () => setFlipped(true))
+    );
+    document.querySelectorAll('[data-flip-to-front]').forEach((btn) =>
+      btn.addEventListener('click', () => setFlipped(false))
+    );
+  }
+</script>
 
 <style>
   .cover {
@@ -104,7 +170,7 @@ const problems = ['Governance Gridlock', 'Dormant Ownership', 'Declining Demand'
 
   .stage {
     position: relative;
-    width: min(92vw, 740px);
+    width: min(92vw, 840px);
     margin: 0 auto;
     text-align: center;
   }
@@ -188,15 +254,35 @@ const problems = ['Governance Gridlock', 'Dormant Ownership', 'Declining Demand'
     padding: 11px 11px 28px;
     box-shadow: 0 24px 64px rgba(0, 0, 0, 0.7), 0 0 64px rgba(255, 224, 168, 0.08);
   }
-  .board-inner {
-    position: relative;
-    background: #f6f4ee;            /* changeable-letter white */
-    border-radius: 3px;
-    padding: 1.7rem 2rem 1.8rem;
-    overflow: hidden;
+  /* ---- 2a. Flip card: only the two faces rotate ---- */
+  .flip-frame {
+    perspective: 1000px;
+    overflow: hidden;             /* contain the angled panel; leaves the bulbs fully visible */
   }
-  /* Faint horizontal track lines across the white */
-  .board-inner::before {
+  .flip {
+    position: relative;
+    display: grid;                 /* both faces share one cell -> sizes to the taller */
+    transform-style: preserve-3d;
+    transform: rotateY(16deg);     /* front rest: LEFT edge closer & taller, right recedes */
+    transition: transform 0.8s ease;
+  }
+  .flip.flipped {
+    /* mirror rest: RIGHT edge closer & taller; back face ends face-out & readable */
+    transform: rotateY(196deg);
+  }
+  .face {
+    grid-area: 1 / 1;              /* stack both faces in the same space */
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    background: #f6f4ee;           /* changeable-letter white */
+    border-radius: 3px;
+    overflow: hidden;
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+  }
+  /* Faint horizontal track lines across the white (both faces) */
+  .face::before {
     content: '';
     position: absolute;
     inset: 0;
@@ -208,6 +294,26 @@ const problems = ['Governance Gridlock', 'Dormant Ownership', 'Declining Demand'
       rgba(0, 0, 0, 0.07) 41px
     );
     pointer-events: none;
+  }
+  .face-front {
+    justify-content: flex-start;
+    pointer-events: auto;
+  }
+  .face-back {
+    justify-content: center;       /* poster-style vertical centering */
+    transform: rotateY(180deg);    /* pre-rotated so it reads correctly when flipped */
+    pointer-events: none;
+  }
+  /* Only the face currently showing is clickable */
+  .flip.flipped .face-front { pointer-events: none; }
+  .flip.flipped .face-back { pointer-events: auto; }
+  .face-content {
+    position: relative;            /* sit above the track lines */
+    width: 100%;
+    padding: 1.3rem 2.4rem 1.4rem;     /* relaxed -> slightly shorter than the tall version, not squished */
+    /* optical re-centering: the tilt's near edge magnifies the left,
+       so nudge content toward the far edge so text reads centered */
+    transform: translateX(0.4rem);
   }
   .kicker {
     position: relative;
@@ -229,7 +335,7 @@ const problems = ['Governance Gridlock', 'Dormant Ownership', 'Declining Demand'
   }
   .rows {
     position: relative;
-    margin-top: 1.3rem;
+    margin-top: 1rem;
     text-align: left;
   }
   .row {
@@ -237,7 +343,7 @@ const problems = ['Governance Gridlock', 'Dormant Ownership', 'Declining Demand'
     align-items: baseline;
     justify-content: space-between;
     gap: 0.85rem;
-    padding: 0.85rem 0;
+    padding: 0.7rem 0;
     border-top: 1px dotted #b8b2a4;
     text-decoration: none;
     transition: background-color 0.15s ease;
@@ -266,6 +372,111 @@ const problems = ['Governance Gridlock', 'Dormant Ownership', 'Declining Demand'
     font-weight: 700;
     color: #c01a1a;
     white-space: nowrap;
+  }
+
+  /* ---- 2b. Flip controls + back "bill" ---- */
+  /* Mounted on the stable .board frame, vertically centred on the edge,
+     sitting against the dark so they pop (not buried in the cream). */
+  .frame-caret {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 4;
+    width: 38px;
+    height: 58px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    background: none;
+    border: none;
+    color: #e0241f;                /* clean red */
+    cursor: pointer;
+    filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.65));
+    transition: color 0.15s ease, filter 0.15s ease;
+  }
+  .frame-caret svg {
+    width: 28px;
+    height: 28px;
+  }
+  .frame-caret:hover,
+  .frame-caret:focus-visible {
+    color: #ff463f;
+    filter: drop-shadow(0 0 6px rgba(224, 36, 31, 0.6));
+    outline: none;
+  }
+  .frame-caret-right { right: -5px; }
+  .frame-caret-left { left: -5px; display: none; }   /* hidden until flipped */
+  .board.is-flipped .frame-caret-right { display: none; }
+  .board.is-flipped .frame-caret-left { display: flex; }
+  .headliner {
+    display: block;
+    margin-top: 0.6rem;
+    /* full-width hover row */
+    padding: 0.35rem 0;
+    border-radius: 3px;
+    font-family: 'Anton', sans-serif;
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+    font-size: clamp(2.1rem, 6.4vw, 3.3rem);
+    line-height: 0.98;
+    color: #14140f;
+    text-decoration: none;
+    transition: background-color 0.15s ease, color 0.15s ease;
+  }
+  .headliner:hover,
+  .headliner:focus-visible {
+    background-color: rgba(192, 26, 26, 0.05);
+    color: #c01a1a;
+    outline: none;
+  }
+  .headliner-arrow {
+    font-size: 0.42em;
+    vertical-align: middle;
+    margin-left: 0.4em;
+    color: #c01a1a;
+  }
+  .bill-sub {
+    margin-top: 0.55rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    font-size: 0.82rem;
+    color: #6b6459;
+  }
+  .featuring-label {
+    margin-top: 1rem;
+    text-transform: uppercase;
+    letter-spacing: 0.22em;
+    text-indent: 0.22em;
+    font-size: 0.66rem;
+    font-weight: 700;
+    color: #8a8175;
+  }
+  .acts {
+    margin-top: 0.55rem;
+    display: flex;
+    flex-direction: column;     /* full-width rows (stretch) */
+    gap: 0.1rem;
+  }
+  .act {
+    display: block;
+    /* full-width hover row */
+    padding: 0.5rem 0;
+    border-radius: 3px;
+    font-family: 'Anton', sans-serif;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    font-size: clamp(1rem, 2.6vw, 1.35rem);
+    line-height: 1.1;
+    color: #2a2722;
+    text-decoration: none;
+    transition: background-color 0.15s ease, color 0.15s ease;
+  }
+  .act:hover,
+  .act:focus-visible {
+    background-color: rgba(192, 26, 26, 0.05);
+    color: #c01a1a;
+    outline: none;
   }
 
   /* ---- 3. Bulb string ---- */
@@ -386,6 +597,9 @@ const problems = ['Governance Gridlock', 'Dormant Ownership', 'Declining Demand'
       animation: none;
       opacity: 0.75;
     }
+    /* Swap faces instantly, no rotation animation */
+    .flip,
+    .frame-caret,
     .ticket,
     .row { transition: none; }
   }
