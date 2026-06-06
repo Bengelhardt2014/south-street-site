@@ -30,12 +30,13 @@ const problems = ['Governance Gridlock', 'Dormant Ownership', 'Declining Demand'
           <rect x="9" y="346" width="42" height="11" rx="2.5" fill="#7e1c15" />
         </svg>
 
-        <!-- 1. Black header plate (the venue brand) -->
+        <!-- 1. Small framed marquee sign (the venue brand) -->
         <div class="plate">
-          <div class="badge">SSS</div>
-          <div class="brand">Saving South Street</div>
-          <p class="subtitle">A four-part strategy to restabilize a historic cultural corridor</p>
-          <p class="credit">Brandon K. Engelhardt &middot; MS Urban Strategy &middot; Drexel 2026</p>
+          <div class="plate-head">
+            <div class="badge">SSS</div>
+            <div class="brand">Saving South Street</div>
+          </div>
+          <p class="sign-sub">South Street &middot; Philadelphia</p>
         </div>
 
         <!-- 2. White changeable-letter board — two-sided 3D flip card -->
@@ -108,13 +109,19 @@ const problems = ['Governance Gridlock', 'Dormant Ownership', 'Declining Demand'
         </div>
       </div>
 
-      <!-- 6. Ticket-style buttons -->
-      <p class="ticket-kicker">Also showing</p>
-      <div class="tickets">
-        <a class="ticket" href="/map">Not enough density</a>
-        <a class="ticket" href="/map">No outdoor space</a>
-        <a class="ticket" href="/map">Too much nightlife</a>
-        <a class="ticket" href="/map">Too much takeout</a>
+      <!-- Lower area on a soft dark scrim so it reads over the photo -->
+      <div class="lower">
+        <p class="subtitle">A four-part strategy to restabilize a historic cultural corridor</p>
+        <p class="credit">Brandon K. Engelhardt &middot; MS Urban Strategy &middot; Drexel 2026</p>
+
+        <!-- 6. Ticket-style buttons -->
+        <p class="ticket-kicker">Also showing</p>
+        <div class="tickets">
+          <a class="ticket" href="/map">Not enough density</a>
+          <a class="ticket" href="/map">No outdoor space</a>
+          <a class="ticket" href="/map">Unbalanced Business Mix</a>
+          <a class="ticket" href="/map">Too much takeout</a>
+        </div>
       </div>
     </div>
   </section>
@@ -141,6 +148,8 @@ const problems = ['Governance Gridlock', 'Dormant Ownership', 'Declining Demand'
 
 <style>
   .cover {
+    /* Single knob to tune how dark it gets directly behind the marquee. */
+    --overlay-darkness: 0.74;
     position: relative;
     min-height: calc(100dvh - 58px);
     display: flex;
@@ -148,22 +157,22 @@ const problems = ['Governance Gridlock', 'Dormant Ownership', 'Declining Demand'
     justify-content: center;
     padding: 2.5rem 1.5rem 3.5rem;
     background-color: #05070f;
-    background-image:
-      linear-gradient(rgba(4, 6, 14, 0.82), rgba(2, 3, 9, 0.93)),
-      url('/images/tla-marquee.png');
+    background-image: url('/images/website_background_2560x1440.jpg');
     background-size: cover;
-    background-position: center 35%;
+    background-position: center;
     overflow: hidden;
   }
-  /* Night vignette so the white board glows against the dark */
+  /* Dark overlay: darkest directly behind the marquee, easing lighter
+     toward the edges so the bulbs glow and the text stays readable. */
   .cover::before {
     content: '';
     position: absolute;
     inset: 0;
     background: radial-gradient(
-      ellipse at 50% 42%,
-      rgba(20, 28, 56, 0.25),
-      rgba(2, 3, 9, 0.78) 78%
+      ellipse 88% 82% at 50% 46%,
+      rgba(3, 5, 12, var(--overlay-darkness)) 0%,
+      rgba(3, 5, 12, calc(var(--overlay-darkness) - 0.30)) 62%,
+      rgba(3, 5, 12, calc(var(--overlay-darkness) - 0.46)) 100%
     );
     pointer-events: none;
   }
@@ -200,30 +209,49 @@ const problems = ['Governance Gridlock', 'Dormant Ownership', 'Declining Demand'
     50% { opacity: 0.85; }
   }
 
-  /* ---- 1. Header plate ---- */
+  /* ---- 1. Small framed marquee sign ---- */
   .plate {
     position: relative;
-    z-index: 2;
-    background: #07080c;
-    border: 1px solid rgba(255, 255, 255, 0.14);
-    border-bottom: none;
-    border-radius: 10px 10px 0 0;
-    padding: 1.3rem 1rem 1.15rem;
-    box-shadow: 0 -2px 30px rgba(0, 0, 0, 0.5);
+    z-index: 3;                  /* sits on top of the board */
+    width: fit-content;
+    min-width: 50%;              /* roughly half to two-thirds of the board */
+    max-width: 66%;
+    margin: 0 auto -10px;        /* centered + slightly overlaps the board top */
+    background: #ffffff;
+    border: 2px solid #14140f;   /* black frame */
+    border-radius: 4px;
+    padding: 0.62rem 1.5rem 0.7rem;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.45);
+    text-align: center;
   }
-  .badge {
-    width: 62px;
-    height: 62px;
-    margin: 0 auto 0.8rem;
+  /* Badge + title share one centered line */
+  .plate-head {
     display: flex;
     align-items: center;
     justify-content: center;
-    border: 1px solid rgba(245, 240, 230, 0.55);
+    gap: 0.7rem;
+  }
+  .sign-sub {
+    margin-top: 0.32rem;
+    text-transform: uppercase;
+    letter-spacing: 0.24em;
+    text-indent: 0.24em;
+    font-size: 0.58rem;
+    color: rgba(20, 20, 15, 0.7);
+  }
+  .badge {
+    width: 46px;
+    height: 46px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid rgba(0, 0, 0, 0.5);
     border-radius: 50%;
     font-family: 'Bebas Neue', 'Anton', sans-serif;
-    font-size: 1.24rem;
+    font-size: 0.98rem;
     letter-spacing: 0.12em;
-    color: #f5f0e6;
+    color: #14140f;
     text-indent: 0.12em;
   }
   .brand {
@@ -231,7 +259,7 @@ const problems = ['Governance Gridlock', 'Dormant Ownership', 'Declining Demand'
     text-transform: uppercase;
     letter-spacing: 0.32em;
     text-indent: 0.32em;
-    color: #f5f0e6;
+    color: #14140f;
     font-size: clamp(1.22rem, 4.9vw, 1.78rem);
     line-height: 1.1;
     -webkit-text-stroke: 0.5px currentColor;
@@ -246,78 +274,82 @@ const problems = ['Governance Gridlock', 'Dormant Ownership', 'Declining Demand'
   }
 
   /* ---- 2. Letter board ---- */
+  /* Dark frame as a clean rounded rectangle around the flat board; the
+     bulb string runs along its straight bottom edge. */
   .board {
     position: relative;
     z-index: 1;
-    background: #0d0f14;            /* dark frame */
-    border-radius: 0 0 10px 10px;
-    padding: 11px 11px 28px;
-    box-shadow: 0 24px 64px rgba(0, 0, 0, 0.7), 0 0 64px rgba(255, 224, 168, 0.08);
+    background: #0d0f14;           /* dark frame */
+    border-radius: 10px;           /* clean rounded rectangle */
+    padding: 11px 11px 28px;       /* frame + room for the bulb string */
+    /* Soft drop shadow beneath -> reads as a box projecting off the wall;
+       crisp 1px edge keeps the dark frame defined against the photo. */
+    box-shadow:
+      0 32px 60px rgba(0, 0, 0, 0.62),
+      0 10px 22px rgba(0, 0, 0, 0.5),
+      0 0 0 1px rgba(0, 0, 0, 0.55),
+      0 0 70px rgba(255, 224, 168, 0.09);
   }
-  /* ---- 2a. Flip card: only the two faces rotate ---- */
+  /* ---- 2a. Flip card: two flat faces that swing flat-to-flat ---- */
   .flip-frame {
-    perspective: 1000px;
-    overflow: hidden;             /* contain the angled panel; leaves the bulbs fully visible */
+    perspective: 1200px;
+    overflow: hidden;             /* contains the swing; bulbs stay below, fully visible */
+    border-radius: 3px;
   }
   .flip {
     position: relative;
     display: grid;                 /* both faces share one cell -> sizes to the taller */
     transform-style: preserve-3d;
-    transform: rotateY(16deg);     /* front rest: LEFT edge closer & taller, right recedes */
     transition: transform 0.8s ease;
   }
   .flip.flipped {
-    /* mirror rest: RIGHT edge closer & taller; back face ends face-out & readable */
-    transform: rotateY(196deg);
+    transform: rotateY(180deg);    /* swing to the opposite face */
   }
+  /* Flat, straight rectangular faces (no clip-path, no tilt) */
   .face {
     grid-area: 1 / 1;              /* stack both faces in the same space */
+    --channel: 2.4rem;            /* marquee slot height (shared by both faces) */
     position: relative;
     display: flex;
     flex-direction: column;
-    background: #f6f4ee;           /* changeable-letter white */
+    justify-content: flex-start;   /* top-aligned so the slots phase-lock to the grid */
+    background-color: #f6f4ee;     /* changeable-letter white */
+    /* Etched channel lines filling the WHOLE board, evenly spaced edge to edge */
+    background-image: repeating-linear-gradient(
+      to bottom,
+      rgba(0, 0, 0, 0.16) 0,
+      rgba(0, 0, 0, 0.16) 1px,
+      rgba(255, 255, 255, 0.6) 1px,
+      rgba(255, 255, 255, 0.6) 2px,
+      transparent 2px,
+      transparent var(--channel)
+    );
     border-radius: 3px;
     overflow: hidden;
     -webkit-backface-visibility: hidden;
     backface-visibility: hidden;
   }
-  /* Faint horizontal track lines across the white (both faces) */
-  .face::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background-image: repeating-linear-gradient(
-      to bottom,
-      transparent 0,
-      transparent 40px,
-      rgba(0, 0, 0, 0.07) 40px,
-      rgba(0, 0, 0, 0.07) 41px
-    );
-    pointer-events: none;
+  /* Each line of text fills one slot, stacked from the top so they phase-lock
+     to the etched grid; one empty slot of padding sits above. */
+  .face-content {
+    position: relative;            /* text sits above the etched lines */
+    width: 100%;
+    padding: var(--channel) 2.2rem 0;
   }
-  .face-front {
-    justify-content: flex-start;
-    pointer-events: auto;
-  }
+  /* Both faces use the base 1-slot top padding (one empty slot at the very top). */
+  .face-front { pointer-events: auto; }
   .face-back {
-    justify-content: center;       /* poster-style vertical centering */
-    transform: rotateY(180deg);    /* pre-rotated so it reads correctly when flipped */
+    transform: rotateY(180deg);    /* pre-rotated so the text reads correctly when flipped */
     pointer-events: none;
   }
   /* Only the face currently showing is clickable */
   .flip.flipped .face-front { pointer-events: none; }
   .flip.flipped .face-back { pointer-events: auto; }
-  .face-content {
-    position: relative;            /* sit above the track lines */
-    width: 100%;
-    padding: 1.3rem 2.4rem 1.4rem;     /* relaxed -> slightly shorter than the tall version, not squished */
-    /* optical re-centering: the tilt's near edge magnifies the left,
-       so nudge content toward the far edge so text reads centered */
-    transform: translateX(0.4rem);
-  }
   .kicker {
-    position: relative;
-    display: inline-block;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: var(--channel);    /* one slot */
     text-transform: uppercase;
     letter-spacing: 0.22em;
     text-indent: 0.22em;
@@ -326,8 +358,10 @@ const problems = ['Governance Gridlock', 'Dormant Ownership', 'Declining Demand'
     color: #c01a1a;
   }
   .board-lead {
-    position: relative;
-    margin-top: 0.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: var(--channel);    /* one slot */
     text-transform: uppercase;
     letter-spacing: 0.08em;
     font-size: 0.9rem;
@@ -335,21 +369,18 @@ const problems = ['Governance Gridlock', 'Dormant Ownership', 'Declining Demand'
   }
   .rows {
     position: relative;
-    margin-top: 1rem;
+    margin-top: var(--channel);    /* one blank channel between header and the problems */
     text-align: left;
   }
   .row {
     display: flex;
-    align-items: baseline;
+    align-items: center;           /* text sits centered in its channel */
     justify-content: space-between;
     gap: 0.85rem;
-    padding: 0.7rem 0;
-    border-top: 1px dotted #b8b2a4;
+    min-height: var(--channel);    /* one slot */
+    padding: 0 1.1rem 0 0;         /* right gutter clears the right caret */
     text-decoration: none;
     transition: background-color 0.15s ease;
-  }
-  .row:last-child {
-    border-bottom: 1px dotted #b8b2a4;
   }
   .row:hover,
   .row:focus-visible {
@@ -360,7 +391,7 @@ const problems = ['Governance Gridlock', 'Dormant Ownership', 'Declining Demand'
     font-family: 'Anton', sans-serif;
     text-transform: uppercase;
     letter-spacing: 0.02em;
-    font-size: clamp(1.55rem, 4.6vw, 2.4rem);
+    font-size: clamp(1.45rem, 4vw, 2.1rem);
     line-height: 1;
     color: #14140f;
   }
@@ -405,21 +436,20 @@ const problems = ['Governance Gridlock', 'Dormant Ownership', 'Declining Demand'
     filter: drop-shadow(0 0 6px rgba(224, 36, 31, 0.6));
     outline: none;
   }
-  .frame-caret-right { right: -5px; }
-  .frame-caret-left { left: -5px; display: none; }   /* hidden until flipped */
+  .frame-caret-right { right: 14px; }                /* fully inside the white board */
+  .frame-caret-left { left: 14px; display: none; }   /* hidden until flipped */
   .board.is-flipped .frame-caret-right { display: none; }
   .board.is-flipped .frame-caret-left { display: flex; }
   .headliner {
-    display: block;
-    margin-top: 0.6rem;
-    /* full-width hover row */
-    padding: 0.35rem 0;
-    border-radius: 3px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: var(--channel);    /* one slot */
     font-family: 'Anton', sans-serif;
     text-transform: uppercase;
     letter-spacing: 0.02em;
-    font-size: clamp(2.1rem, 6.4vw, 3.3rem);
-    line-height: 0.98;
+    font-size: clamp(1.7rem, 5vw, 2.1rem);
+    line-height: 1;
     color: #14140f;
     text-decoration: none;
     transition: background-color 0.15s ease, color 0.15s ease;
@@ -437,14 +467,20 @@ const problems = ['Governance Gridlock', 'Dormant Ownership', 'Declining Demand'
     color: #c01a1a;
   }
   .bill-sub {
-    margin-top: 0.55rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: var(--channel);    /* one slot */
     text-transform: uppercase;
     letter-spacing: 0.08em;
     font-size: 0.82rem;
     color: #6b6459;
   }
   .featuring-label {
-    margin-top: 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: var(--channel);    /* one slot */
     text-transform: uppercase;
     letter-spacing: 0.22em;
     text-indent: 0.22em;
@@ -453,16 +489,15 @@ const problems = ['Governance Gridlock', 'Dormant Ownership', 'Declining Demand'
     color: #8a8175;
   }
   .acts {
-    margin-top: 0.55rem;
     display: flex;
-    flex-direction: column;     /* full-width rows (stretch) */
-    gap: 0.1rem;
+    flex-direction: column;
   }
   .act {
-    display: block;
-    /* full-width hover row */
-    padding: 0.5rem 0;
-    border-radius: 3px;
+    display: flex;
+    align-items: center;           /* text centered in its slot */
+    justify-content: center;
+    min-height: var(--channel);    /* one slot */
+    padding: 0;
     font-family: 'Anton', sans-serif;
     text-transform: uppercase;
     letter-spacing: 0.03em;
@@ -508,22 +543,36 @@ const problems = ['Governance Gridlock', 'Dormant Ownership', 'Declining Demand'
     }
   }
 
-  /* ---- 5. Subtitle + credit ---- */
+  /* ---- 5. Lower area: subtitle + byline + tickets on a soft scrim ---- */
+  .lower {
+    position: relative;
+    margin-top: 0.5rem;
+    padding: 1.1rem 1.6rem 0.7rem;
+    border-radius: 16px;
+    /* soft dark scrim so the text & tickets stay readable over the photo */
+    background: radial-gradient(
+      ellipse 96% 100% at 50% 44%,
+      rgba(6, 8, 16, 0.52) 0%,
+      rgba(6, 8, 16, 0) 72%
+    );
+  }
   .subtitle {
-    margin: 0.9rem auto 0;
-    max-width: 38rem;
+    margin: 0 auto;
+    max-width: 40rem;
     font-family: Georgia, 'Times New Roman', ui-serif, serif;
     font-style: italic;
-    font-size: 1.24rem;
-    line-height: 1.5;
-    color: #e7e2d6;
+    font-size: 1rem;
+    line-height: 1.45;
+    color: rgba(247, 244, 236, 0.96);
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.6);
   }
   .credit {
-    margin-top: 0.7rem;
+    margin-top: 0.4rem;
     text-transform: uppercase;
     letter-spacing: 0.16em;
-    font-size: 0.71rem;
-    color: rgba(196, 189, 174, 0.65);
+    font-size: 0.66rem;
+    color: rgba(228, 223, 211, 0.85);
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.55);
   }
 
   /* ---- 6. Ticket buttons ---- */
@@ -534,7 +583,8 @@ const problems = ['Governance Gridlock', 'Dormant Ownership', 'Declining Demand'
     text-indent: 0.22em;
     font-size: 0.66rem;
     font-weight: 700;
-    color: rgba(196, 189, 174, 0.7);
+    color: rgba(224, 218, 205, 0.88);
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
   }
   .tickets {
     margin-top: 0.7rem;
