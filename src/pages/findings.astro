@@ -15,24 +15,24 @@ const mixRows: { measure: string; south: string; east: string }[] = [
 
 // Jump-link table of contents.
 const toc: { id: string; title: string }[] = [
-  { id: 'finding-1', title: 'The occupancy gap' },
+  { id: 'finding-1', title: 'Highest vacancy on South Street in over 30 years' },
   { id: 'finding-2', title: 'A zoning patchwork on one corridor' },
   { id: 'finding-3', title: 'Dormant ownership and the land-value decoupling' },
-  { id: 'finding-4', title: 'Decay in motion' },
+  { id: 'finding-4', title: 'The hidden cost of long-term vacancy' },
   { id: 'finding-5', title: 'The mix flipped, not the ownership' },
-  { id: 'finding-6', title: 'The damage concentrates on a few blocks' },
+  { id: 'finding-6', title: 'Vacancy is concentrated in the former cultural core' },
 ];
 ---
 
 <Layout title="Findings · Saving South Street">
-  <div class="finding-wrap">
+  <div class="finding-wrap mx-auto max-w-5xl">
     <!-- HERO -->
     <section>
       <h1 class="text-3xl font-semibold tracking-tight text-stone-900">Findings</h1>
-      <p class="finding-headline">South Street's decline is structural, not ambient.</p>
+      <p class="finding-headline">The Neighborhood Commercial Corridor Paradox</p>
       <p class="mt-3 text-stone-700">
-        A 2026 field survey of every storefront on the corridor, measured against East Passyunk
-        Avenue.
+        A 2026 field survey of every storefront on South Street, from Front through the 1100 block,
+        measured against East Passyunk Avenue from 1200 to Broad Street.
       </p>
       <p class="mt-2 text-sm">
         <a
@@ -53,14 +53,16 @@ const toc: { id: string; title: string }[] = [
         a peer with the same pre-1900 building stock, the same density and transit, and a
         wealthier-than-average neighborhood. East Passyunk faced the same retail pressure and stayed
         full. South Street did not. The decline is structural to the corridor, not ambient to retail.
+        The two corridors even share part of their customer base. Neighborhoods like Bella Vista sit
+        between them, close enough that the same residents could reasonably shop either one.
       </p>
       <ul class="finding-stats">
-        <li><strong>A 17-point occupancy gap.</strong> South Street runs 70.3% occupied against East Passyunk's 87.3%.</li>
-        <li><strong>Half the vacancy is frozen.</strong> Of 68 empty storefronts, 35 are long-term vacant, against just 2 on East Passyunk. The emptiness is stuck, not turning over.</li>
-        <li><strong>A zoning patchwork.</strong> South Street splits into 3 districts across 4 CMX classes plus residential pockets, while East Passyunk runs on a single designation, so the same use can be by-right at one address and need a variance a few doors down.</li>
+        <li><strong>The highest vacancy in over 30 years.</strong> South Street runs 70.3% occupied against East Passyunk's 87.3%, a 17-point gap, and its vacancy is the highest the corridor has seen in more than three decades.</li>
+        <li><strong>Half the vacancy is long-term.</strong> Of 68 empty storefronts, 35 are long-term vacant, against just 2 on East Passyunk. The emptiness is stuck, not turning over.</li>
+        <li><strong>A zoning patchwork.</strong> South Street splits across 5 registered community organizations and 4 CMX zoning classes, while East Passyunk runs through 2 RCOs on a single CMX designation, so the same use can be by-right at one address and need a variance a few doors down.</li>
         <li><strong>3 in 5 parcels sit with dormant owners.</strong> 155 of 271 parcels have either changed hands without a market sale or not sold in over 20 years.</li>
-        <li><strong>Prices climb while the buildings rot.</strong> South Street land sells for about 1.8x East Passyunk's, a $273,000 premium, even as half its parcels logged a new code violation in the last 3 years, 4x East Passyunk's count.</li>
-        <li><strong>The mix flipped, not the ownership.</strong> Both corridors are about 87% independent, so chains are a myth. South Street skews value-priced, late-night, and takeout, with smoke shops and check-cashers at 9.4% of tenants versus zero, and it runs thin on daytime, fitness, and fresh-food uses.</li>
+        <li><strong>Prices climb while the buildings rot.</strong> South Street land sells for about 1.8x East Passyunk's, a $273,000 premium. Even with no upkeep, the buildings keep appreciating on the strength of the surrounding neighborhoods, which gives owners little reason to reinvest. Half logged a new code violation in the last 3 years, 4x East Passyunk's count.</li>
+        <li><strong>The mix flipped, not the ownership.</strong> Both corridors are about 87% independent, so national chains killing the character is no longer the issue. South Street skews value-priced, late-night, and takeout, with smoke shops and check-cashers at 9.4% of tenants versus zero, and it runs thin on daytime, fitness, and fresh-food uses.</li>
         <li><strong>The culture economy hollowed out.</strong> The corridor that ran on live music, comedy, and galleries is down to one surviving venue, the TLA. The Laff House, where Kevin Hart and Bill Burr started, closed in 2013 with no comedy club since, and a third of the corridor's anchor parcels, several of them former venues, sit empty.</li>
         <li><strong>The damage concentrates on a few blocks.</strong> The Front-to-5th dead zone carries the worst of it. The 300 block alone is 59% vacant, while the western 900 and 1000 blocks outperform East Passyunk.</li>
       </ul>
@@ -81,7 +83,9 @@ const toc: { id: string; title: string }[] = [
     <!-- FINDING 1 -->
     <section class="finding-section" id="finding-1">
       <p class="finding-kicker">Finding 1</p>
-      <h2 class="text-2xl font-semibold tracking-tight text-stone-900">The occupancy gap</h2>
+      <h2 class="text-2xl font-semibold tracking-tight text-stone-900">
+        Highest vacancy on South Street in over 30 years
+      </h2>
       <div class="finding-statblock">
         <div class="finding-stat-items">
           <div class="finding-stat-item">
@@ -95,6 +99,9 @@ const toc: { id: string; title: string }[] = [
         </div>
         <p class="finding-stat-sub">a 17-point gap</p>
       </div>
+      <p class="finding-body">
+        South Street's commercial vacancy is the highest the corridor has seen in over 30 years.
+      </p>
       <p class="finding-body">
         East Passyunk sits on the same pre-1900 building stock, the same density, and the same
         transit, and it faced the same retail pressure. It stayed full. South Street did not.
@@ -173,11 +180,15 @@ const toc: { id: string; title: string }[] = [
       <div class="finding-statblock">
         <div class="finding-stat-items">
           <div class="finding-stat-item">
-            <span class="finding-stat-num">3</span>
-            <span class="finding-stat-label">zoning districts across 4 CMX classes</span>
+            <span class="finding-stat-num">4</span>
+            <span class="finding-stat-label">CMX zoning classes</span>
+          </div>
+          <div class="finding-stat-item">
+            <span class="finding-stat-num">5</span>
+            <span class="finding-stat-label">registered community organizations (RCOs)</span>
           </div>
         </div>
-        <p class="finding-stat-sub">East Passyunk runs on 1</p>
+        <p class="finding-stat-sub">East Passyunk runs on 1 CMX class and 2 RCOs</p>
       </div>
       <p class="finding-body">
         From the sidewalk the two corridors look alike, brick row buildings 2 to 4 stories tall with
@@ -194,6 +205,11 @@ const toc: { id: string; title: string }[] = [
         A tenant looking at two storefronts a few doors apart can find one that permits the business
         by-right and another that routes the same use through the Zoning Board for a variance. That
         friction shapes what can open where.
+      </p>
+      <p class="finding-body">
+        Each RCO receives notice of any zoning variance or special exception in its area and can
+        object, so 5 RCOs means more meetings and more veto points for any change, where East Passyunk
+        has 2.
       </p>
 
       <figure class="finding-figure">
@@ -294,7 +310,9 @@ const toc: { id: string; title: string }[] = [
     <!-- FINDING 4 -->
     <section class="finding-section" id="finding-4">
       <p class="finding-kicker">Finding 4</p>
-      <h2 class="text-2xl font-semibold tracking-tight text-stone-900">Decay in motion</h2>
+      <h2 class="text-2xl font-semibold tracking-tight text-stone-900">
+        The hidden cost of long-term vacancy
+      </h2>
       <div class="finding-statblock">
         <div class="finding-stat-items">
           <div class="finding-stat-item">
@@ -305,11 +323,31 @@ const toc: { id: string; title: string }[] = [
         <p class="finding-stat-sub">4x East Passyunk's rate</p>
       </div>
       <p class="finding-body">
-        This is the building half of the decoupling. The violation profile is not residue from a past
-        decade. The deterioration is happening in motion, while price speculation remains high. South
-        Street's violation profile exceeds East Passyunk's at every threshold, and 16.2% of its
-        parcels carry open violations today. Owners are not investing in the buildings even as the
-        parcels appreciate.
+        This is the building half of the land-value decoupling. The deterioration is happening in
+        motion, while prices stay high. South Street's violation profile exceeds East Passyunk's at
+        every threshold, and 16.2% of its parcels carry open violations today.
+      </p>
+      <p class="finding-body">
+        Long-term vacancy and decay open an economic gap that neither side has a reason to close. The
+        owner is not incentivized to fix the building, because the parcel keeps appreciating
+        regardless. The commercial tenant who would take the space cannot afford the cost of making it
+        usable. That is a market failure, and it sits at the center of South Street's vacancy.
+      </p>
+      <blockquote class="finding-quote">
+        <p>
+          We no longer send people interested in the area to South Street itself. The capital needed
+          for the majority of the buildouts on the ground-floor level is just too costly, we're
+          talking $100,000+. It's not reasonable for a small business to be able to afford that.
+        </p>
+        <cite>Director at a large commercial real estate brokerage, 2026 interviews</cite>
+      </blockquote>
+      <p class="finding-body">
+        The programs built to close that gap mostly skip South Street. The city's larger fit-out
+        tools, like the InStore Forgivable Loan of $50,000 to $100,000, flow only to corridors inside
+        low-to-moderate income areas. That test looks at the blocks around the corridor, and South
+        Street's neighbors in Society Hill, Queen Village, and Bella Vista post some of the highest
+        incomes in the city, near $101,000. The corridor reads as affluent even though its storefronts
+        sit empty, so it does not qualify.
       </p>
 
       <figure class="finding-figure">
@@ -356,7 +394,7 @@ const toc: { id: string; title: string }[] = [
             <span class="finding-stat-label">East Passyunk independent</span>
           </div>
         </div>
-        <p class="finding-stat-sub">chains are a myth, the mix is what changed</p>
+        <p class="finding-stat-sub">national chains are not the issue, the mix is what changed</p>
       </div>
       <p class="finding-body">
         Interviewees on both corridors voiced a common claim that South Street lost its character to
@@ -407,8 +445,6 @@ const toc: { id: string; title: string }[] = [
         evening, the hours that serve a neighborhood. Sidewalk seating turns a visit into a stay: a
         diner at a sidewalk table holds the storefront for 90 minutes instead of 9. South Street's mix
         produces faster, in-and-out visits. The mid-day to early-evening economy is what is missing.
-        One director at a large Philadelphia brokerage admitted they no longer send tenants to scout
-        South Street at all, a measure of how far the gap has opened.
       </p>
     </section>
 
@@ -416,7 +452,7 @@ const toc: { id: string; title: string }[] = [
     <section class="finding-section" id="finding-6">
       <p class="finding-kicker">Finding 6</p>
       <h2 class="text-2xl font-semibold tracking-tight text-stone-900">
-        The damage concentrates on a few blocks
+        Vacancy is concentrated in the former cultural core
       </h2>
       <div class="finding-statblock">
         <div class="finding-stat-items">
@@ -427,6 +463,10 @@ const toc: { id: string; title: string }[] = [
         </div>
         <p class="finding-stat-sub">double the 30% corridor average</p>
       </div>
+      <p class="finding-body">
+        South Street's largest vacancy hole is concentrated in the former cultural heart of the
+        corridor.
+      </p>
       <p class="finding-body">
         South Street's 30% corridor average is propped up almost entirely by the 300 block. Remove it
         and the remaining 10 blocks come in at 24%, 6 points lower. The 900 and 1000 blocks at 11.5%
@@ -466,13 +506,22 @@ const toc: { id: string; title: string }[] = [
       </blockquote>
 
       <aside class="finding-callout">
-        <img
-          class="finding-callout-img"
-          src="/images/tla-marquee.png"
-          alt="The Theatre of the Living Arts marquee on South Street, the corridor's last surviving live venue."
-          loading="lazy"
-          decoding="async"
-        />
+        <figure class="finding-figure finding-callout-figure">
+          <img
+            src="/images/Figure%201.1.png"
+            alt="Photograph of South Street on the 200 block in 2026, showing a mix of vacant and active storefronts."
+            loading="lazy"
+            decoding="async"
+          />
+          <figcaption>
+            <span class="finding-fig-title">Figure 1.1. South Street on the 200 block, 2026.</span>
+            <span class="finding-fig-subtitle">
+              Vacant and active storefronts illustrating mixed commercial conditions along the
+              corridor.
+            </span>
+            <span class="finding-source">Source: Author's photograph, 2026.</span>
+          </figcaption>
+        </figure>
         <div class="finding-callout-body">
           <h3 class="finding-callout-title">The dead zone is where the culture used to be.</h3>
           <p>
@@ -493,6 +542,25 @@ const toc: { id: string; title: string }[] = [
           </p>
         </div>
       </aside>
+
+      <figure class="finding-figure">
+        <img
+          src="/images/Figure%205.9.png"
+          alt="Photograph of long-term vacant storefronts on the 300 block of South Street in 2026."
+          loading="lazy"
+          decoding="async"
+        />
+        <figcaption>
+          <span class="finding-fig-title">
+            Figure 5.9. Long-term vacant storefronts on the 300 block of South Street, 2026.
+          </span>
+          <span class="finding-fig-subtitle">
+            The 300 block carried 23 of its 39 parcels vacant on the 2026 field survey, the corridor's
+            worst stretch, several with no signage or permits.
+          </span>
+          <span class="finding-source">Source: Author's photograph, 2026.</span>
+        </figcaption>
+      </figure>
     </section>
 
     <!-- HANDOFF -->
@@ -517,9 +585,10 @@ const toc: { id: string; title: string }[] = [
 </Layout>
 
 <style>
-  /* One column: the Layout <main> already centers at max-w-6xl with px-6, so the
-     content fills that single width. No inner measure cap, so prose, bullets,
-     figures, and the table all share the same width. */
+  /* One column: an inner mx-auto max-w-5xl centers the content a bit narrower
+     than the Layout <main>. Body text and bullet lists are additionally capped at
+     75ch (left-aligned at the column's left edge) so lines read comfortably, while
+     figures, the table, and the stat blocks keep the full column width. */
 
   /* Headline under the H1. */
   .finding-headline {
@@ -549,6 +618,7 @@ const toc: { id: string; title: string }[] = [
 
   .finding-body {
     margin: 1rem 0 0;
+    max-width: 75ch; /* comfortable line length, left-aligned in the column */
     color: #44403c; /* stone-700 */
     font-size: 0.98rem;
     line-height: 1.65;
@@ -562,6 +632,7 @@ const toc: { id: string; title: string }[] = [
     display: flex;
     flex-direction: column;
     gap: 0.75rem;
+    max-width: 75ch;
   }
   .finding-stats li {
     position: relative;
@@ -771,7 +842,7 @@ const toc: { id: string; title: string }[] = [
     border-bottom: 0;
   }
 
-  /* Culture callout: a visually distinct aside with the TLA photo. */
+  /* Culture callout: a visually distinct aside with a corridor photo. */
   .finding-callout {
     margin-top: 2rem;
     padding: 1.25rem 1.5rem 1.5rem;
@@ -780,13 +851,10 @@ const toc: { id: string; title: string }[] = [
     border-left: 4px solid #8b1a1a; /* site accent red */
     border-radius: 6px;
   }
-  .finding-callout-img {
-    display: block;
-    width: 100%;
-    max-width: 640px;
-    height: auto;
+  /* The photo figure sits flush at the top of the callout, above its text. */
+  .finding-callout-figure {
+    margin-top: 0;
     margin-bottom: 1.1rem;
-    border-radius: 4px;
   }
   .finding-callout-title {
     margin: 0;
@@ -796,6 +864,7 @@ const toc: { id: string; title: string }[] = [
   }
   .finding-callout p {
     margin: 0.7rem 0 0;
+    max-width: 75ch;
     color: #44403c; /* stone-700 */
     font-size: 0.95rem;
     line-height: 1.6;
@@ -804,6 +873,7 @@ const toc: { id: string; title: string }[] = [
   /* Closing handoff. */
   .finding-handoff-lead {
     margin: 0;
+    max-width: 75ch;
     font-size: 1.05rem;
     font-weight: 600;
     color: #1c1917; /* stone-900 */
@@ -815,6 +885,7 @@ const toc: { id: string; title: string }[] = [
     display: flex;
     flex-direction: column;
     gap: 0.65rem;
+    max-width: 75ch;
   }
   .finding-handoff-list li {
     position: relative;
