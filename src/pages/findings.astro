@@ -25,15 +25,16 @@ const toc: { id: string; title: string }[] = [
 ---
 
 <Layout title="Findings · Saving South Street">
-  <div class="finding-wrap mx-auto max-w-5xl">
+  <div class="finding-wrap">
     <!-- HERO -->
     <section>
-      <h1 class="text-3xl font-semibold tracking-tight text-stone-900">Findings</h1>
-      <p class="finding-headline">The Neighborhood Commercial Corridor Paradox</p>
+      <p class="finding-kicker">Findings</p>
+      <h1 class="finding-hero-title">The Neighborhood Commercial Corridor Paradox</h1>
       <p class="mt-3 text-stone-700">
         A 2026 field survey of every storefront on South Street, from Front through the 1100 block,
         measured against East Passyunk Avenue from 1200 to Broad Street.
       </p>
+      <p class="finding-byline">An urban planning thesis by Brandon K. Engelhardt | 2026</p>
       <p class="mt-2 text-sm">
         <a
           href="/thesis.pdf"
@@ -46,7 +47,9 @@ const toc: { id: string; title: string }[] = [
 
     <!-- EXECUTIVE SUMMARY -->
     <section class="finding-section">
-      <h2 class="text-2xl font-semibold tracking-tight text-stone-900">Executive summary</h2>
+      <h2 class="finding-section-heading text-2xl font-semibold tracking-tight text-stone-900">
+        Executive summary
+      </h2>
       <p class="finding-body">
         South Street's emptiness gets blamed on COVID and e-commerce. This study tests that with a
         2026 field survey of every storefront on the corridor, measured against East Passyunk Avenue,
@@ -565,6 +568,9 @@ const toc: { id: string; title: string }[] = [
 
     <!-- HANDOFF -->
     <section class="finding-section">
+      <h2 class="finding-section-heading text-2xl font-semibold tracking-tight text-stone-900">
+        Where this goes next
+      </h2>
       <p class="finding-handoff-lead">
         These findings are the evidence. What they mean, and what to do about them, lives on the next
         two tabs.
@@ -585,19 +591,24 @@ const toc: { id: string; title: string }[] = [
 </Layout>
 
 <style>
-  /* One column: an inner mx-auto max-w-5xl centers the content a bit narrower
-     than the Layout <main>. Body text and bullet lists are additionally capped at
-     75ch (left-aligned at the column's left edge) so lines read comfortably, while
-     figures, the table, and the stat blocks keep the full column width. */
+  /* One unified width: the content fills the Layout <main> (mx-auto max-w-6xl), a
+     single centered column. Body text, bullets, stat blocks, figures, captions,
+     the table, and the handoff all share this one width. */
 
-  /* Headline under the H1. */
-  .finding-headline {
-    margin: 0.5rem 0 0;
-    font-size: 1.65rem;
-    line-height: 1.2;
-    font-weight: 600;
-    letter-spacing: -0.01em;
+  /* Hero: a small muted kicker over a large dominant title. */
+  .finding-hero-title {
+    margin: 0.35rem 0 0;
+    font-size: clamp(2rem, 5vw, 2.6rem);
+    line-height: 1.1;
+    font-weight: 700;
+    letter-spacing: -0.02em;
     color: #1c1917; /* stone-900 */
+  }
+  .finding-byline {
+    margin: 0.55rem 0 0;
+    font-size: 0.85rem;
+    font-style: italic;
+    color: #78716c; /* stone-500 */
   }
 
   /* Section rhythm: a thin rule sets each section apart, like the History page. */
@@ -605,6 +616,13 @@ const toc: { id: string; title: string }[] = [
     margin-top: 3rem;
     padding-top: 2rem;
     border-top: 1px solid #e7e5e4; /* stone-200 */
+  }
+
+  /* Major section headings get a subtle underline for a structured look. */
+  .finding-section-heading {
+    margin-bottom: 0.4rem;
+    padding-bottom: 0.6rem;
+    border-bottom: 1px solid #e7e5e4; /* stone-200 */
   }
 
   .finding-kicker {
@@ -618,7 +636,6 @@ const toc: { id: string; title: string }[] = [
 
   .finding-body {
     margin: 1rem 0 0;
-    max-width: 75ch; /* comfortable line length, left-aligned in the column */
     color: #44403c; /* stone-700 */
     font-size: 0.98rem;
     line-height: 1.65;
@@ -632,7 +649,6 @@ const toc: { id: string; title: string }[] = [
     display: flex;
     flex-direction: column;
     gap: 0.75rem;
-    max-width: 75ch;
   }
   .finding-stats li {
     position: relative;
@@ -800,7 +816,7 @@ const toc: { id: string; title: string }[] = [
   .finding-table {
     border-collapse: collapse;
     max-width: 48rem; /* about max-w-3xl */
-    margin-right: auto; /* left-aligned in the column */
+    margin-inline: auto; /* centered within the column */
     font-size: 0.92rem;
   }
   .finding-table-caption {
@@ -864,7 +880,6 @@ const toc: { id: string; title: string }[] = [
   }
   .finding-callout p {
     margin: 0.7rem 0 0;
-    max-width: 75ch;
     color: #44403c; /* stone-700 */
     font-size: 0.95rem;
     line-height: 1.6;
@@ -873,7 +888,6 @@ const toc: { id: string; title: string }[] = [
   /* Closing handoff. */
   .finding-handoff-lead {
     margin: 0;
-    max-width: 75ch;
     font-size: 1.05rem;
     font-weight: 600;
     color: #1c1917; /* stone-900 */
@@ -885,7 +899,6 @@ const toc: { id: string; title: string }[] = [
     display: flex;
     flex-direction: column;
     gap: 0.65rem;
-    max-width: 75ch;
   }
   .finding-handoff-list li {
     position: relative;
