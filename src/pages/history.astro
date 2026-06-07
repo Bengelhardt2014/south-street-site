@@ -1,14 +1,778 @@
 ---
 import Layout from '../layouts/Layout.astro';
+import { eras, type Era } from '../data/eras';
+
+// The prologue (cycle 0) is compressed deep history shown at a fixed, compact
+// width — it is intentionally NOT to scale. Only the modern eras (cycles 1 & 2)
+// flex-grow proportionally to their year span, filling the space to the right.
+const indexed = eras.map((era, index) => ({ era, index }));
+const prologue = indexed.filter((x) => x.era.cycle === 0);
+const modern = indexed.filter((x) => x.era.cycle > 0);
+
+const span = (e: Era) => e.yearEnd - e.yearStart;
+const range = (e: Era) => (e.ongoing ? `${e.yearStart}–present` : `${e.yearStart}–${e.yearEnd}`);
+const cap = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
+// prologue → "Prologue"; modern → "Cycle {n} · {Phase}"
+const tag = (e: Era) => (e.cycle === 0 ? 'Prologue' : `Cycle ${e.cycle} · ${cap(e.phase)}`);
 ---
 
 <Layout title="History — Saving South Street">
   <section class="max-w-3xl">
-    <h1 class="text-3xl font-semibold tracking-tight text-stone-900">History</h1>
-    <p class="mt-3 text-stone-700">
-      A narrative history of South Street's evolution across the 20th and early 21st centuries — from streetcar
-      commercial corridor through urban renewal, the South Street Renaissance, and the present day. The format
-      of this page (long-form chapter, interactive timeline, or scroll-driven narrative) is still being decided.
+    <h1 class="text-3xl font-semibold tracking-tight text-stone-900">How South Street Got Here</h1>
+    <p class="mt-3 text-stone-700">Two cycles of collapse, reinvention, and commercialization.</p>
+    <p class="mt-2 text-sm">
+      <a
+        href="/thesis.pdf"
+        target="_blank"
+        rel="noopener"
+        class="text-stone-500 underline underline-offset-2 hover:text-stone-800"
+      >Full history and sources</a>
     </p>
   </section>
+
+  <section class="era-timeline" data-era-timeline aria-label="Timeline of South Street eras">
+    <div class="era-scroll">
+      <div class="era-grid" data-era-grid>
+        <!-- Kicker row: "Prologue" sits above the whole prologue group. -->
+        <div class="era-row era-kickers" aria-hidden="true">
+          <div class="era-prologue-kicker">
+            <span class="era-kicker">Prologue</span>
+          </div>
+        </div>
+
+        <!-- Era bands (real buttons — they navigate the chapter panel below). -->
+        <div class="era-row era-bands">
+          <div class="era-prologue-group">
+            {prologue.map(({ era, index }) => (
+              <button
+                type="button"
+                class="era-band era-band--prologue"
+                style={`--era:${era.color}`}
+                data-era-band
+                data-index={index}
+              >
+                <span class="era-name">{era.name}</span>
+                <span class="era-years">{range(era)}</span>
+              </button>
+            ))}
+          </div>
+          <div class="era-divider" aria-hidden="true"></div>
+          {modern.map(({ era, index }) => (
+            <button
+              type="button"
+              class="era-band"
+              style={`flex-grow:${span(era)}; --era:${era.color}`}
+              data-era-band
+              data-index={index}
+            >
+              <span class="era-name">{era.name}</span>
+              <span class="era-years">{range(era)}</span>
+            </button>
+          ))}
+        </div>
+
+        <!-- Year axis: boundary year at each band's left edge, "now" at the right end. -->
+        <div class="era-row era-axis">
+          <div class="era-prologue-axis">
+            {prologue.map(({ era }) => (
+              <div class="era-axis-cell">
+                <span class="era-year">{era.yearStart}</span>
+              </div>
+            ))}
+          </div>
+          <div class="era-divider-spacer" aria-hidden="true"></div>
+          {modern.map(({ era }, i) => (
+            <div class="era-axis-cell era-axis-cell--modern" style={`flex-grow:${span(era)}`}>
+              <span class="era-year">{era.yearStart}</span>
+              {i === modern.length - 1 && <span class="era-year era-year--now">now</span>}
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+
+    <!-- Chapter panel. All chapters are rendered server-side; the script shows
+         only the selected one. A <noscript> fallback reveals all chapters. -->
+    <div class="era-panel" data-era-panel>
+      <div class="era-overview" data-overview>
+        <p>Pick an era, or step through from the beginning.</p>
+        <button type="button" class="era-btn" data-start>Start</button>
+      </div>
+
+      <div class="era-chapters" aria-live="polite">
+        {indexed.map(({ era, index }) => {
+          const hasContent = era.summary !== '' || era.beats.length > 0;
+          return (
+            <article class="era-chapter" data-chapter data-index={index}>
+              <h2 class="era-chapter-title">{era.title ?? era.name}</h2>
+              <div class="era-chapter-meta">
+                <span class="era-chapter-years">{range(era)}</span>
+                <span class="era-tag" style={`--era:${era.color}`}>{tag(era)}</span>
+              </div>
+              {hasContent ? (
+                <>
+                  {era.summary && <p class="era-summary">{era.summary}</p>}
+                  {era.beats.length > 0 && (
+                    <ul class="era-beats">
+                      {era.beats.map((b) => (
+                        <li>{b.text}</li>
+                      ))}
+                    </ul>
+                  )}
+                </>
+              ) : (
+                <p class="era-chapter-empty">Chapter in progress</p>
+              )}
+            </article>
+          );
+        })}
+      </div>
+
+      <div class="era-nav" data-nav hidden>
+        <button type="button" class="era-btn era-btn--ghost" data-prev>Prev</button>
+        <span class="era-progress" data-progress></span>
+        <button type="button" class="era-btn era-btn--ghost" data-next>Next</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Standalone finale, always visible below the stepper regardless of era. -->
+  <section class="era-stands" id="where-it-stands" aria-labelledby="where-it-stands-heading">
+    <h2 id="where-it-stands-heading" class="text-2xl font-semibold tracking-tight text-stone-900">
+      Where it stands today
+    </h2>
+
+    <figure class="era-figure">
+      <img
+        src="/images/vibrancy_index_timeline_with_historical_eras.webp"
+        alt="Line chart of South Street's vibrancy index from the 1850s to 2026, rising and falling twice."
+        loading="lazy"
+        decoding="async"
+      />
+      <figcaption>
+        Vibrancy has risen and fallen twice since the 1960s, the two cycles this page traces.
+      </figcaption>
+    </figure>
+
+    <figure class="era-figure">
+      <img
+        src="/images/south_street_vacancy_chart_website_large.webp"
+        alt="Line chart of South Street commercial vacancy over time, near a 30-year high by 2026."
+        loading="lazy"
+        decoding="async"
+      />
+      <figcaption>By 2026, commercial vacancy sits near a 30-year high.</figcaption>
+    </figure>
+
+    <div class="era-handoff">
+      <p class="era-handoff-line">Where to go from here.</p>
+      <nav class="era-handoff-links" aria-label="Where to go from here">
+        <a href="/map">The corridor today</a>
+        <a href="/findings">The diagnosis</a>
+        <a href="/analysis">The proposed fix</a>
+      </nav>
+    </div>
+
+    <div class="era-closing">
+      <p class="era-closing-line">
+        This is the short version. The full history, with footnotes and bibliography, is in the
+        thesis.
+      </p>
+      <a class="era-btn" href="/thesis.pdf" target="_blank" rel="noopener">
+        Read the thesis (PDF)
+      </a>
+    </div>
+  </section>
 </Layout>
+
+<script>
+  type Refs = {
+    grid: HTMLElement | null;
+    bands: HTMLButtonElement[];
+    panel: HTMLElement | null;
+    overview: HTMLElement | null;
+    chapters: HTMLElement[];
+    nav: HTMLElement | null;
+    prev: HTMLButtonElement | null;
+    next: HTMLButtonElement | null;
+    progress: HTMLElement | null;
+    start: HTMLButtonElement | null;
+  };
+
+  const root = document.querySelector<HTMLElement>('[data-era-timeline]');
+  if (root) {
+    const r: Refs = {
+      grid: root.querySelector('[data-era-grid]'),
+      bands: Array.from(root.querySelectorAll<HTMLButtonElement>('[data-era-band]')),
+      panel: root.querySelector('[data-era-panel]'),
+      overview: root.querySelector('[data-overview]'),
+      chapters: Array.from(root.querySelectorAll<HTMLElement>('[data-chapter]')),
+      nav: root.querySelector('[data-nav]'),
+      prev: root.querySelector('[data-prev]'),
+      next: root.querySelector('[data-next]'),
+      progress: root.querySelector('[data-progress]'),
+      start: root.querySelector('[data-start]'),
+    };
+
+    const count = r.bands.length;
+    let selected = -1; // -1 = overview state
+
+    const clamp = (i: number) => Math.max(0, Math.min(count - 1, i));
+
+    // The standalone finale lives below the stepper (outside the timeline root).
+    const standsSection = document.getElementById('where-it-stands');
+    const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    function scrollToStands(): void {
+      standsSection?.scrollIntoView({ behavior: prefersReduced ? 'auto' : 'smooth', block: 'start' });
+    }
+
+    function select(index: number): void {
+      const i = clamp(index);
+      selected = i;
+
+      if (r.overview) r.overview.hidden = true;
+      if (r.nav) r.nav.hidden = false;
+      r.grid?.classList.add('is-selecting');
+
+      r.bands.forEach((b) => {
+        const active = Number(b.dataset.index) === i;
+        b.classList.toggle('is-active', active);
+        if (active) b.setAttribute('aria-current', 'step');
+        else b.removeAttribute('aria-current');
+      });
+
+      r.chapters.forEach((c) => {
+        const active = Number(c.dataset.index) === i;
+        c.classList.toggle('is-active', active);
+        if (active) {
+          // Re-trigger the subtle step animation.
+          c.classList.remove('is-stepping');
+          void c.offsetWidth;
+          c.classList.add('is-stepping');
+        }
+      });
+
+      if (r.progress) r.progress.textContent = `${i + 1} / ${count}`;
+      if (r.prev) r.prev.disabled = i === 0;
+      // On the last era, Next becomes a scroll-to-finale control rather than a
+      // chapter advance, so it is relabeled and never disabled.
+      if (r.next) {
+        r.next.textContent = i === count - 1 ? 'See where it stands now' : 'Next';
+        r.next.disabled = false;
+      }
+    }
+
+    r.bands.forEach((b) =>
+      b.addEventListener('click', () => select(Number(b.dataset.index))),
+    );
+    r.start?.addEventListener('click', () => select(0));
+    r.prev?.addEventListener('click', () => {
+      if (selected > 0) select(selected - 1);
+    });
+    r.next?.addEventListener('click', () => {
+      if (selected < 0) return;
+      if (selected < count - 1) select(selected + 1);
+      else scrollToStands(); // last era: jump to the standalone finale
+    });
+
+    // Left/Right arrow keys. Right from the overview starts the walk.
+    document.addEventListener('keydown', (e) => {
+      if (e.key !== 'ArrowLeft' && e.key !== 'ArrowRight') return;
+      if (e.key === 'ArrowRight') {
+        if (selected < 0) {
+          select(0);
+          e.preventDefault();
+        } else if (selected < count - 1) {
+          select(selected + 1);
+          e.preventDefault();
+        }
+      } else if (selected > 0) {
+        select(selected - 1);
+        e.preventDefault();
+      }
+    });
+
+    // Touch swipe on the panel: left = next, right = prev.
+    if (r.panel) {
+      let x0: number | null = null;
+      r.panel.addEventListener(
+        'touchstart',
+        (e) => {
+          x0 = e.changedTouches[0].clientX;
+        },
+        { passive: true },
+      );
+      r.panel.addEventListener(
+        'touchend',
+        (e) => {
+          if (x0 === null) return;
+          const dx = e.changedTouches[0].clientX - x0;
+          x0 = null;
+          if (Math.abs(dx) < 40) return;
+          if (dx < 0) select(selected < 0 ? 0 : selected + 1);
+          else if (selected > 0) select(selected - 1);
+        },
+        { passive: true },
+      );
+    }
+  }
+</script>
+
+<noscript>
+  <style>
+    /* Without JS, reveal every chapter and hide the interactive-only controls. */
+    .era-chapter { display: block !important; }
+    .era-overview,
+    .era-nav { display: none !important; }
+  </style>
+</noscript>
+
+<style>
+  .era-timeline {
+    margin-top: 2.5rem;
+  }
+
+  /* Narrow screens scroll the timeline rather than wrapping it into a mess. */
+  .era-scroll {
+    overflow-x: auto;
+    padding-bottom: 0.5rem;
+  }
+
+  .era-grid {
+    /* Prologue: three thin fixed-width chapters; the rest flexes. */
+    --prologue-band-w: 120px;
+    --prologue-w: calc(var(--prologue-band-w) * 3 + 4px); /* 3 bands + 2 inner gaps */
+    min-width: 820px;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  /* Three stacked rows share the same left-edge structure so columns align:
+     a fixed-width prologue block, the divider, then the proportional modern arc. */
+  .era-row {
+    display: flex;
+    gap: 2px;
+    align-items: stretch;
+  }
+
+  /* Fixed-width prologue blocks (same width in every row). */
+  .era-prologue-kicker,
+  .era-prologue-group,
+  .era-prologue-axis {
+    flex: 0 0 var(--prologue-w);
+    display: flex;
+    gap: 2px; /* light separator between the three prologue chapters */
+  }
+  .era-prologue-kicker {
+    align-items: flex-end;
+  }
+
+  /* The divider after the prologue, and its width-matching spacer in other rows. */
+  .era-divider,
+  .era-divider-spacer {
+    flex: 0 0 16px;
+  }
+
+  .era-kicker {
+    font-size: 0.625rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    color: #78716c; /* stone-500 — legible on light and dark */
+  }
+
+  /* Era bands (buttons). Fill is the era color at low opacity; the solid color is
+     a top accent line. Label text inherits the page text color and the fill is
+     translucent, so labels stay legible whether the page is light or dark. */
+  .era-band {
+    flex: 1 1 0;
+    min-width: 0;
+    position: relative;
+    min-height: 88px;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    gap: 2px;
+    margin: 0;
+    padding: 0.625rem 0.75rem;
+    border: 0;
+    border-top: 3px solid var(--era);
+    border-radius: 4px;
+    font: inherit;
+    text-align: left;
+    color: inherit;
+    cursor: pointer;
+    background: #f5f5f4; /* fallback if color-mix is unsupported */
+    background: color-mix(in srgb, var(--era) 16%, transparent);
+    transition:
+      transform 0.12s ease,
+      box-shadow 0.2s ease,
+      background-color 0.2s ease,
+      opacity 0.2s ease;
+  }
+  /* Clickable affordance in the overview state. */
+  .era-band:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  }
+  .era-band:focus-visible {
+    outline: 2px solid #1c1917;
+    outline-offset: 2px;
+  }
+
+  /* Prologue chapters: fixed compact width, lighter quiet-neutral fill, dashed
+     accent — the muted "before" against the vivid modern eras. */
+  .era-band--prologue {
+    flex: 0 0 var(--prologue-band-w);
+    min-height: 88px;
+    background: color-mix(in srgb, var(--era) 22%, transparent);
+    border-top-style: dashed;
+    padding-left: 0.6rem;
+    padding-right: 0.6rem;
+  }
+
+  /* Selected state: the chosen band is emphasized; the rest dim, so the
+     timeline doubles as a position/progress indicator. */
+  .era-grid.is-selecting .era-band {
+    opacity: 0.5;
+  }
+  .era-grid.is-selecting .era-band.is-active {
+    opacity: 1;
+  }
+  .era-band.is-active {
+    border-top-width: 4px;
+    background: color-mix(in srgb, var(--era) 30%, transparent);
+    box-shadow:
+      inset 0 0 0 2px var(--era),
+      0 2px 10px rgba(0, 0, 0, 0.1);
+  }
+  .era-band--prologue.is-active {
+    background: color-mix(in srgb, var(--era) 38%, transparent);
+  }
+
+  .era-name {
+    font-size: 0.9rem;
+    font-weight: 600;
+    line-height: 1.15;
+    color: inherit;
+  }
+  /* Narrow prologue bands: slightly smaller name, allowed to wrap to two lines. */
+  .era-band--prologue .era-name {
+    font-size: 0.78rem;
+  }
+  .era-years {
+    font-size: 0.75rem;
+    color: inherit;
+    opacity: 0.65;
+    font-variant-numeric: tabular-nums;
+  }
+  .era-band--prologue .era-years {
+    font-size: 0.7rem;
+  }
+
+  /* Vertical divider line, centered in the 16px slot after the prologue. */
+  .era-divider {
+    position: relative;
+    align-self: stretch;
+  }
+  .era-divider::before {
+    content: '';
+    position: absolute;
+    left: 50%;
+    top: 0;
+    bottom: 0;
+    border-left: 1px dashed #d6d3d1; /* stone-300 */
+  }
+
+  /* Year axis */
+  .era-axis-cell {
+    flex: 0 0 var(--prologue-band-w); /* prologue ticks; modern overrides below */
+    min-width: 0;
+    position: relative;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    padding-top: 7px;
+    border-top: 1px solid #e7e5e4; /* stone-200 */
+  }
+  .era-axis-cell--modern {
+    flex: 1 1 0;
+  }
+  /* Tick at each band's left edge (the boundary year). */
+  .era-axis-cell::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: -1px;
+    width: 1px;
+    height: 6px;
+    background: #a8a29e; /* stone-400 */
+  }
+  /* Closing tick at the right end of the last (ongoing) band, beside "now". */
+  .era-axis .era-axis-cell--modern:last-of-type::after {
+    content: '';
+    position: absolute;
+    right: 0;
+    top: -1px;
+    width: 1px;
+    height: 6px;
+    background: #a8a29e;
+  }
+  .era-year {
+    font-size: 0.7rem;
+    color: #57534e; /* stone-600 */
+    font-variant-numeric: tabular-nums;
+  }
+  .era-year--now {
+    font-weight: 600;
+    color: #44403c; /* stone-700 */
+  }
+
+  /* ---- Chapter panel ---- */
+  .era-panel {
+    margin-top: 1.5rem;
+    /* Reserve height so the page doesn't jump as chapters change. */
+    min-height: 18rem;
+  }
+
+  .era-overview {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.85rem;
+    padding: 1rem 0;
+  }
+  /* The `display` rules above would otherwise beat the [hidden] attribute, so
+     restore hiding explicitly (higher specificity than the bare class). */
+  .era-overview[hidden],
+  .era-nav[hidden] {
+    display: none;
+  }
+  .era-overview p {
+    margin: 0;
+    color: #57534e;
+    font-size: 0.95rem;
+  }
+
+  .era-btn {
+    appearance: none;
+    display: inline-block;
+    border: 1px solid transparent;
+    border-radius: 5px;
+    padding: 0.45rem 1rem;
+    font: inherit;
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-decoration: none;
+    cursor: pointer;
+    background: #1c1917; /* stone-900 */
+    color: #fafaf9;
+    transition: background-color 0.12s ease;
+  }
+  .era-btn:hover {
+    background: #292524; /* stone-800 */
+  }
+  .era-btn:focus-visible {
+    outline: 2px solid #1c1917;
+    outline-offset: 2px;
+  }
+  .era-btn--ghost {
+    background: transparent;
+    color: #1c1917;
+    border-color: #d6d3d1; /* stone-300 */
+  }
+  .era-btn--ghost:hover {
+    background: #f5f5f4; /* stone-100 */
+  }
+  .era-btn:disabled {
+    opacity: 0.4;
+    cursor: default;
+  }
+  .era-btn--ghost:disabled:hover {
+    background: transparent;
+  }
+
+  /* Chapters: hidden by default; the script reveals the selected one. */
+  .era-chapter {
+    display: none;
+  }
+  .era-chapter.is-active {
+    display: block;
+  }
+  .era-chapter-title {
+    margin: 0;
+    font-size: 1.25rem;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    color: #1c1917;
+  }
+  .era-chapter-meta {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.6rem;
+    margin-top: 0.3rem;
+  }
+  .era-chapter-years {
+    font-size: 0.85rem;
+    color: #78716c;
+    font-variant-numeric: tabular-nums;
+  }
+  .era-tag {
+    font-size: 0.7rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    padding: 2px 9px;
+    border-radius: 999px;
+    color: #44403c; /* stone-700 — legible on the tinted chip */
+    background: color-mix(in srgb, var(--era) 18%, transparent);
+    border: 1px solid color-mix(in srgb, var(--era) 45%, transparent);
+  }
+  .era-summary {
+    margin: 0.85rem 0 0 0;
+    max-width: 62ch;
+    color: #44403c;
+    font-size: 0.95rem;
+    line-height: 1.55;
+  }
+  .era-beats {
+    margin: 0.85rem 0 0 0;
+    padding: 0;
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    max-width: 66ch;
+  }
+  .era-beats li {
+    position: relative;
+    padding-left: 1.1rem;
+    color: #57534e;
+    font-size: 0.9rem;
+    line-height: 1.45;
+  }
+  .era-beats li::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0.55em;
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: #a8a29e;
+  }
+  .era-chapter-empty {
+    margin: 0.85rem 0 0 0;
+    color: #a8a29e;
+    font-style: italic;
+    font-size: 0.9rem;
+  }
+
+  /* Standalone finale section below the stepper. Separated from the stepper by a
+     thin rule, then the two charts, the handoff links, and the thesis closing. */
+  .era-stands {
+    margin-top: 2.5rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid #e7e5e4; /* stone-200 */
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+
+  .era-figure {
+    margin: 0;
+  }
+  .era-figure img {
+    display: block;
+    width: 100%;
+    max-width: 720px;
+    height: auto; /* scale down cleanly on narrow screens */
+    border: 1px solid #e7e5e4; /* stone-200 */
+    border-radius: 4px;
+  }
+  .era-figure figcaption {
+    margin-top: 0.45rem;
+    max-width: 60ch;
+    font-size: 0.8rem;
+    line-height: 1.4;
+    color: #78716c; /* stone-500 */
+  }
+
+  .era-handoff-line {
+    margin: 0 0 0.5rem 0;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #1c1917;
+  }
+  .era-handoff-links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem 1.5rem;
+  }
+  .era-handoff-links a {
+    font-size: 0.9rem;
+    color: #57534e; /* stone-600 */
+    text-decoration: underline;
+    text-underline-offset: 2px;
+  }
+  .era-handoff-links a:hover {
+    color: #1c1917;
+  }
+
+  /* Thesis closing block, separated from the handoff links by a thin rule. */
+  .era-closing {
+    padding-top: 1rem;
+    border-top: 1px solid #e7e5e4; /* stone-200 */
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.75rem;
+  }
+  .era-closing-line {
+    margin: 0;
+    max-width: 60ch;
+    color: #57534e; /* stone-600 */
+    font-size: 0.9rem;
+    font-style: italic;
+  }
+
+  .era-nav {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-top: 1.25rem;
+  }
+  .era-progress {
+    font-size: 0.8rem;
+    color: #78716c;
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* Subtle step animation when the chapter changes. */
+  @keyframes eraStep {
+    from {
+      opacity: 0;
+      transform: translateY(4px);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+  .era-chapter.is-active.is-stepping {
+    animation: eraStep 180ms ease-out;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .era-band,
+    .era-band:hover {
+      transition: none;
+      transform: none;
+    }
+    .era-chapter.is-active.is-stepping {
+      animation: none;
+    }
+  }
+</style>
