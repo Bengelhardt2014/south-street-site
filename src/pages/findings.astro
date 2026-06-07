@@ -30,6 +30,10 @@ const toc: { id: string; title: string }[] = [
     <section>
       <p class="finding-kicker">Findings</p>
       <h1 class="finding-hero-title">The Neighborhood Commercial Corridor Paradox</h1>
+      <p class="finding-thesis">
+        Twice since the 1960s, South Street fell and came back. This time the market's reset is
+        broken.
+      </p>
       <p class="mt-3 text-stone-700">
         A 2026 field survey of every storefront on South Street, from Front through the 1100 block,
         measured against East Passyunk Avenue from 1200 to Broad Street.
@@ -71,6 +75,21 @@ const toc: { id: string; title: string }[] = [
       </ul>
     </section>
 
+    <!-- THE ARGUMENT -->
+    <section class="finding-argument" aria-label="The argument">
+      <p class="finding-argument-kicker">The argument</p>
+      <p class="finding-argument-text">
+        South Street has run on roughly 30-year cycles, falling and recovering twice since 1965. Each
+        recovery was set off from outside: the fight against the Crosstown Expressway in the 1960s,
+        then the residential return and development wave of the 1980s and 90s. This downturn is
+        different. Vacancy has reached crisis levels comparable to the Crosstown era, but today that
+        distress sits alongside rising property values. Long-term owners have little reason to sell,
+        cut rents, or reinvest, and the small businesses that would refill the corridor cannot absorb
+        the cost of reopening aging spaces. The market's reset mechanism is broken. Left alone, South
+        Street stays frozen rather than renewing, which is the case for outside intervention.
+      </p>
+    </section>
+
     <!-- ON THIS PAGE -->
     <nav class="finding-toc" aria-label="On this page">
       <span class="finding-toc-label">On this page</span>
@@ -104,6 +123,13 @@ const toc: { id: string; title: string }[] = [
       </div>
       <p class="finding-body">
         South Street's commercial vacancy is the highest the corridor has seen in over 30 years.
+      </p>
+      <p class="finding-body">
+        South Street has moved through roughly 30-year cycles, falling and recovering twice since 1965
+        (traced on the <a href="/history">History tab</a>). What breaks the pattern this time is the
+        company the vacancy keeps. In past downturns, falling values eventually pressured owners to
+        sell or reinvest. Today the vacancy sits alongside rising land values, so that pressure never
+        arrives.
       </p>
       <p class="finding-body">
         East Passyunk sits on the same pre-1900 building stock, the same density, and the same
@@ -566,23 +592,26 @@ const toc: { id: string; title: string }[] = [
       </figure>
     </section>
 
-    <!-- HANDOFF -->
+    <!-- CLOSING SYNTHESIS + HANDOFF -->
     <section class="finding-section">
       <h2 class="finding-section-heading text-2xl font-semibold tracking-tight text-stone-900">
-        Where this goes next
+        What the findings add up to
       </h2>
-      <p class="finding-handoff-lead">
-        These findings are the evidence. What they mean, and what to do about them, lives on the next
-        two tabs.
+      <p class="finding-body">
+        Taken together, these findings describe a corridor whose self-correction has stalled. Vacancy
+        is at a 30-year high and half of it is long-term. The buildings decay while their land keeps
+        appreciating, so owners have no reason to act. The tenants who would refill the corridor
+        cannot afford the cost of entry, and the city programs built to help cannot reach an area this
+        affluent on paper. That is a market failure, and markets in this state do not fix themselves.
+        South Street's past recoveries were triggered from outside, and this one will need the same.
       </p>
       <ul class="finding-handoff-list">
         <li>
-          <a href="/analysis">The Policy Analysis tab</a> traces the three problems behind the numbers
-          and lays out four proposals.
+          <a href="/analysis">The Policy Analysis tab</a> lays out what that intervention looks like.
         </li>
         <li><a href="/map">The Map</a> shows the survey parcel by parcel.</li>
         <li>
-          The full Chapter V, with every figure and table, is in the
+          The full chapter is in the
           <a href="/thesis.pdf" target="_blank" rel="noopener">thesis</a>.
         </li>
       </ul>
@@ -591,9 +620,15 @@ const toc: { id: string; title: string }[] = [
 </Layout>
 
 <style>
-  /* One unified width: the content fills the Layout <main> (mx-auto max-w-6xl), a
-     single centered column. Body text, bullets, stat blocks, figures, captions,
-     the table, and the handoff all share this one width. */
+  /* One unified width. The shared Layout <main> caps content at a 1104px box, so
+     this must be narrower than that to bind. 56rem (896px) gives a comfortable
+     reading column centered in the viewport with generous equal margins.
+     Everything (text, bullets, stat blocks, figures, captions, the table, the
+     handoff) shares this width; small-screen gutters come from the <main> px-6. */
+  .finding-wrap {
+    max-width: 56rem; /* 896px, narrower than the main's 1104px box so it binds */
+    margin-inline: auto; /* centered in the viewport with generous equal margins */
+  }
 
   /* Hero: a small muted kicker over a large dominant title. */
   .finding-hero-title {
@@ -603,6 +638,37 @@ const toc: { id: string; title: string }[] = [
     font-weight: 700;
     letter-spacing: -0.02em;
     color: #1c1917; /* stone-900 */
+  }
+  /* Thesis statement: a touch larger than the dek, in the body text color. */
+  .finding-thesis {
+    margin: 0.7rem 0 0;
+    font-size: 1.2rem;
+    line-height: 1.45;
+    font-weight: 500;
+    color: #44403c; /* stone-700, the body text color */
+  }
+
+  /* The argument: a distinct panel setting out the central thesis. */
+  .finding-argument {
+    margin-top: 3rem;
+    padding: 1.5rem 1.75rem;
+    background: #f5f5f4; /* stone-100, lightly shaded off the page */
+    border-left: 4px solid #1c1917; /* stone-900 accent */
+    border-radius: 6px;
+  }
+  .finding-argument-kicker {
+    margin: 0 0 0.55rem;
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: #78716c; /* stone-500 */
+  }
+  .finding-argument-text {
+    margin: 0;
+    font-size: 1.05rem;
+    line-height: 1.65;
+    color: #292524; /* stone-800 */
   }
   .finding-byline {
     margin: 0.55rem 0 0;
