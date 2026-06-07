@@ -3240,6 +3240,9 @@ import Layout from '../layouts/Layout.astro';
     // dedicated low-z pane below the parcel dots.
     let bidLayerRef: L.GeoJSON | null = null;
     let rcoLayerRef: L.GeoJSON | null = null;
+    // Exposed by initBoundaryOverlays so the URL-view reader can reproduce an RCO
+    // boundary highlight (e.g. South Street/Headhouse District) the way a click would.
+    let highlightRcoShapesRef: ((rcoNames: string[], fly: boolean) => void) | null = null;
     let zoningLayerRef: L.GeoJSON | null = null;
     let densityLayerRef: L.GeoJSON | null = null;
     let ringLayerRef: L.GeoJSON | null = null;
@@ -3537,6 +3540,8 @@ import Layout from '../layouts/Layout.astro';
         });
         if (fly && bounds.isValid()) map.flyToBounds(bounds, { padding: [40, 40], maxZoom: 16 });
       };
+      // Expose to the URL-view reader (module scope) for programmatic highlighting.
+      highlightRcoShapesRef = highlightShapes;
 
       // Washington Square West highlights/zooms census tract 11.02, not the large
       // WSW RCO polygon. The tract layer is its own (non-RCO) overlay.
@@ -4030,6 +4035,263 @@ import Layout from '../layouts/Layout.astro';
       updateBidLabelVisibility();
     }
 
+    // -------------------- URL view presets (deep links) --------------------
+    // /map?view=<preset> opens the map pre-filtered so links (e.g. from the Cover)
+    // can land on a curated view. Generic by design: add presets to the table and
+    // the reader applies whatever fields are present, leaving the rest at default.
+    // Overlay keys map to the real sidebar checkbox IDs.
+    const OVERLAY_CHECKBOX_IDS: Record<string, string> = {
+      bids: 'overlay-bids',
+      rcos: 'overlay-rcos',
+      zoning: 'overlay-zoning',
+      density: 'overlay-density',
+    };
+
+    type ViewPreset = {
+      corridor?: CorridorChoice;
+      zoomAdjust?: number;
+      vacancy?: string[];
+      category?: string[];
+      peak?: number[];          // Peak activation period values 1..5 (5 = Late night)
+      ownership?: string[];
+      outdoorOnly?: boolean;
+      overlays?: string[];
+      // neighborhood: data-nbhd value of a sidebar .nbhd-trigger to click last,
+      // opening that neighborhood's demographic panel (e.g. 'Society Hill').
+      neighborhood?: string;
+      // selectBid: BID polygons are non-interactive (no selection), and the only
+      // feature matching this name is the 'South Street/Headhouse District' RCO
+      // boundary — so we highlight that RCO shape via the existing highlightShapes
+      // mechanism (see highlightRcoShapesRef) rather than any BID handler.
+      selectBid?: string;
+    };
+
+    const PRESETS: Record<string, ViewPreset> = {
+      governance: {
+        corridor: 'south-street',
+        zoomAdjust: 0,
+        vacancy: [], category: [], ownership: [], outdoorOnly: false,
+        overlays: ['bids', 'rcos'],
+        selectBid: 'South Street/Headhouse District',
+      },
+      ownership: {
+        corridor: 'all',
+        zoomAdjust: 0,
+        vacancy: ['long_term'],
+        category: [],
+        ownership: ['out_of_area', 'dollar_sale'],
+        outdoorOnly: false,
+        overlays: [],
+      },
+      demand: {
+        corridor: 'south-street',
+        zoomAdjust: 0,
+        vacancy: ['short_term', 'under_renovation', 'long_term'],
+        category: [],
+        ownership: [],
+        outdoorOnly: false,
+        overlays: ['bids'],
+      },
+      density: {
+        corridor: 'south-street',
+        zoomAdjust: -1,
+        vacancy: [],
+        category: [],
+        ownership: [],
+        outdoorOnly: false,
+        overlays: ['bids', 'density'],
+      },
+      outdoor: {
+        corridor: 'all',
+        zoomAdjust: 0,
+        vacancy: [],
+        category: [],
+        ownership: [],
+        outdoorOnly: true,
+        overlays: [],
+      },
+      latenight: {
+        corridor: 'all',
+        zoomAdjust: 0,
+        vacancy: [],
+        category: [],
+        ownership: [],
+        outdoorOnly: false,
+        peak: [5],
+        overlays: [],
+      },
+      takeout: {
+        corridor: 'all',
+        zoomAdjust: 0,
+        vacancy: [],
+        // Exact business_category value from the data — the separator is an EN
+        // DASH (U+2013), not a hyphen. Verified byte-for-byte against
+        // parcels.geojson so the exact-match category filter and the checkbox
+        // sync both hit this category.
+        category: ['Restaurant – Quick Service / Takeout'],
+        ownership: [],
+        outdoorOnly: false,
+        overlays: [],
+      },
+      healthy: {
+        corridor: 'south-street',
+        zoomAdjust: 0,
+        vacancy: [],
+        // Exact business_category values from the data (verified byte-for-byte
+        // against parcels.geojson). 'Health / Wellness' is the whole Health &
+        // Wellness segment (its only sub-category); the two Food values are the
+        // Grocery & Market sub-categories — Convenience Store is deliberately
+        // excluded. The Food values use an EN DASH (U+2013), not a hyphen.
+        // South Street scope → 13 parcels.
+        category: [
+          'Health / Wellness',
+          'Food – Grocery / Market',
+          'Food – Specialty Food',
+        ],
+        ownership: [],
+        outdoorOnly: false,
+        overlays: [],
+      },
+      aging: {
+        corridor: 'all',
+        zoomAdjust: 0,
+        vacancy: [],
+        category: [],
+        ownership: [],
+        outdoorOnly: false,
+        neighborhood: 'Society Hill',
+        overlays: ['bids', 'rcos', 'density'],
+      },
+      culture: {
+        corridor: 'south-street',
+        zoomAdjust: 0,
+        vacancy: [],
+        // Both sub-categories of the Arts & Culture segment (exact data values,
+        // plain ASCII — slashes, no en-dash), so the segment box reads fully
+        // checked. South Street scope → 7 parcels.
+        category: ['Arts / Gallery', 'Entertainment'],
+        ownership: [],
+        outdoorOnly: false,
+        overlays: ['bids'],
+      },
+      smokeshops: {
+        corridor: 'all',
+        zoomAdjust: 0,
+        vacancy: [],
+        // Single Retail Goods sub-category (exact data value, plain ASCII). One of
+        // seven sub-categories → Retail Goods parent reads indeterminate. All 12
+        // parcels are on South Street, zero on East Passyunk — the contrast is the
+        // point, so both corridors stay in view.
+        category: ['Smoke Shop'],
+        ownership: [],
+        outdoorOnly: false,
+        overlays: [],
+      },
+    };
+
+    function applyViewFromURL(): void {
+      const viewKey = new URLSearchParams(window.location.search).get('view');
+      if (!viewKey) return;
+      const preset = PRESETS[viewKey];
+      if (!preset) return; // unknown view → leave the default map untouched
+
+      // Corridor: drive the existing segmented control so its handler runs flyTo,
+      // ribbon updates, and aria-pressed exactly as a user click would.
+      if (preset.corridor) {
+        const btn = document.querySelector<HTMLButtonElement>(
+          `.corridor-segment[data-value="${preset.corridor}"]`,
+        );
+        if (btn) {
+          // zoomAdjust: after the corridor fly lands, pin BOTH center and zoom to
+          // the South Street corridor explicitly. The mid-fly ribbon invalidateSize
+          // is a pan (no zoomend), so waiting on zoomend runs this after the fly
+          // settles; setting the center explicitly makes the resize-shifted center
+          // irrelevant. Mirrors the manual sequence (South Street → zoom out → density).
+          if (typeof preset.zoomAdjust === 'number' && preset.zoomAdjust !== 0 && mapRef) {
+            const adjust = preset.zoomAdjust;
+            mapRef.once('zoomend', () => {
+              if (!mapRef) return;
+              const bounds = corridorBounds.south_street;
+              if (!bounds || !bounds.isValid()) return;
+              const center = bounds.getCenter();
+              // Match flyToCorridor's [40,40] padding so fitZoom equals the fly's fit.
+              const fitZoom = mapRef.getBoundsZoom(bounds, false, L.point(40, 40));
+              mapRef.setView(center, fitZoom + adjust, { animate: false });
+            });
+          }
+          btn.click();
+        }
+      }
+
+      // Business-mix filters from the preset, then resync the controls' visuals.
+      setFilterState((s) => {
+        if (preset.vacancy) s.vacancy = new Set(preset.vacancy);
+        if (preset.category) s.category = new Set(preset.category);
+        if (preset.peak) s.peak = new Set(preset.peak);
+        if (preset.ownership) s.ownership = new Set(preset.ownership);
+        if (typeof preset.outdoorOnly === 'boolean') s.outdoorOnly = preset.outdoorOnly;
+      });
+      resyncBusinessMixUI();
+      // Segments render collapsed, so expand any segment that now has a checked
+      // category — general (not segment-specific), reusing the existing toggle and
+      // only acting on still-collapsed segments. No-op when no category is set.
+      document
+        .querySelectorAll<HTMLInputElement>('.filter-category:checked')
+        .forEach((cb) => {
+          const segEl = cb.closest('.segment');
+          if (segEl && segEl.querySelector('.segment-children')?.hasAttribute('hidden')) {
+            toggleSegmentExpand(segEl);
+          }
+        });
+      // Ownership chips live in the Building mix section and have no resync-from-
+      // state helper, so reflect their pressed state by hand.
+      const ownership = preset.ownership;
+      if (ownership) {
+        document
+          .querySelectorAll<HTMLButtonElement>('.chip-row[data-chip-group="ownership"] .chip')
+          .forEach((chip) => {
+            chip.setAttribute(
+              'aria-pressed',
+              ownership.includes(chip.dataset.value || '') ? 'true' : 'false',
+            );
+          });
+      }
+
+      // Overlays: the preset's list is a COMPLETE declaration. Turn ON every
+      // listed overlay and turn OFF every known overlay not listed — BID defaults
+      // on, so some views need it cleared. Fire 'change' only when the state
+      // actually flips, so unaffected overlays are left alone.
+      if (preset.overlays) {
+        const wanted = preset.overlays;
+        for (const key of Object.keys(OVERLAY_CHECKBOX_IDS)) {
+          const box = document.getElementById(OVERLAY_CHECKBOX_IDS[key]) as HTMLInputElement | null;
+          if (!box) continue;
+          const shouldBeOn = wanted.includes(key);
+          if (box.checked !== shouldBeOn) {
+            box.checked = shouldBeOn;
+            box.dispatchEvent(new Event('change', { bubbles: true }));
+          }
+        }
+      }
+
+      // selectBid: reproduce the highlighted boundary. The RCO overlay is on now
+      // (above), so reuse the RCO highlight mechanism for the matching shape.
+      if (preset.selectBid && highlightRcoShapesRef) {
+        highlightRcoShapesRef([preset.selectBid], false);
+      }
+
+      // Neighborhood: LAST view-affecting step. Click the sidebar trigger so the
+      // (local) selectNeighborhood runs — opens the demographic panel, highlights
+      // the polygon, ensures RCO on, and flies to frame it. Runs last so its
+      // flyToBounds is the final framing and overrides the corridor fly. No-op
+      // when a preset has no neighborhood.
+      if (preset.neighborhood) {
+        document
+          .querySelector<HTMLButtonElement>(`.nbhd-trigger[data-nbhd="${preset.neighborhood}"]`)
+          ?.click();
+      }
+    }
+
     async function initMap() {
       const map = L.map('map', {
         center: [39.938, -75.155],
@@ -4222,6 +4484,10 @@ import Layout from '../layouts/Layout.astro';
         // Run subscribers once to perform the initial render (which also adds
         // markers to the map based on current visibility logic).
         subscribers.forEach((fn) => fn());
+
+        // Deep-link support: apply ?view=<preset> now that the map, filters, and
+        // controls are all initialized. No-op when the param is absent/unknown.
+        applyViewFromURL();
 
         // Expose for manual console testing.
         (window as unknown as Record<string, unknown>).__filterState = filterState;

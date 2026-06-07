@@ -51,7 +51,7 @@ const problems = ['Governance Gridlock', 'Dormant Ownership', 'Declining Demand'
                   <div class="board-lead">What's holding South Street back</div>
                   <div class="rows">
                     {problems.map((name) => (
-                      <a class="row" href="/map">
+                      <a class="row" href={name === 'Governance Gridlock' ? '/map?view=governance' : name === 'Dormant Ownership' ? '/map?view=ownership' : name === 'Declining Demand' ? '/map?view=demand' : '/map'}>
                         <span class="prob">{name}</span>
                         <span class="cue">see the map &rarr;</span>
                       </a>
@@ -70,8 +70,8 @@ const problems = ['Governance Gridlock', 'Dormant Ownership', 'Declining Demand'
                   <div class="acts">
                     <a class="act" href="/findings">Creative District &amp; Overlay</a>
                     <a class="act" href="/findings">Revitalization Corporation</a>
-                    <a class="act" href="/findings">CMX-3 Upzone</a>
-                    <a class="act" href="/findings">Pedestrianize the Core</a>
+                    <a class="act" href="/findings">Upzone to CMX3</a>
+                    <a class="act" href="/findings">Pedestrian Plaza at 300</a>
                   </div>
                 </div>
               </div>
@@ -117,10 +117,16 @@ const problems = ['Governance Gridlock', 'Dormant Ownership', 'Declining Demand'
         <!-- 6. Ticket-style buttons -->
         <p class="ticket-kicker">Also showing</p>
         <div class="tickets">
-          <a class="ticket" href="/map">Not enough density</a>
-          <a class="ticket" href="/map">No outdoor space</a>
-          <a class="ticket" href="/map">Unbalanced Business Mix</a>
-          <a class="ticket" href="/map">Too much takeout</a>
+          <a class="ticket" href="/map?view=density">Not enough density</a>
+          <a class="ticket" href="/map?view=outdoor">No outdoor space</a>
+          <a class="ticket" href="/map?view=latenight">No Daytime Draw</a>
+          <a class="ticket" href="/map?view=takeout">Too much takeout</a>
+        </div>
+        <div class="tickets">
+          <a class="ticket" href="/map?view=healthy">Few Healthy Options</a>
+          <a class="ticket" href="/map?view=aging">Aging Demographic</a>
+          <a class="ticket" href="/map?view=culture">Arts &amp; Culture Loss</a>
+          <a class="ticket" href="/map?view=smokeshops">Smoke Shops</a>
         </div>
       </div>
     </div>
@@ -627,6 +633,13 @@ const problems = ['Governance Gridlock', 'Dormant Ownership', 'Declining Demand'
     background: #fff;
     transform: translateY(-1px);
     outline: none;
+  }
+  /* Second "Also showing" row: blank placeholder tickets (no labels yet). They
+     reuse .ticket for shape/spacing; the &nbsp; in the markup keeps the text-line
+     height, and this min-width keeps the same ticket width the first row has so
+     they don't collapse. Remove this class once real labels are added. */
+  .ticket--placeholder {
+    min-width: 8rem;
   }
 
   @media (max-width: 760px) {
