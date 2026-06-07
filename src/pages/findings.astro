@@ -1,13 +1,587 @@
 ---
 import Layout from '../layouts/Layout.astro';
+
+// Tenant-mix comparison (Finding 4) rendered as an accessible table.
+const mixRows: { measure: string; south: string; east: string }[] = [
+  { measure: 'Retail goods', south: '41%', east: '21%' },
+  { measure: 'Professional services', south: '1%', east: '11%' },
+  { measure: 'Health and fitness', south: '6%', east: '8%' },
+  { measure: 'Grocery and fresh food', south: '3%', east: '5%' },
+  { measure: 'Peaks late at night', south: '23%', east: 'under 1%' },
+  { measure: 'Smoke shops and check-cashers', south: '9%', east: '0%' },
+  { measure: 'Value-priced (mean tier, 1 to 4)', south: '1.96', east: '2.39' },
+  { measure: 'Outdoor seating', south: '7%', east: '20%' },
+];
 ---
 
-<Layout title="Findings — Saving South Street">
-  <section class="max-w-3xl">
-    <h1 class="text-3xl font-semibold tracking-tight text-stone-900">Findings</h1>
-    <p class="mt-3 text-stone-700">
-      An embedded slide deck summarizing the thesis findings and recommendations for South Street. The deck
-      will be added in a later phase, alongside speaker notes and download options.
-    </p>
-  </section>
+<Layout title="Findings · Saving South Street">
+  <div class="max-w-3xl">
+    <!-- HERO -->
+    <section>
+      <h1 class="text-3xl font-semibold tracking-tight text-stone-900">Findings</h1>
+      <p class="finding-headline">South Street's decline is structural, not ambient.</p>
+      <p class="mt-3 text-stone-700">
+        A 2026 storefront-by-storefront survey of the corridor, measured against East Passyunk
+        Avenue.
+      </p>
+      <p class="mt-2 text-sm">
+        <a
+          href="/thesis.pdf"
+          target="_blank"
+          rel="noopener"
+          class="text-stone-500 underline underline-offset-2 hover:text-stone-800"
+        >Read the full chapter (PDF)</a>
+      </p>
+    </section>
+
+    <!-- EXECUTIVE SUMMARY -->
+    <section class="finding-section">
+      <h2 class="text-2xl font-semibold tracking-tight text-stone-900">Executive summary</h2>
+      <p class="finding-body">
+        South Street's emptiness gets blamed on COVID and e-commerce. This study tests that with a
+        2026 field survey of every storefront on the corridor, measured against East Passyunk Avenue,
+        a peer with the same pre-1900 building stock, the same density and transit, and a
+        wealthier-than-average neighborhood. East Passyunk faced the same retail pressure and stayed
+        full. South Street did not. The decline is structural to the corridor, not ambient to retail.
+      </p>
+      <ul class="finding-stats">
+        <li><strong>A 17-point occupancy gap.</strong> South Street runs 70.3% occupied against East Passyunk's 87.3%.</li>
+        <li><strong>Half the vacancy is frozen.</strong> Of 68 empty storefronts, 35 are long-term vacant, against just 2 on East Passyunk. The emptiness is stuck, not turning over.</li>
+        <li><strong>Three in five parcels sit with dormant owners.</strong> 155 of 271 parcels have either changed hands without a market sale or not sold in over 20 years.</li>
+        <li><strong>Prices climb while the buildings rot.</strong> South Street land sells for about 1.8 times East Passyunk's, a $273,000 premium, even as half its parcels logged a new code violation in the last three years, four times East Passyunk's count.</li>
+        <li><strong>The mix flipped, not the ownership.</strong> Both corridors are about 87% independent, so chains are a myth. South Street skews value-priced, late-night, and takeout, with smoke shops and check-cashers at 9.4% of tenants versus zero, and it runs thin on daytime, fitness, and fresh-food uses.</li>
+        <li><strong>The culture economy hollowed out.</strong> The corridor that ran on live music, comedy, and galleries is down to one surviving venue, the TLA. The Laff House, where Kevin Hart and Bill Burr started, closed in 2013 with no comedy club since, and a third of the corridor's anchor parcels, several of them former venues, sit empty.</li>
+        <li><strong>The damage concentrates on a few blocks.</strong> The Front-to-5th dead zone carries the worst of it. The 300 block alone is 59% vacant, while the western 900 and 1000 blocks outperform East Passyunk.</li>
+      </ul>
+    </section>
+
+    <!-- FINDING 1 -->
+    <section class="finding-section">
+      <p class="finding-kicker">Finding 1</p>
+      <h2 class="text-2xl font-semibold tracking-tight text-stone-900">The occupancy gap</h2>
+      <p class="finding-stat">
+        South Street runs 70.3% occupied. East Passyunk runs 87.3%. A 17-point gap.
+      </p>
+      <p class="finding-body">
+        East Passyunk sits on the same pre-1900 building stock, the same density, and the same
+        transit, and it faced the same retail pressure. It stayed full. South Street did not.
+      </p>
+      <p class="finding-body">
+        The deeper story is the kind of vacancy, not just the amount. South Street has 68 empty
+        storefronts and 35 of them are long-term vacant. East Passyunk has 20 empty and only 2 are
+        long-term. Half of South Street's emptiness is sitting still, not turning over.
+      </p>
+      <p class="finding-body">
+        A storefront counts as long-term vacant when it shows no sign of a next tenant: no for-rent
+        sign, no posted permit, no visible work inside, and visible neglect like rotted trim, leaks,
+        and faded graffiti. In plain terms, it could not appear on a brokerage listing today.
+      </p>
+
+      <figure class="finding-figure">
+        <img
+          src="/images/Figure%205.6.webp"
+          alt="Bar chart comparing commercial occupancy rates: South Street 70.3 percent, East Passyunk 87.3 percent."
+          loading="lazy"
+          decoding="async"
+        />
+        <figcaption>
+          <span class="finding-caption">
+            Commercial occupancy rate on South Street and East Passyunk.
+          </span>
+          <span class="finding-source">
+            Source: Author's field survey, 2026. Sample restricted to parcels with commercial real
+            estate space (South Street n=229; East Passyunk n=157).
+          </span>
+        </figcaption>
+      </figure>
+
+      <figure class="finding-figure">
+        <img
+          src="/images/Figure%205.7.webp"
+          alt="Chart comparing vacancy type composition on South Street and East Passyunk, showing South Street's larger share of long-term vacancy."
+          loading="lazy"
+          decoding="async"
+        />
+        <figcaption>
+          <span class="finding-caption">
+            Vacancy type composition on South Street and East Passyunk.
+          </span>
+          <span class="finding-source">
+            Source: Author's field survey, 2026. Sample restricted to vacant commercial parcels
+            (South Street n=68; East Passyunk n=20).
+          </span>
+        </figcaption>
+      </figure>
+    </section>
+
+    <!-- FINDING 2 -->
+    <section class="finding-section">
+      <p class="finding-kicker">Finding 2</p>
+      <h2 class="text-2xl font-semibold tracking-tight text-stone-900">
+        Dormant owners hold the land while the buildings wait
+      </h2>
+      <p class="finding-stat">
+        155 of South Street's 271 parcels, about three in five, have either changed hands for a
+        dollar or not sold in over 20 years. The land sells for about 1.8 times East Passyunk's, a
+        $273,000 premium.
+      </p>
+      <p class="finding-body">
+        A parcel carries two values, the land underneath and the building on top. When an owner is
+        engaged, running the storefront and maintaining the building, both values rise together. When
+        an owner is dormant, holding for land appreciation instead of operating income, the two split
+        apart. That split is South Street's diagnosis.
+      </p>
+      <p class="finding-body">
+        Society Hill and Queen Village, two of the highest-income neighborhoods in the city, sit on
+        either side of the corridor and set a price floor under the land. Center City is a 15-minute
+        walk away. Together they price the parcels on what they could become, housing or mixed-use,
+        not on how the storefront performs today. So an owner can leave a storefront empty, keep
+        collecting rent from the apartments above, and still watch the land appreciate. Holding
+        without operating becomes the rational move.
+      </p>
+      <p class="finding-body">
+        East Passyunk never had that price floor. When PARC and its predecessor began buying there,
+        the land was cheap enough to acquire ten parcels and tie rents to tenant sales. South Street
+        never had a group buy the bricks. Its long holds belong to portfolio owners like Axelrod and
+        Midwood, who together control more than 40 addresses, concentrated on the eastern blocks where
+        vacancy runs heaviest.
+      </p>
+
+      <figure class="finding-figure">
+        <img
+          src="/images/Figure%205.4.webp"
+          alt="Chart of the distribution of years since last sale for South Street and East Passyunk parcels."
+          loading="lazy"
+          decoding="async"
+        />
+        <figcaption>
+          <span class="finding-caption">
+            Distribution of years since last sale on South Street and East Passyunk parcels.
+          </span>
+          <span class="finding-source">
+            Source: Author's analysis of Philadelphia Office of Property Assessment records.
+            CMX-zoned parcels with valid sale-date records (South Street n=235 of 245; East Passyunk
+            n=196 of 196).
+          </span>
+        </figcaption>
+      </figure>
+    </section>
+
+    <!-- FINDING 3 -->
+    <section class="finding-section">
+      <p class="finding-kicker">Finding 3</p>
+      <h2 class="text-2xl font-semibold tracking-tight text-stone-900">
+        The buildings are decaying in motion
+      </h2>
+      <p class="finding-stat">
+        Half of South Street's CMX parcels (50.2%) logged a new code violation in the last three
+        years. That is four times East Passyunk's rate.
+      </p>
+      <p class="finding-body">
+        This is the building half of the land-value split. The deterioration is not leftover from a
+        past decade. It is happening now, while prices stay high.
+      </p>
+      <p class="finding-body">
+        South Street's violation profile runs higher than East Passyunk's at every level of severity,
+        and 16.2% of its parcels carry an open violation today. Owners are letting the buildings slide
+        even as the parcels gain value.
+      </p>
+
+      <figure class="finding-figure">
+        <img
+          src="/images/Figure%205.5.webp"
+          alt="Chart of code violation severity and recent activity for South Street and East Passyunk parcels."
+          loading="lazy"
+          decoding="async"
+        />
+        <figcaption>
+          <span class="finding-caption">
+            Code violation severity and recent activity on South Street and East Passyunk parcels.
+          </span>
+          <span class="finding-source">
+            Source: Author's analysis of Philadelphia Office of Property Assessment records and
+            Licenses and Inspections violation history. CMX-zoned parcels (South Street n=245; East
+            Passyunk n=196). The recent count reflects parcels with a most recent violation dated on
+            or after January 1, 2023.
+          </span>
+        </figcaption>
+      </figure>
+    </section>
+
+    <!-- FINDING 4 -->
+    <section class="finding-section">
+      <p class="finding-kicker">Finding 4</p>
+      <h2 class="text-2xl font-semibold tracking-tight text-stone-900">
+        The mix flipped, not the ownership
+      </h2>
+      <p class="finding-stat">
+        Both corridors are about 87% independent. The story that national chains killed South Street
+        is a myth.
+      </p>
+      <p class="finding-body">
+        What changed is what the independent storefronts sell and when they open. South Street leans
+        value-priced, late-night, and takeout. Smoke shops and check-cashers make up 9.4% of its
+        tenants and zero of East Passyunk's. It runs thin on the daily-life uses that hold a
+        neighborhood: professional services, fitness, and fresh food.
+      </p>
+
+      <div class="finding-table-wrap">
+        <table class="finding-table">
+          <caption class="finding-table-caption">
+            Tenant mix on South Street compared with East Passyunk.
+          </caption>
+          <thead>
+            <tr>
+              <th scope="col">Measure</th>
+              <th scope="col">South Street</th>
+              <th scope="col">East Passyunk</th>
+            </tr>
+          </thead>
+          <tbody>
+            {mixRows.map((row) => (
+              <tr>
+                <th scope="row">{row.measure}</th>
+                <td>{row.south}</td>
+                <td>{row.east}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+      <p class="finding-source finding-source--table">
+        Source: Author's field survey, 2026. Active CMX tenants (South Street n=160; East Passyunk
+        n=132).
+      </p>
+
+      <p class="finding-body">
+        East Passyunk packs about 80% of its tenants into the afternoon and evening, the hours that
+        serve a neighborhood. South Street tilts late-night and in-and-out. The mid-day to
+        early-evening economy is what is missing.
+      </p>
+    </section>
+
+    <!-- FINDING 5 -->
+    <section class="finding-section">
+      <p class="finding-kicker">Finding 5</p>
+      <h2 class="text-2xl font-semibold tracking-tight text-stone-900">
+        The damage concentrates on a few blocks
+      </h2>
+      <p class="finding-stat">
+        The 300 block is 59% vacant, 23 of 39 storefronts empty, more than the next three worst blocks
+        combined. The western 900 and 1000 blocks, at 12% and 11%, beat East Passyunk's 12.7%.
+      </p>
+      <p class="finding-body">
+        South Street's 30% corridor average is propped up almost entirely by the 300 block. Take it
+        out and the other ten blocks come in at 24%. The healthy western end is healthier than the
+        comparison corridor.
+      </p>
+      <p class="finding-body">
+        The 300 block alone holds 14 of the corridor's 35 long-term vacant parcels, 40% of the stuck
+        inventory on a single block.
+      </p>
+
+      <figure class="finding-figure">
+        <img
+          src="/images/Figure%205.8.webp"
+          alt="Bar chart of commercial vacancy rate by block on South Street, with the 300 block as a clear outlier."
+          loading="lazy"
+          decoding="async"
+        />
+        <figcaption>
+          <span class="finding-caption">
+            Commercial vacancy rate by block on South Street, 2026.
+          </span>
+          <span class="finding-source">
+            Source: Author's 2026 field survey. Vacancy rate per block calculated as the share of
+            commercial parcels currently vacant (n=229). The 300 block is the corridor's vacancy
+            outlier.
+          </span>
+        </figcaption>
+      </figure>
+
+      <aside class="finding-callout">
+        <img
+          class="finding-callout-img"
+          src="/images/tla-marquee.png"
+          alt="The Theatre of the Living Arts marquee on South Street, the corridor's last surviving live venue."
+          loading="lazy"
+          decoding="async"
+        />
+        <div class="finding-callout-body">
+          <h3 class="finding-callout-title">The dead zone is where the culture used to be.</h3>
+          <p>
+            The Front-to-5th stretch that now reads as a ghost town is the same ground that once held
+            the corridor's live entertainment cluster: music halls, jazz rooms, and comedy clubs.
+            South Street built its name on that scene.
+          </p>
+          <p>
+            Today it is down to one surviving venue, the Theatre of the Living Arts. Ripley's Music
+            Hall closed in 1985, Grendel's Lair in 1987, and JC Dobbs in 1996. The Laff House, where
+            Kevin Hart and Bill Burr started out, closed in 2013, and no comedy club has replaced it
+            in the 13 years since.
+          </p>
+          <p>
+            By the 2026 survey, arts and culture had fallen to 4.4% of the corridor's active tenants,
+            a steep drop for a street that once ran on performance. A third of South Street's anchor
+            parcels, nine of twenty-seven, sit empty, several of them former venues.
+          </p>
+        </div>
+      </aside>
+    </section>
+
+    <!-- HANDOFF -->
+    <section class="finding-section">
+      <p class="finding-handoff-lead">
+        These findings are the evidence. What they mean, and what to do about them, lives on the next
+        two tabs.
+      </p>
+      <ul class="finding-handoff-list">
+        <li>
+          <a href="/analysis">The Policy Analysis tab</a> traces the three problems behind the numbers
+          and lays out four proposals.
+        </li>
+        <li><a href="/map">The Map</a> shows the survey parcel by parcel.</li>
+        <li>
+          The full Chapter V, with every figure and table, is in the
+          <a href="/thesis.pdf" target="_blank" rel="noopener">thesis</a>.
+        </li>
+      </ul>
+    </section>
+  </div>
 </Layout>
+
+<style>
+  /* Headline under the H1 (large statement of the finding). */
+  .finding-headline {
+    margin: 0.5rem 0 0;
+    max-width: 28ch;
+    font-size: 1.6rem;
+    line-height: 1.2;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    color: #1c1917; /* stone-900 */
+  }
+
+  /* Section rhythm: a thin rule sets each section apart, like the History page. */
+  .finding-section {
+    margin-top: 2.75rem;
+    padding-top: 1.75rem;
+    border-top: 1px solid #e7e5e4; /* stone-200 */
+  }
+
+  .finding-kicker {
+    margin: 0 0 0.2rem;
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: #78716c; /* stone-500 */
+  }
+
+  /* The bold stat headline that leads each finding. */
+  .finding-stat {
+    margin: 0.85rem 0 0;
+    max-width: 64ch;
+    font-size: 1.05rem;
+    line-height: 1.45;
+    font-weight: 600;
+    color: #1c1917; /* stone-900 */
+  }
+
+  .finding-body {
+    margin: 0.95rem 0 0;
+    max-width: 64ch;
+    color: #44403c; /* stone-700 */
+    font-size: 0.95rem;
+    line-height: 1.6;
+  }
+
+  /* Executive-summary stat bullets: bold lead, regular after. */
+  .finding-stats {
+    margin: 1.1rem 0 0;
+    padding: 0;
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 0.7rem;
+    max-width: 66ch;
+  }
+  .finding-stats li {
+    position: relative;
+    padding-left: 1.1rem;
+    color: #44403c; /* stone-700 */
+    font-size: 0.95rem;
+    line-height: 1.5;
+  }
+  .finding-stats li::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0.55em;
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: #a8a29e; /* stone-400 */
+  }
+  .finding-stats li strong {
+    color: #1c1917; /* stone-900 */
+  }
+
+  /* Figures: identical treatment to the History charts, with a Source sub-line. */
+  .finding-figure {
+    margin: 1.5rem 0 0;
+  }
+  .finding-figure img {
+    display: block;
+    width: 100%;
+    max-width: 720px;
+    height: auto; /* scale down cleanly on narrow screens */
+    border: 1px solid #e7e5e4; /* stone-200 */
+    border-radius: 4px;
+  }
+  .finding-figure figcaption {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+    margin-top: 0.45rem;
+    max-width: 60ch;
+    line-height: 1.4;
+  }
+  .finding-caption {
+    font-size: 0.8rem;
+    color: #57534e; /* stone-600 */
+  }
+  .finding-source {
+    font-size: 0.72rem;
+    color: #a8a29e; /* stone-400 */
+  }
+  .finding-source--table {
+    margin: 0.5rem 0 0;
+    max-width: 60ch;
+    line-height: 1.4;
+  }
+
+  /* Finding 4 comparison table (accessible). Scrolls on very narrow screens. */
+  .finding-table-wrap {
+    margin-top: 1.25rem;
+    overflow-x: auto;
+  }
+  .finding-table {
+    border-collapse: collapse;
+    width: 100%;
+    max-width: 560px;
+    font-size: 0.85rem;
+  }
+  .finding-table-caption {
+    text-align: left;
+    margin-bottom: 0.5rem;
+    font-size: 0.8rem;
+    color: #78716c; /* stone-500 */
+  }
+  .finding-table th,
+  .finding-table td {
+    padding: 0.5rem 0.75rem;
+    border-bottom: 1px solid #e7e5e4; /* stone-200 */
+  }
+  .finding-table thead th {
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    font-weight: 700;
+    color: #78716c; /* stone-500 */
+  }
+  .finding-table tbody th {
+    text-align: left;
+    font-weight: 500;
+    color: #1c1917; /* stone-900 */
+  }
+  .finding-table td {
+    color: #44403c; /* stone-700 */
+    font-variant-numeric: tabular-nums;
+  }
+  /* Value columns align right for quick scanning. */
+  .finding-table th:not(:first-child),
+  .finding-table td:not(:first-child) {
+    text-align: right;
+    white-space: nowrap;
+  }
+  .finding-table tbody tr:last-child th,
+  .finding-table tbody tr:last-child td {
+    border-bottom: 0;
+  }
+
+  /* Culture callout: a visually distinct aside with the TLA photo. */
+  .finding-callout {
+    margin-top: 1.75rem;
+    padding: 1.1rem 1.25rem 1.25rem;
+    background: #f7f4ee; /* warm parchment, distinct from the page */
+    border: 1px solid #e7e0d3;
+    border-left: 4px solid #8b1a1a; /* site accent red */
+    border-radius: 6px;
+  }
+  .finding-callout-img {
+    display: block;
+    width: 100%;
+    max-width: 520px;
+    height: auto;
+    margin-bottom: 0.95rem;
+    border-radius: 4px;
+  }
+  .finding-callout-title {
+    margin: 0;
+    font-size: 1.05rem;
+    font-weight: 600;
+    color: #1c1917; /* stone-900 */
+  }
+  .finding-callout p {
+    margin: 0.65rem 0 0;
+    max-width: 60ch;
+    color: #44403c; /* stone-700 */
+    font-size: 0.92rem;
+    line-height: 1.55;
+  }
+
+  /* Closing handoff. */
+  .finding-handoff-lead {
+    margin: 0;
+    max-width: 60ch;
+    font-size: 1rem;
+    font-weight: 600;
+    color: #1c1917; /* stone-900 */
+  }
+  .finding-handoff-list {
+    margin: 1rem 0 0;
+    padding: 0;
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+    max-width: 64ch;
+  }
+  .finding-handoff-list li {
+    position: relative;
+    padding-left: 1.1rem;
+    color: #44403c; /* stone-700 */
+    font-size: 0.95rem;
+    line-height: 1.5;
+  }
+  .finding-handoff-list li::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0.6em;
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: #a8a29e; /* stone-400 */
+  }
+  .finding-handoff-list a {
+    color: #1c1917; /* stone-900 */
+    font-weight: 500;
+    text-decoration: underline;
+    text-underline-offset: 2px;
+  }
+  .finding-handoff-list a:hover {
+    color: #57534e; /* stone-600 */
+  }
+</style>
