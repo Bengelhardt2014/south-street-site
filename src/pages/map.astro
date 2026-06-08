@@ -11,7 +11,23 @@ import Layout from '../layouts/Layout.astro';
   />
 
   <div class="map-layout flex flex-col md:flex-row">
-    <aside class="map-sidebar border-b border-stone-200 md:w-[360px] md:shrink-0 md:border-b-0 md:overflow-y-auto">
+    <aside id="map-sidebar" class="map-sidebar border-b border-stone-200 md:w-[360px] md:shrink-0 md:border-b-0 md:overflow-y-auto">
+      <button
+        class="mobile-filter-toggle"
+        id="mobile-filter-toggle"
+        type="button"
+        aria-expanded="false"
+        aria-controls="map-sidebar"
+      >
+        <span class="mobile-filter-toggle-main">
+          <svg class="mobile-filter-caret" viewBox="0 0 12 8" fill="none" aria-hidden="true">
+            <path d="M1.5 1.5l4.5 4 4.5-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          <span>Filters</span>
+        </span>
+        <span class="mobile-filter-count" id="mobile-filter-count">Showing 519 parcels</span>
+      </button>
+
       <div class="sidebar-intro">
         <h2 class="text-[1.1rem] font-bold text-stone-900">Saving South Street: Parcel Map</h2>
         <p class="mt-1 text-[0.9rem] leading-snug text-stone-600">
@@ -298,6 +314,67 @@ import Layout from '../layouts/Layout.astro';
         flex: 1;
         min-height: 0;       /* enable flex-shrink for nested flex */
       }
+    }
+
+    /* Mobile Filters toggle bar — hidden on desktop. */
+    .mobile-filter-toggle { display: none; }
+
+    /* ---- Mobile: lead with the map, collapse the filters behind a toggle ---- */
+    @media (max-width: 767px) {
+      /* Map renders first and tall; filters drop below it. */
+      .map-column { order: -1; }
+      .map-column #map { height: 62vh; }
+
+      /* The intro title/description is redundant on mobile; the always-visible
+         parcel count on the Filters bar carries the context instead. */
+      .map-sidebar .sidebar-intro,
+      .map-sidebar .sticky-sentinel { display: none; }
+
+      /* The Filters toggle bar: "Filters" + caret on the left, live count on the right. */
+      .mobile-filter-toggle {
+        display: flex;
+        width: 100%;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        padding: 13px 20px;
+        background: #f5f3ef;
+        border: 0;
+        border-bottom: 1px solid #e7e5e4;
+        cursor: pointer;
+        font: inherit;
+        text-align: left;
+      }
+      .mobile-filter-toggle-main {
+        display: inline-flex;
+        align-items: center;
+        gap: 9px;
+        font-size: 14px;
+        font-weight: 600;
+        color: #1c1917;
+      }
+      .mobile-filter-caret {
+        width: 12px;
+        height: 8px;
+        color: #57534e;
+        transition: transform 0.2s ease;
+      }
+      .map-sidebar.filters-open .mobile-filter-caret {
+        transform: rotate(180deg);
+      }
+      .mobile-filter-count {
+        font-size: 12px;
+        color: #78716c;
+        font-variant-numeric: tabular-nums;
+        white-space: nowrap;
+      }
+
+      /* Collapsed by default; revealed when the toggle is open. */
+      .map-sidebar .filter-section { display: none; }
+      .map-sidebar.filters-open .filter-section { display: block; }
+
+      /* Keep the corridor section in flow (no sticky) within the mobile list. */
+      .filter-section[data-section="corridor"] { position: static; }
     }
 
     /* Block-level heat ribbon below the map.
@@ -4500,5 +4577,32 @@ import Layout from '../layouts/Layout.astro';
     }
 
     initMap();
+  </script>
+
+  <script>
+    // Mobile only: collapse the filter panel behind the "Filters" toggle and
+    // mirror the live parcel count beside it. (CSS hides the toggle on desktop.)
+    const mfToggle = document.getElementById('mobile-filter-toggle');
+    const mfSidebar = document.querySelector('.map-sidebar');
+    if (mfToggle && mfSidebar) {
+      mfToggle.addEventListener('click', () => {
+        const open = mfSidebar.classList.toggle('filters-open');
+        mfToggle.setAttribute('aria-expanded', String(open));
+      });
+    }
+    const mfCountSrc = document.getElementById('corridor-counter');
+    const mfCountDst = document.getElementById('mobile-filter-count');
+    if (mfCountSrc && mfCountDst) {
+      const syncCount = () => {
+        const t = mfCountSrc.textContent && mfCountSrc.textContent.trim();
+        if (t) mfCountDst.textContent = t;
+      };
+      syncCount();
+      new MutationObserver(syncCount).observe(mfCountSrc, {
+        childList: true,
+        characterData: true,
+        subtree: true,
+      });
+    }
   </script>
 </Layout>

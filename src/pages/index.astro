@@ -65,6 +65,7 @@ const problems = ['Governance Gridlock', 'Dormant Ownership', 'Declining Demand'
                 <div class="face-content bill">
                   <div class="kicker">The Main Event</div>
                   <a class="headliner" href="/analysis">Full Policy<span class="headliner-arrow" aria-hidden="true">&rarr;</span></a>
+                  <a class="bill-summary-cta" href="/summary">See the summary <span aria-hidden="true">&rarr;</span></a>
                   <div class="bill-sub">The integrated four-part package.</div>
                   <div class="featuring-label">Featuring</div>
                   <div class="acts">
@@ -472,6 +473,29 @@ const problems = ['Governance Gridlock', 'Dormant Ownership', 'Declining Demand'
     vertical-align: middle;
     margin-left: 0.4em;
     color: #c01a1a;
+  }
+  /* Secondary CTA sitting just under the headliner, phase-locked to one slot. */
+  .bill-summary-cta {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.35em;
+    min-height: var(--channel);    /* one slot */
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    text-indent: 0.14em;
+    font-size: 0.66rem;
+    font-weight: 700;
+    color: #c01a1a;
+    text-decoration: none;
+    transition: color 0.15s ease;
+  }
+  .bill-summary-cta:hover,
+  .bill-summary-cta:focus-visible {
+    color: #e0241f;
+    text-decoration: underline;
+    text-underline-offset: 2px;
+    outline: none;
   }
   .bill-sub {
     display: flex;

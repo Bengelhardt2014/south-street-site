@@ -1246,4 +1246,21 @@ const packageRows: { proposal: string; cells: Cell[] }[] = [
   #other-levers {
     scroll-margin-top: 1.5rem;
   }
+
+  /* ---- Mobile type + spacing pass: headings and body down a notch, tighter
+     stat grid. The big numbers already clamp down on small screens. Desktop unchanged. ---- */
+  @media (max-width: 767px) {
+    .finding-hero-title { font-size: 1.85rem; }
+    .finding-thesis { font-size: 1.05rem; }
+    .finding-section-heading { font-size: 1.4rem; }
+    .finding-body { font-size: 0.9rem; line-height: 1.55; }
+    .finding-statblock { margin-top: 1rem; }
+    .finding-stat-items { gap: 0.9rem 1.6rem; }
+    .finding-stat-num { font-size: 1.7rem; }
+    .finding-stat-label { font-size: 0.78rem; }
+    .finding-stats { gap: 0.6rem; }
+    .finding-stats li { font-size: 0.92rem; }
+    .finding-section { margin-top: 2.25rem; padding-top: 1.6rem; }
+    .analysis-solution-num { font-size: 1.6rem; }
+  }
 </style>

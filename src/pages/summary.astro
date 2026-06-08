@@ -1,0 +1,803 @@
+---
+import Layout from '../layouts/Layout.astro';
+
+// 02 History: five turning points (kept from the original timeline).
+const timeline = [
+  { year: '1965', label: 'Expressway threat empties the corridor' },
+  { year: '1974', label: 'Expressway killed; counterculture renaissance' },
+  { year: '1992', label: 'Business district forms; the mall era begins, and arts and entertainment uses start to decline' },
+  { year: '2008', label: 'E-commerce era; the slide begins' },
+  { year: '2026', label: 'A 30-year vacancy high' },
+];
+
+// 02 History: two cultural-decline callouts (neutral section).
+const culturalDecline = [
+  { num: '1', label: 'Live entertainment venue remains, the TLA' },
+  { num: '4.4%', label: "Arts and culture's share of active tenants" },
+];
+
+// 03 The Economic Doom Loop: stages of the self-reinforcing cycle.
+const loop = [
+  'Rising vacancy',
+  'Weaker foot traffic',
+  'Weaker leasing demand',
+  'Stalled reinvestment',
+];
+
+// 04 Diagnosis: three structural problems, each with its evidence callouts.
+// Items with `num` render as big-number callouts; items with `text` render as
+// prose callouts (the qualitative, governance-style evidence).
+const governance = [
+  { text: 'No single body holds the mandate, capital, and authority to unlock stuck parcels and steward the corridor. East Passyunk has PARC; South Street has no equivalent.' },
+  { text: 'South Street is harder to coordinate and harder to reuse than East Passyunk. Its 11 blocks are split across five RCOs and four base zoning classes, meaning the same business can be allowed by-right on one block but require a ZBA variance on another.' },
+];
+const dormant = [
+  { num: '59%', label: 'Vacancy rate on the 300 block, 2x the corridor average', lg: true },
+  { num: '35 to 2', label: 'Long-term vacancies vs East Passyunk' },
+  { num: '$150K', label: 'Estimated buildout cost to reopen a long-vacant storefront, compared with a city Storefront Improvement Program grant cap of $10K' },
+  { num: '1.8x', label: 'What South Street land transacts at vs East Passyunk, even as conditions deteriorate: the land-value decoupling' },
+  { num: '50%', label: 'Of parcels recorded a new code violation in 3 years, 4x East Passyunk' },
+];
+const pedestrian = [
+  { num: '276 vs 400', label: 'Residents per 2,000 sq ft of retail, 31% below the critical-mass benchmark' },
+  { num: '30.2 to 39.3', label: 'Median age rose over 50 years' },
+  { text: "South Street's tenant mix depends more on visitors and late-night activity than on daily neighborhood use. Compared with East Passyunk, it has 3x the takeout businesses, half as many personal service, health, and grocery options, and 23% of tenants peaking late at night." },
+];
+
+// 05 The Integrated Policy Package: four proposals under their formal names,
+// each tagged with the problem it carries; linked to the Policy page sections.
+const proposals = [
+  { n: '1', title: 'Pennsylvania Creative District and Cultural Corridor Overlay', tag: 'Cultural identity, grant funding, visitation', href: '/analysis#proposal-1' },
+  { n: '2', title: 'South Street Revitalization Corporation', tag: 'Governance gridlock and dormant ownership', href: '/analysis#proposal-2' },
+  { n: '3', title: 'CMX-3 Upzone with Pedestrian Design Standards', tag: 'Zoning friction and rental supply', href: '/analysis#proposal-3' },
+  { n: '4', title: 'Pedestrian plaza pilot on the 300 block', tag: "Pedestrian demand and the corridor's failing center", href: '/analysis#proposal-4' },
+];
+
+// 05: two grounded precedent callouts (green section).
+const precedents = [
+  { num: '38%', label: "A nearby precedent: Philadelphia's West Walnut pedestrianization lifted participating-business sales 38% during car-free hours." },
+  { num: '550', label: 'Latent creative demand exists; roughly 550 makers wait for space at the Bok Building near East Passyunk while South Street sits vacant.' },
+];
+---
+
+<Layout title="Summary · Saving South Street">
+  <div class="sum-wrap">
+    <!-- HERO -->
+    <header class="sum-hero">
+      <p class="sum-eyebrow"><span class="sum-eyebrow-num">Summary</span></p>
+      <h1 class="sum-headline sum-hero-headline">Saving South Street</h1>
+      <p class="sum-subtitle">A Four-Part Strategy to Restabilize a Historic Cultural Corridor</p>
+      <p class="sum-dek">
+        This study examines why South Street, one of Philadelphia's most recognizable cultural
+        corridors, is declining despite the strong residential market around it. It is based on a
+        2026 parcel-level field survey of South Street and East Passyunk Avenue, stakeholder
+        interviews, historical analysis, and Census demographic comparisons. The goal is to identify
+        what is structurally holding South Street back and what policy package could restabilize it
+        without erasing its cultural identity.
+      </p>
+      <p class="sum-statstrip">
+        <span><strong>519</strong> parcels surveyed</span>
+        <span class="sum-dot" aria-hidden="true">&middot;</span>
+        <span><strong>17</strong> stakeholder interviews</span>
+        <span class="sum-dot" aria-hidden="true">&middot;</span>
+        <span><strong>2</strong> corridors compared</span>
+      </p>
+    </header>
+
+    <!-- 01 THE PARADOX -->
+    <section class="sum-section">
+      <p class="sum-eyebrow"><span class="sum-eyebrow-num">01</span> The paradox</p>
+      <h2 class="sum-headline">The Neighborhood Commercial Corridor Paradox</h2>
+      <p class="sum-subtitle">
+        Decline amid residential strength. Commercial vacancy stands at a 30-year high even as the
+        surrounding neighborhoods have gained population, spending power, and home value.
+      </p>
+
+      <div class="sum-callouts">
+        <div class="sum-callout">
+          <span class="sum-callout-num">70%</span>
+          <span class="sum-callout-label">Occupied &middot; South Street</span>
+        </div>
+        <div class="sum-callout">
+          <span class="sum-callout-num">87%</span>
+          <span class="sum-callout-label">Occupied &middot; East Passyunk</span>
+        </div>
+        <div class="sum-callout">
+          <span class="sum-callout-num">84%</span>
+          <span class="sum-callout-label">Occupied &middot; Center City District</span>
+        </div>
+      </div>
+      <p class="sum-attribution">
+        South Street and East Passyunk from the 2026 field survey; Center City from Center City
+        District, spring 2026.
+      </p>
+    </section>
+
+    <!-- 02 HISTORY (neutral; absorbs the old history section) -->
+    <section class="sum-section">
+      <p class="sum-eyebrow"><span class="sum-eyebrow-num">02</span> History</p>
+      <h2 class="sum-headline">Cyclical Reinvention and Cultural Decline</h2>
+      <p class="sum-subtitle">
+        South Street has reinvented itself roughly once a generation; its defining cultural economy
+        has now thinned to a handful of legacy anchors.
+      </p>
+
+      <div class="sum-timeline">
+        <div class="sum-timeline-track">
+          {timeline.map((t) => (
+            <div class="sum-tl-item">
+              <span class="sum-tl-year">{t.year}</span>
+              <span class="sum-tl-label">{t.label}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <p class="sum-cluster-label">The cultural economy, 1985 and 2025</p>
+      <div class="sum-callout">
+        <span class="sum-callout-text">
+          South Street once produced culture from the inside out. In 1985, venues, theaters,
+          galleries, record shops, and clubs generated daily foot traffic; by 2025, recreating that
+          same energy required a permitted, sponsored, eight-hour festival.
+        </span>
+      </div>
+
+      <div class="sum-callouts">
+        <div class="sum-callout">
+          <span class="sum-callout-text">
+            U2, the Ramones, and Springsteen played the strip; Kevin Hart and Bill Burr began at the
+            Laff House, which closed in 2013 with no comedy club since.
+          </span>
+        </div>
+        {culturalDecline.map((c) => (
+          <div class="sum-callout">
+            <span class="sum-callout-num">{c.num}</span>
+            <span class="sum-callout-label">{c.label}</span>
+          </div>
+        ))}
+      </div>
+    </section>
+
+    <!-- 03 THE DOOM LOOP (NEW; clay-red) -->
+    <section class="sum-section sum-section--clay">
+      <p class="sum-eyebrow"><span class="sum-eyebrow-num">03</span> The doom loop</p>
+      <h2 class="sum-headline">The Economic Doom Loop</h2>
+      <p class="sum-subtitle">
+        A self-reinforcing cycle in which vacancy depresses foot traffic, weak foot traffic
+        depresses leasing demand, and weak leasing demand forecloses reinvestment.
+      </p>
+
+      <div class="sum-loop">
+        <div class="sum-loop-row">
+          {loop.map((stage, i) => (
+            <>
+              <div class="sum-loop-node">{stage}</div>
+              {i < loop.length - 1 && (
+                <span class="sum-loop-arrow" aria-hidden="true">&rarr;</span>
+              )}
+            </>
+          ))}
+        </div>
+        <p class="sum-loop-return">
+          <span class="sum-loop-cycle" aria-hidden="true">&#8635;</span>
+          The cycle returns to rising vacancy, and repeats.
+        </p>
+      </div>
+      <p class="sum-statement sum-statement--clay">
+        Unlike earlier cycles, land demand remains high, so owners can hold appreciating parcels
+        even as storefronts sit empty.
+      </p>
+    </section>
+
+    <!-- 04 DIAGNOSIS (reframe of the old findings; clay-red) -->
+    <section class="sum-section sum-section--clay">
+      <p class="sum-eyebrow"><span class="sum-eyebrow-num">04</span> Diagnosis</p>
+      <h2 class="sum-headline">Diagnosis: Three Structural Problems</h2>
+      <p class="sum-subtitle">
+        The decline is structural, not a product of COVID, e-commerce, or weak neighborhood
+        spending power.
+      </p>
+      <p class="sum-statement sum-statement--clay">
+        South Street is not simply vacant; it is caught between the corridor it once was, the
+        neighborhood it now serves, and institutions without the authority to remake it.
+      </p>
+
+      <p class="sum-cluster-label">Governance gridlock</p>
+      <p class="sum-descriptor">
+        Fragmented authority across a BID and overlapping RCOs, with no entity empowered to
+        coordinate a corridor reset.
+      </p>
+      <div class="sum-callouts sum-callouts--two">
+        {governance.map((c) => (
+          <div class="sum-callout">
+            <span class="sum-callout-text">{c.text}</span>
+          </div>
+        ))}
+      </div>
+
+      <p class="sum-cluster-label">Dormant real estate ownership</p>
+      <p class="sum-descriptor">
+        Long-vacant parcels held for land appreciation, decoupling rising land value from
+        deteriorating buildings.
+      </p>
+      <div class="sum-callouts">
+        {dormant.map((c) => (
+          <div class={`sum-callout${c.lg ? ' sum-callout--lg' : ''}`}>
+            <span class="sum-callout-num">{c.num}</span>
+            <span class="sum-callout-label">{c.label}</span>
+          </div>
+        ))}
+      </div>
+
+      <p class="sum-cluster-label">Declining pedestrian demand</p>
+      <p class="sum-descriptor">
+        South Street no longer has enough nearby residents or cultural anchors to support its amount
+        of retail space. As housing supply tightens and destination venues close, the corridor
+        depends on fewer daily users to sustain its storefronts.
+      </p>
+      <div class="sum-callouts">
+        {pedestrian.map((c) => (
+          c.num ? (
+            <div class="sum-callout">
+              <span class="sum-callout-num">{c.num}</span>
+              <span class="sum-callout-label">{c.label}</span>
+            </div>
+          ) : (
+            <div class="sum-callout">
+              <span class="sum-callout-text">{c.text}</span>
+            </div>
+          )
+        ))}
+      </div>
+    </section>
+
+    <!-- 05 THE PACKAGE (green) -->
+    <section class="sum-section sum-section--green">
+      <p class="sum-eyebrow"><span class="sum-eyebrow-num">05</span> The package</p>
+      <h2 class="sum-headline">The Integrated Policy Package</h2>
+      <p class="sum-subtitle">
+        A four-part strategy to restabilize the corridor; no single proposal is sufficient on its
+        own.
+      </p>
+
+      <div class="sum-fix-cards">
+        {proposals.map((p) => (
+          <a class="sum-fix-card" href={p.href}>
+            <span class="sum-fix-num">{p.n}</span>
+            <span class="sum-fix-title">{p.title}</span>
+            <span class="sum-fix-tag">{p.tag}</span>
+          </a>
+        ))}
+      </div>
+
+      <div class="sum-callouts sum-callouts--two">
+        {precedents.map((c) => (
+          <div class="sum-callout">
+            <span class="sum-callout-num">{c.num}</span>
+            <span class="sum-callout-label">{c.label}</span>
+          </div>
+        ))}
+      </div>
+    </section>
+
+    <!-- 06 THE STAKES (neutral) -->
+    <section class="sum-section">
+      <p class="sum-eyebrow"><span class="sum-eyebrow-num">06</span> The stakes</p>
+      <h2 class="sum-headline">Two Failure Modes</h2>
+      <p class="sum-subtitle">
+        Absent a coordinated intervention, the corridor faces two outcomes, and the window is
+        narrowing.
+      </p>
+      <p class="sum-statement">
+        Either the paradox widens until residents abandon the corridor, or residential conversion
+        fills the vacancies and erases its cultural identity. The package is designed to balance
+        reinvention with preservation.
+      </p>
+    </section>
+
+    <!-- READ THE FULL STUDY (closing section, kept) -->
+    <section class="sum-section">
+      <p class="sum-eyebrow"><span class="sum-eyebrow-num">Further reading</span></p>
+      <h2 class="sum-headline">Read the full study</h2>
+      <p class="sum-subtitle">
+        The complete analysis, methods, and citations are in the thesis and its companion pages.
+      </p>
+
+      <div class="sum-finalbtns">
+        <a class="sum-btn" href="/history">History</a>
+        <a class="sum-btn" href="/findings">Findings</a>
+        <a class="sum-btn" href="/analysis">Policy Analysis</a>
+      </div>
+      <p class="sum-thesis">
+        <a href="/thesis.pdf" target="_blank" rel="noopener">Read the full thesis (PDF)</a>
+      </p>
+
+      <div class="sum-capital">
+        <p class="sum-capital-kicker">Capital improvement project recommendation</p>
+        <p class="sum-capital-blurb">
+          The corridor's largest future opportunity sits at its eastern gateway: replacing aging,
+          uninviting pedestrian infrastructure with a stronger connection between South Street's 100
+          block, its existing pedestrian bridge, and the new Delaware River bridge over Columbus
+          Boulevard.
+        </p>
+        <figure class="sum-closing-figure">
+          <img
+            src="/images/Figure 7.1.png"
+            alt="The South Street pedestrian bridge over I-95, looking toward the Penn's Landing arch."
+            loading="lazy"
+            decoding="async"
+          />
+        </figure>
+      </div>
+    </section>
+  </div>
+</Layout>
+
+<style>
+  /* An editorial single-scroll layout on the site's tokens (stone palette,
+     clay-red for decline and diagnosis, green for the policy package). */
+  .sum-wrap {
+    max-width: 66rem;
+    margin-inline: auto;
+  }
+
+  /* ---- Section rhythm: generous space, a quiet divider between sections ---- */
+  .sum-hero {
+    padding-top: 0.5rem;
+  }
+  .sum-section {
+    margin-top: clamp(3rem, 7vw, 5rem);
+    padding-top: clamp(2rem, 5vw, 3rem);
+    border-top: 1px solid #e7e5e4; /* stone-200 thin divider */
+  }
+
+  /* ---- Eyebrow labels (numbered 01 to 06) ---- */
+  .sum-eyebrow {
+    display: flex;
+    align-items: baseline;
+    gap: 0.55rem;
+    margin: 0 0 0.2rem;
+    font-size: 0.72rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: #78716c; /* stone-500 */
+  }
+  .sum-eyebrow-num {
+    font-size: 0.78rem;
+    font-weight: 800;
+    letter-spacing: 0.06em;
+    color: #1c1917; /* stone-900, neutral by default */
+    font-variant-numeric: tabular-nums;
+  }
+  .sum-section--clay .sum-eyebrow-num { color: #9c4f3f; } /* decline / diagnosis */
+  .sum-section--green .sum-eyebrow-num { color: #4f7a52; } /* policy package */
+
+  /* ---- Display headlines: bold, editorial, never the marquee ---- */
+  .sum-headline {
+    margin: 0.5rem 0 0;
+    font-size: clamp(1.8rem, 4.5vw, 2.8rem);
+    line-height: 1.1;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    color: #1c1917; /* stone-900 */
+  }
+  .sum-hero-headline {
+    font-size: clamp(2.6rem, 8vw, 4.5rem);
+    line-height: 1.02;
+  }
+
+  /* ---- One-line subtitle (every section carries one) ---- */
+  .sum-subtitle {
+    margin: 0.9rem 0 0;
+    max-width: 64ch;
+    font-size: clamp(1.05rem, 2vw, 1.25rem);
+    line-height: 1.5;
+    font-weight: 450;
+    color: #44403c; /* stone-700 */
+  }
+  /* Hero dek: the descriptive line under the tagline subtitle. */
+  .sum-dek {
+    margin: 0.7rem 0 0;
+    max-width: 50rem; /* ~800px so the intro reads in about 4 lines on desktop */
+    font-size: 1rem;
+    line-height: 1.5;
+    color: #57534e; /* stone-600 */
+  }
+
+  /* ---- Hero stat strip ---- */
+  .sum-statstrip {
+    margin: 1.6rem 0 0;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.4rem 0.9rem;
+    font-size: 0.98rem;
+    color: #57534e; /* stone-600 */
+  }
+  .sum-statstrip strong {
+    color: #1c1917; /* stone-900 */
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+  }
+  .sum-dot { color: #a8a29e; } /* stone-400 */
+
+  /* ---- Data callouts: big black numbers, short labels; or prose ---- */
+  .sum-callouts {
+    margin: 1.25rem 0 0;
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+  @media (min-width: 560px) {
+    .sum-callouts { grid-template-columns: repeat(2, 1fr); }
+  }
+  @media (min-width: 920px) {
+    .sum-callouts { grid-template-columns: repeat(3, 1fr); }
+  }
+  .sum-callout {
+    display: flex;
+    flex-direction: column;
+    padding: 1.3rem 1.4rem 1.4rem;
+    border: 1px solid #e7e5e4; /* stone-200 */
+    border-radius: 14px;
+    background: #ffffff;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  }
+  .sum-callout-num {
+    font-size: clamp(1.9rem, 5.5vw, 2.7rem);
+    line-height: 1.02;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    color: #1c1917; /* stone-900, numbers stay black */
+    font-variant-numeric: tabular-nums;
+  }
+  .sum-callout-label {
+    margin-top: 0.6rem;
+    font-size: 0.88rem;
+    line-height: 1.4;
+    color: #57534e; /* stone-600 */
+  }
+  /* Prose callouts (qualitative evidence, the legends note, the contrast block). */
+  .sum-callout-text {
+    font-size: 0.98rem;
+    line-height: 1.5;
+    font-weight: 500;
+    color: #292524; /* stone-800 */
+  }
+  /* Striking callouts read larger and span two columns for rhythm. */
+  .sum-callout--lg .sum-callout-num {
+    font-size: clamp(2.8rem, 9vw, 4.25rem);
+  }
+  @media (min-width: 560px) {
+    .sum-callout--lg { grid-column: span 2; }
+  }
+  /* In the decline / diagnosis sections the bubbles carry a faint clay tint. */
+  .sum-section--clay .sum-callout {
+    background: #fbf4f2;
+    border-color: #ecd9d3;
+  }
+  /* In the policy package the precedent callouts carry the green accent. */
+  .sum-section--green .sum-callout {
+    background: #f3f8f1;
+    border-color: #d6e4d2;
+  }
+  .sum-section--green .sum-callout-num {
+    color: #4f7a52; /* solution green */
+  }
+
+  /* A pair of cards stays two-up on wide screens rather than dropping into the
+     three-column grid. */
+  @media (min-width: 920px) {
+    .sum-callouts--two { grid-template-columns: repeat(2, 1fr); }
+  }
+
+  /* ---- Cluster / problem labels: neutral by default, clay in diagnosis ---- */
+  .sum-cluster-label {
+    margin: 2rem 0 0.9rem;
+    font-size: 0.72rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: #57534e; /* stone-600 (history / identity) */
+  }
+  .sum-section--clay .sum-cluster-label { color: #9c4f3f; } /* diagnosis */
+
+  /* One-line descriptor under a problem label. */
+  .sum-descriptor {
+    margin: 0.1rem 0 0;
+    max-width: 74ch;
+    font-size: 0.95rem;
+    line-height: 1.45;
+    color: #57534e; /* stone-600 */
+  }
+
+  /* ---- Emphasized statement / framing line ---- */
+  .sum-statement {
+    margin: 1.6rem 0 0;
+    padding-left: 1.25rem;
+    border-left: 3px solid #1c1917; /* neutral by default */
+    max-width: 64ch;
+    font-size: clamp(1.1rem, 2.2vw, 1.4rem);
+    line-height: 1.4;
+    font-weight: 500;
+    color: #292524; /* stone-800 */
+  }
+  .sum-statement--clay { border-left-color: #9c4f3f; }
+
+  /* ---- 01 occupancy cluster attribution: a quiet source line ---- */
+  .sum-attribution {
+    margin: 0.95rem 0 0;
+    max-width: 60ch;
+    font-size: 0.78rem;
+    line-height: 1.4;
+    color: #78716c; /* stone-500 */
+  }
+
+  /* ---- 02 timeline: vertical on mobile, horizontal on wide ---- */
+  .sum-timeline { margin: 1.75rem 0 0; }
+  .sum-timeline-track {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    padding-left: 1.4rem;
+    border-left: 2px solid #e7e5e4; /* stone-200 rail */
+  }
+  .sum-tl-item { position: relative; }
+  .sum-tl-item::before {
+    content: '';
+    position: absolute;
+    left: -1.4rem;
+    top: 0.35rem;
+    transform: translateX(-50%);
+    width: 11px;
+    height: 11px;
+    border-radius: 50%;
+    background: #1c1917; /* stone-900 marker */
+    box-shadow: 0 0 0 3px #fafaf9; /* mask the rail behind the dot */
+  }
+  .sum-tl-year {
+    display: block;
+    font-size: 1.5rem;
+    font-weight: 800;
+    line-height: 1;
+    letter-spacing: -0.01em;
+    color: #1c1917; /* stone-900 */
+    font-variant-numeric: tabular-nums;
+  }
+  .sum-tl-label {
+    display: block;
+    margin-top: 0.4rem;
+    font-size: 0.85rem;
+    line-height: 1.35;
+    color: #57534e; /* stone-600 */
+  }
+  @media (min-width: 820px) {
+    .sum-timeline-track {
+      flex-direction: row;
+      gap: 0;
+      padding-left: 0;
+      border-left: 0;
+      border-top: 2px solid #e7e5e4; /* horizontal rail */
+      padding-top: 1.6rem;
+    }
+    .sum-tl-item { flex: 1; padding-right: 1.2rem; }
+    .sum-tl-item::before {
+      left: 0;
+      top: -1.6rem;
+      transform: translateY(-50%);
+    }
+  }
+
+  /* ---- 03 doom loop: vertical on mobile, horizontal on wide, looping back ---- */
+  .sum-loop { margin: 1.75rem 0 0; }
+  .sum-loop-row {
+    display: flex;
+    flex-direction: column; /* mobile: stacked */
+    align-items: stretch;
+    gap: 0.55rem;
+  }
+  .sum-loop-node {
+    flex: 1;
+    padding: 0.9rem 1.1rem;
+    border: 1px solid #ecd9d3; /* clay border */
+    border-left: 4px solid #9c4f3f; /* clay accent */
+    border-radius: 10px;
+    background: #fbf4f2; /* clay tint */
+    font-size: 0.98rem;
+    font-weight: 600;
+    line-height: 1.25;
+    color: #1c1917; /* stone-900 */
+    text-align: center;
+  }
+  .sum-loop-arrow {
+    align-self: center;
+    font-size: 1.25rem;
+    line-height: 1;
+    color: #9c4f3f; /* clay */
+    transform: rotate(90deg); /* mobile: point down */
+  }
+  .sum-loop-return {
+    margin: 1rem 0 0;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #9c4f3f; /* clay */
+  }
+  .sum-loop-cycle {
+    font-size: 1.3rem;
+    line-height: 1;
+  }
+  @media (min-width: 820px) {
+    .sum-loop-row { flex-direction: row; align-items: stretch; }
+    .sum-loop-node { display: flex; align-items: center; justify-content: center; }
+    .sum-loop-arrow { transform: none; } /* desktop: point right */
+  }
+
+  /* ---- 05 policy package cards: the executive-summary solution-card look ---- */
+  .sum-fix-cards {
+    margin: 1.5rem 0 0;
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 0.85rem;
+  }
+  @media (min-width: 560px) {
+    .sum-fix-cards { grid-template-columns: repeat(2, 1fr); }
+  }
+  @media (min-width: 920px) {
+    .sum-fix-cards { grid-template-columns: repeat(4, 1fr); }
+  }
+  .sum-fix-card {
+    display: flex;
+    flex-direction: column;
+    gap: 0.45rem;
+    padding: 1.1rem 1.1rem 1.25rem;
+    border: 1px solid #d6e4d2; /* soft green border */
+    border-top: 4px solid #4f7a52; /* solution green accent */
+    border-radius: 10px;
+    background: #f3f8f1; /* faint green tint */
+    text-decoration: none;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+    transition:
+      transform 0.12s ease,
+      box-shadow 0.12s ease,
+      background-color 0.12s ease;
+  }
+  .sum-fix-card:hover {
+    transform: translateY(-2px);
+    background: #ecf4e9;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  }
+  .sum-fix-card:focus-visible {
+    outline: 2px solid #4f7a52;
+    outline-offset: 2px;
+  }
+  .sum-fix-num {
+    font-size: 1.9rem;
+    line-height: 1;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    color: #4f7a52; /* solution green */
+    font-variant-numeric: tabular-nums;
+  }
+  .sum-fix-title {
+    font-size: 0.95rem;
+    font-weight: 600;
+    line-height: 1.25;
+    color: #1c1917; /* stone-900 */
+  }
+  /* The problem each proposal carries. */
+  .sum-fix-tag {
+    margin-top: 0.2rem;
+    font-size: 0.7rem;
+    font-weight: 700;
+    line-height: 1.3;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: #4f7a52; /* solution green */
+  }
+
+  /* ---- Closing: buttons + thesis link + hopeful image ---- */
+  .sum-finalbtns {
+    margin: 1.5rem 0 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+  }
+  .sum-btn {
+    display: inline-block;
+    padding: 0.7rem 1.3rem;
+    border-radius: 8px;
+    background: #1c1917; /* stone-900, black */
+    color: #fafaf9; /* stone-50 */
+    font-size: 0.95rem;
+    font-weight: 600;
+    text-decoration: none;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
+    transition:
+      background-color 0.12s ease,
+      box-shadow 0.12s ease;
+  }
+  .sum-btn:hover {
+    background: #292524; /* stone-800 */
+    box-shadow: 0 5px 14px rgba(0, 0, 0, 0.28);
+  }
+  .sum-btn:focus-visible {
+    outline: 2px solid #1c1917;
+    outline-offset: 2px;
+  }
+  .sum-thesis { margin: 1.25rem 0 0; }
+  .sum-thesis a {
+    font-size: 0.9rem;
+    color: #78716c; /* stone-500 */
+    text-decoration: underline;
+    text-underline-offset: 2px;
+  }
+  .sum-thesis a:hover { color: #292524; }
+  .sum-closing-figure {
+    margin: 2.25rem 0 0;
+  }
+  .sum-closing-figure img {
+    display: block;
+    width: 100%;
+    height: auto;
+    border: 1px solid #e7e5e4; /* stone-200 */
+    border-radius: 14px;
+  }
+
+  /* Capital improvement recommendation: a distinct captioned block so the
+     closing image reads as its own recommendation, not a floating figure. */
+  .sum-capital {
+    margin: 2.5rem 0 0;
+    padding: 1.6rem 1.6rem 1.75rem;
+    background: #f6f5f2; /* subtle warm stone tint */
+    border: 1px solid #e7e5e4; /* stone-200 */
+    border-top: 3px solid #1c1917; /* neutral accent sets it apart from the buttons */
+    border-radius: 14px;
+  }
+  .sum-capital-kicker {
+    margin: 0;
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: #57534e; /* stone-600 */
+  }
+  .sum-capital-blurb {
+    margin: 0.6rem 0 0;
+    max-width: 72ch;
+    font-size: 0.98rem;
+    line-height: 1.55;
+    color: #44403c; /* stone-700 */
+  }
+  .sum-capital .sum-closing-figure {
+    margin-top: 1.2rem;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .sum-fix-card,
+    .sum-btn { transition: none; }
+  }
+
+  /* ---- Mobile type + spacing pass: dial the numbers and headings down a notch
+     and tighten the callout rhythm so the page reads denser. Desktop unchanged. ---- */
+  @media (max-width: 767px) {
+    .sum-hero-headline { font-size: 2.2rem; }
+    .sum-headline { font-size: 1.55rem; }
+    .sum-subtitle { font-size: 1rem; }
+    .sum-dek { font-size: 0.95rem; }
+    .sum-statstrip { margin-top: 1.2rem; font-size: 0.9rem; }
+    .sum-callouts { gap: 0.65rem; margin-top: 1rem; }
+    .sum-callout { padding: 1rem 1.1rem 1.05rem; }
+    .sum-callout-num { font-size: 1.6rem; }
+    .sum-callout--lg .sum-callout-num { font-size: 2.25rem; }
+    .sum-callout-label { font-size: 0.84rem; margin-top: 0.45rem; }
+    .sum-cluster-label { margin: 1.5rem 0 0.7rem; }
+    .sum-statement { font-size: 1.1rem; margin-top: 1.25rem; }
+    .sum-fix-cards { gap: 0.65rem; }
+    .sum-fix-num { font-size: 1.6rem; }
+    .sum-section { margin-top: 2.5rem; padding-top: 1.75rem; }
+  }
+</style>
