@@ -674,6 +674,20 @@ const problems = ['Governance Gridlock', 'Dormant Ownership', 'Declining Demand'
     .cue { display: none; }
   }
 
+  /* ---- Mobile-only marquee polish (desktop unchanged) ---- */
+  @media (max-width: 767px) {
+    /* Left-align the stacked SAVING / SOUTH / STREET so the leading S of each
+       word lines up down the card (text-indent would offset the first line). */
+    .brand {
+      text-align: left;
+      text-indent: 0;
+    }
+    /* Keep the problem list off the left rail with a little breathing room. */
+    .rows {
+      padding-left: 0.55rem;
+    }
+  }
+
   /* Reduced-motion guard: freeze the chase & glow, leave everything lit */
   @media (prefers-reduced-motion: reduce) {
     .bulb {

@@ -439,6 +439,7 @@ const packageRows: { proposal: string; cells: Cell[] }[] = [
           </tbody>
         </table>
       </div>
+      <p class="analysis-table-note">This table is best viewed on desktop or in the full thesis PDF.</p>
       <p class="finding-source finding-source--table">
         Source: Author's synthesis of Austin Density Bonus Creative Spaces (Ord. 20241010-034) and
         Sound Assessment Ordinance (Ord. 20240912-005); Seattle Pike/Pine Conservation Overlay (SMC
@@ -634,6 +635,7 @@ const packageRows: { proposal: string; cells: Cell[] }[] = [
           </tbody>
         </table>
       </div>
+      <p class="analysis-table-note">This table is best viewed on desktop or in the full thesis PDF.</p>
       <p class="finding-source finding-source--table">Source: Author's synthesis.</p>
     </section>
 
@@ -1247,6 +1249,20 @@ const packageRows: { proposal: string; cells: Cell[] }[] = [
     scroll-margin-top: 1.5rem;
   }
 
+  /* Fallback note shown only on mobile in place of each hidden table. */
+  .analysis-table-note {
+    display: none;
+    margin-top: 1.5rem;
+    padding: 0.85rem 1rem;
+    background: #fafaf9; /* stone-50 */
+    border: 1px dashed #d6d3d1; /* stone-300 */
+    border-radius: 6px;
+    font-size: 0.85rem;
+    font-style: italic;
+    line-height: 1.45;
+    color: #78716c; /* stone-500 */
+  }
+
   /* ---- Mobile type + spacing pass: headings and body down a notch, tighter
      stat grid. The big numbers already clamp down on small screens. Desktop unchanged. ---- */
   @media (max-width: 767px) {
@@ -1262,5 +1278,12 @@ const packageRows: { proposal: string; cells: Cell[] }[] = [
     .finding-stats li { font-size: 0.92rem; }
     .finding-section { margin-top: 2.25rem; padding-top: 1.6rem; }
     .analysis-solution-num { font-size: 1.6rem; }
+
+    /* The wide HTML tables overflow and wrap one character per line on phones;
+       hide each table (with its caption) and its source line, and surface the
+       note instead so the surrounding text still reads sensibly. */
+    .analysis-table-wrap,
+    .finding-source--table { display: none; }
+    .analysis-table-note { display: block; }
   }
 </style>

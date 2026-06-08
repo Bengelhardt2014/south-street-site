@@ -21,7 +21,7 @@ import Layout from '../layouts/Layout.astro';
       >
         <span class="mobile-filter-toggle-main">
           <svg class="mobile-filter-caret" viewBox="0 0 12 8" fill="none" aria-hidden="true">
-            <path d="M1.5 1.5l4.5 4 4.5-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M1.5 6.5l4.5-4 4.5 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
           </svg>
           <span>Filters</span>
         </span>
@@ -324,6 +324,10 @@ import Layout from '../layouts/Layout.astro';
       /* Map renders first and tall; filters drop below it. */
       .map-column { order: -1; }
       .map-column #map { height: 62vh; }
+
+      /* Hide the block-by-block heat ribbon and its caret/handle entirely on
+         mobile, so the only control is the single "Filters" toggle below. */
+      .block-ribbon-wrapper { display: none; }
 
       /* The intro title/description is redundant on mobile; the always-visible
          parcel count on the Filters bar carries the context instead. */
