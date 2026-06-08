@@ -1,14 +1,1249 @@
 ---
 import Layout from '../layouts/Layout.astro';
+
+// Reuse the homepage "Not enough density" CTA href verbatim.
+const densityHref = '/map?view=density';
+
+// Jump-link table of contents.
+const toc: { id: string; title: string }[] = [
+  { id: 'problem-1', title: 'Governance Gridlock' },
+  { id: 'problem-2', title: 'Dormant Real Estate Ownership' },
+  { id: 'problem-3', title: 'Declining Pedestrian Demand' },
+  { id: 'proposal-1', title: 'Creative District and Cultural Corridor Overlay' },
+  { id: 'proposal-2', title: 'South Street Revitalization Corporation' },
+  { id: 'proposal-3', title: 'CMX-3 Upzone with Pedestrian Standards' },
+  { id: 'proposal-4', title: 'Pedestrian Plaza Pilot at the 300 Block' },
+  { id: 'package', title: 'How the Four Fit Together' },
+  { id: 'other-levers', title: 'Other Levers Interviewees Raised' },
+];
+
+// Table 7.1 rows.
+const overlayRows: { dim: string; unlocks: string; model: string }[] = [
+  {
+    dim: 'Zoning & Land Use',
+    unlocks:
+      'By-right approval for cultural uses (performance venues, galleries, artist studios, maker retail, event assembly facilities); FAR exemptions and height bonuses for arts space and adaptive reuse of designated character buildings; reduced parking minimums; pedestrian frontage standards (60% ground-floor transparency, primary entrances on South Street, no auto-oriented uses)',
+    model:
+      'Seattle Pike/Pine Conservation Overlay (SMC 23.73); Austin Density Bonus Creative Spaces (Ord. 20241010-034); Chicago Pedestrian Street (Sec. 17-3-0500)',
+  },
+  {
+    dim: 'Tax & Cash Benefits',
+    unlocks:
+      'Pennsylvania Creative District grant funding (up to $50,000 per year for five years, 1:1 matched); local Cultural Corridor Grant Fund for storefront rehab, cultural buildouts, and creative-business launch capital, deployed via the proposed South Street Revitalization Corporation (Step 2); fee-in-lieu mechanism allowing larger redevelopment to fund creative-space preservation in lieu of on-site provision; LERTA property tax abatement for rehabilitation of qualifying structures within the overlay (up to 10 years); permit fee waivers for cultural-use buildouts and adaptive reuse projects',
+    model:
+      'PA Council on the Arts Creative Districts program; Chicago Neighborhood Opportunity Fund; Austin DBCS fee-in-lieu mechanism; Pennsylvania LERTA (Act 76 of 1977)',
+  },
+  {
+    dim: 'Neighborhood Protection',
+    unlocks:
+      'Sound assessment required for new residential or hotel within 600 ft of an outdoor venue or 300 ft of a performance venue; agent-of-change nuisance presumption for compliant existing venues; replacement requirement when redevelopment removes a qualifying creative space',
+    model: 'Austin Sound Assessment Ordinance (Ord. 20240912-005); Austin DBCS replacement rule',
+  },
+];
+
+// Table 7.2 rows. Each cell carries a direction (up = increase, down = decrease)
+// rendered as a colored arrow plus its short label.
+type Cell = { label: string; dir: 'up' | 'down' };
+const packageRows: { proposal: string; cells: Cell[] }[] = [
+  {
+    proposal: 'Pennsylvania Creative District + Cultural Corridor Overlay',
+    cells: [
+      { label: 'Cultural identity', dir: 'up' },
+      { label: 'Grant capital', dir: 'up' },
+      { label: 'Visitors', dir: 'up' },
+    ],
+  },
+  {
+    proposal: 'South Street Revitalization Corporation',
+    cells: [
+      { label: 'Corridor stewardship', dir: 'up' },
+      { label: 'Vacancy', dir: 'down' },
+      { label: 'Business tenancy diversity', dir: 'up' },
+    ],
+  },
+  {
+    proposal: 'CMX-3 Upzone with Pedestrian Design Standards',
+    cells: [
+      { label: 'Zoning delays', dir: 'down' },
+      { label: 'Private investment', dir: 'up' },
+      { label: 'Rental supply', dir: 'up' },
+    ],
+  },
+  {
+    proposal: 'Pedestrian Plaza Pilot at the 300 Block',
+    cells: [
+      { label: 'Neighborhood visitation', dir: 'up' },
+      { label: 'Property values', dir: 'up' },
+      { label: 'Foot traffic', dir: 'up' },
+    ],
+  },
+];
 ---
 
-<Layout title="Policy Analysis — Saving South Street">
-  <section class="max-w-3xl">
-    <h1 class="text-3xl font-semibold tracking-tight text-stone-900">Policy Analysis</h1>
-    <p class="mt-3 text-stone-700">
-      The thesis findings in long form: the case for a Pennsylvania Creative District designation for South Street,
-      paired with a local Creative Corridor Overlay. This page will include section headers, comparison tables
-      between South Street and East Passyunk Avenue, and embedded chart images.
-    </p>
-  </section>
+<Layout title="Policy Analysis · Saving South Street">
+  <div class="finding-wrap">
+    <!-- HERO -->
+    <section>
+      <p class="finding-kicker">Policy analysis</p>
+      <h1 class="finding-hero-title">The Case for Intervention</h1>
+      <p class="finding-thesis">
+        A four-part strategy to increase investment in the corridor while returning to its cultural
+        and creative roots.
+      </p>
+      <p class="mt-3 text-stone-700">
+        Vacancy is rising, buildings are aging, and costs are climbing, yet land values keep holding
+        firm, leaving South Street too expensive to decline and too burdened to reinvest.
+      </p>
+      <p class="finding-byline">An urban planning thesis by Brandon K. Engelhardt | 2026</p>
+      <p class="mt-2 text-sm">
+        <a
+          href="/thesis.pdf"
+          target="_blank"
+          rel="noopener"
+          class="text-stone-500 underline underline-offset-2 hover:text-stone-800"
+        >Read the full chapter (PDF)</a>
+      </p>
+    </section>
+
+    <!-- EXECUTIVE SUMMARY -->
+    <section class="finding-section">
+      <h2 class="finding-section-heading text-2xl font-semibold tracking-tight text-stone-900">
+        Executive summary
+      </h2>
+      <div class="analysis-solution-cards">
+        <a class="analysis-solution-card" href="#proposal-1">
+          <span class="analysis-solution-num">1</span>
+          <span class="analysis-solution-title">Protect the cultural identity</span>
+        </a>
+        <a class="analysis-solution-card" href="#proposal-2">
+          <span class="analysis-solution-num">2</span>
+          <span class="analysis-solution-title">Create a revitalization entity</span>
+        </a>
+        <a class="analysis-solution-card" href="#proposal-3">
+          <span class="analysis-solution-num">3</span>
+          <span class="analysis-solution-title">Allow more mixed-use development</span>
+        </a>
+        <a class="analysis-solution-card" href="#proposal-4">
+          <span class="analysis-solution-num">4</span>
+          <span class="analysis-solution-title">Redesign the core blocks for pedestrians</span>
+        </a>
+      </div>
+
+      <p class="finding-body">
+        The 2026 fieldwork found a corridor near a 30-year low on the metrics that define a healthy
+        commercial street: occupancy, foot traffic, and storefront condition. This page names the
+        forces behind those numbers and lays out what to do about them. Three structural problems feed
+        each other into a self-reinforcing doom loop: governance gridlock stalls decisions, dormant
+        ownership freezes capital, and declining demand thins the customer base the corridor was built
+        around.
+      </p>
+      <ul class="finding-stats">
+        <li><strong>Too many stakeholders, no shared vision.</strong> South Street's future is shaped by the ZBA, five RCOs, the BID, and Commerce, but they often pursue different goals, making coordinated action difficult.</li>
+        <li><strong>Dormant ownership is blocking reinvestment.</strong> A majority of South Street's parcels are held in passive ownership patterns, while code violations and anchor vacancies show that key properties are deteriorating rather than returning to active use.</li>
+        <li><strong>New construction has fallen to 0.</strong> The corridor saw 24 parcels built in the 1960s and 70s, 18 in the 80s and 90s, 13 in the 2000s and 2010s, and none so far in the 2020s.</li>
+        <li><strong>The corridor lacks the daytime demand needed to sustain itself.</strong> Nearby residents help support South Street, but not at the scale needed to keep active retail full throughout the week.</li>
+        <li><strong>South Street's nearby population aged in place while its customer base thinned.</strong> Over 50 years, the surrounding median age rose from 30.2 to 39.3, while the renter base stayed flat, limiting the younger, more mobile population that typically supports weekday dining, retail, and entertainment.</li>
+      </ul>
+      <p class="finding-body">
+        The response is a coordinated four-part package: protect South Street's cultural identity,
+        create a dedicated revitalization entity, allow more mixed-use development, and redesign the
+        core blocks for pedestrians. Each move solves part of the problem; together, they give the
+        corridor a realistic path back to investment, activity, and cultural relevance.
+      </p>
+    </section>
+
+    <!-- THE ARGUMENT -->
+    <section class="finding-argument" aria-label="The argument">
+      <p class="finding-argument-kicker">The argument</p>
+      <p class="finding-argument-text">
+        South Street breaks the usual corridor pattern: nearby spending power has grown, but the
+        corridor itself has become more vacant, less active, and harder to reinvest in. That is the
+        Neighborhood Commercial Corridor Paradox. Beneath it is a broken cycle. South Street's past
+        recoveries were triggered by external resets. Vacancy rose and fell after the Crosstown
+        Expressway fight and again during the residential development wave of the 1980s and 1990s;
+        today, no similar reset is coming without intervention. This downturn is different. Vacancy has
+        hit a 30-year high, comparable to the Crosstown era, but that distress now sits alongside
+        rising land values. Long-term owners have no reason to sell, cut rents, or reinvest, and the
+        small businesses that would refill the corridor cannot absorb the buildout costs to reopen
+        aging spaces. The market's self-correction is broken, so left alone South Street stays frozen
+        rather than renewing. South Street needs outside intervention. The full case is in the thesis.
+      </p>
+    </section>
+
+    <!-- ON THIS PAGE -->
+    <nav class="finding-toc" aria-label="On this page">
+      <span class="finding-toc-label">On this page</span>
+      <ol class="finding-toc-list">
+        {toc.map((item) => (
+          <li><a href={`#${item.id}`}>{item.title}</a></li>
+        ))}
+      </ol>
+    </nav>
+
+    <!-- PROBLEM 1 -->
+    <section class="finding-section mode-problem" id="problem-1">
+      <p class="finding-kicker">The diagnosis &middot; Problem 1</p>
+      <h2 class="text-2xl font-semibold tracking-tight text-stone-900">Governance Gridlock</h2>
+      <div class="finding-statblock">
+        <div class="finding-stat-items">
+          <div class="finding-stat-item">
+            <span class="finding-stat-num">4</span>
+            <span class="finding-stat-label">governing bodies with overlapping power and no shared agenda</span>
+          </div>
+          <div class="finding-stat-item">
+            <span class="finding-stat-num">15 years</span>
+            <span class="finding-stat-label">a nearby project spent in zoning fights before breaking ground</span>
+          </div>
+        </div>
+      </div>
+      <p class="finding-body">
+        Governance on South Street is not one body making decisions. It is four players with
+        overlapping power and no shared agenda. The Zoning Board of Adjustment gives the final yes or
+        no on any project that needs an exception to the zoning code. The Registered Community
+        Organizations, several neighborhood groups with overlapping turf, vet proposals before the
+        city acts and can line up for or against a change. The Business Improvement District runs the
+        corridor day to day. The Department of Commerce controls the grant money. No single one is in
+        charge, and any of them can stall a project, so anyone trying to build, open, or change
+        something on South Street has to clear several gatekeepers at once.
+      </p>
+      <p class="finding-body">
+        The result is paralysis on initiatives that on any other corridor would not be controversial.
+        Pushback between the East Passyunk BID and its surrounding RCOs is rare, while consensus on
+        South Street is rare on almost any subject. Philadelphia's councilmanic prerogative means a
+        project facing coordinated RCO opposition almost never survives a contested ZBA vote.
+      </p>
+      <p class="finding-body">
+        Those pressure points fire consistently against new proposals because of a mismatch between the
+        corridor and the neighborhoods around it. The RCOs represent the neighborhoods, not the
+        corridor, so most of what operators propose looks like more of what residents already do not
+        want. On top of the zoning patchwork Findings documented, one local brewer chose to open
+        outside the district rather than navigate the variance path as a new operator.
+      </p>
+      <p class="finding-body">
+        The default veto culture compounds beyond storefront decisions. Capital projects stall and
+        operators take their plans elsewhere. A multi-residential project just a block over on
+        Bainbridge spent 15 years in RCO and zoning fights before breaking ground, and the most recent
+        debate and delay on the corridor was over a pet supply store. The business district and the
+        neighborhood organizations both want a healthier corridor, yet they spend more energy fighting
+        each other than working together. The result is gridlock, and the corridor keeps sliding while
+        both sides hold their ground.
+      </p>
+    </section>
+
+    <!-- PROBLEM 2 -->
+    <section class="finding-section mode-problem" id="problem-2">
+      <p class="finding-kicker">The diagnosis &middot; Problem 2</p>
+      <h2 class="text-2xl font-semibold tracking-tight text-stone-900">
+        Dormant Real Estate Ownership
+      </h2>
+      <div class="finding-statblock">
+        <div class="finding-stat-items analysis-stat-compare">
+          <div class="finding-stat-item">
+            <span class="finding-stat-num">$30K to $150K</span>
+            <span class="finding-stat-label">to reopen a long-vacant storefront</span>
+          </div>
+          <span class="analysis-stat-gt" aria-hidden="true">&gt;</span>
+          <div class="finding-stat-item">
+            <span class="finding-stat-num">$10K</span>
+            <span class="finding-stat-label">the Storefront Improvement Program cap meant to cover it</span>
+          </div>
+        </div>
+      </div>
+      <p class="finding-body">
+        Findings showed South Street's land appreciating while its buildings rot. The reason owners do
+        not move sits in two camps. The first is long-tenured holders who inherited or bought decades
+        ago, whose residential cashflow from the apartments above makes ground-floor vacancy painless,
+        so the storefront falls into disrepair with no pressure to lease. The second is recent buyers
+        who acquired at the pre-COVID peak and hold out for rents the market no longer supports,
+        because cutting rent would lower both income and resale value.
+      </p>
+      <p class="finding-body">
+        Either way the storefront stays empty, and the cost of reopening it climbs. Restoring a
+        long-vacant space runs $30,000 to $150,000, and a change of use triggers an inspection that
+        surfaces unpermitted work, costs that fall on the incoming tenant. The city's Storefront
+        Improvement Program caps at $10,000, far short of that gap, so the building waits for a tenant
+        the corridor has not produced. The corner unit at 500 South Street shows the result: a newer
+        building with good bones and full apartments above, now with a homeless encampment in its
+        empty storefront.
+      </p>
+      <p class="finding-body">
+        The scale of this is on Findings: most of the corridor's parcels sit with dormant owners, and
+        a third of its anchor parcels are empty. The point here is that no private actor has a reason
+        to break the pattern. That is the gap the South Street Revitalization Corporation is built to
+        fill.
+      </p>
+    </section>
+
+    <!-- PROBLEM 3 -->
+    <section class="finding-section mode-problem" id="problem-3">
+      <p class="finding-kicker">The diagnosis &middot; Problem 3</p>
+      <h2 class="text-2xl font-semibold tracking-tight text-stone-900">
+        Declining Pedestrian Demand
+      </h2>
+      <div class="finding-statblock">
+        <div class="finding-stat-items">
+          <div class="finding-stat-item">
+            <span class="finding-stat-num">276 vs 400</span>
+            <span class="finding-stat-label">Urban planners estimate a corridor needs roughly 400 residents per 2,000 sq ft of active retail to keep storefronts full. South Street has 276.</span>
+          </div>
+          <div class="finding-stat-item">
+            <span class="finding-stat-num">30.2 to 39.3</span>
+            <span class="finding-stat-label">South Street's surrounding median age over 50 years, while East Passyunk grew younger</span>
+          </div>
+        </div>
+      </div>
+      <p class="finding-body">
+        Even with governance and ownership fixed, South Street cannot run on its surrounding
+        neighborhood alone. The residents within a 15-minute walk have aged in place across five
+        decades, and the rental supply that would bring in the next generation of corridor users has
+        stayed flat since 1970. Population density now sits below what most small retailers need to
+        survive on weekday business. To compensate, the corridor imports customers through nightlife,
+        takeout, and car-oriented destinations, which makes it episodic rather than habitual.
+      </p>
+      <p class="finding-body">
+        South Street's surrounding median age climbed from 30.2 in 1970 to 39.3 in 2020, rising in
+        nearly every decade, while East Passyunk's fell from a 1980 peak toward a younger mix and its
+        renter base grew 40%. The two neighborhoods started from a similar baseline and ran in
+        opposite directions. The result is a structural under-supply of the daily customer most South
+        Street retailers were built around, the young people who once filled the corridor every
+        weeknight.
+      </p>
+      <p class="finding-body">
+        Commercial corridors decline when the residents nearby fall below the density small businesses
+        need. Urban planners agree the benchmark is about 400 residents for every 2,000 square feet of
+        retail. South Street's catchment supplies 276, which is 31% short. The corridor cannot
+        manufacture residents, but it can import them,
+        and its largest untapped source of demand sits two blocks east, across the highway at the
+        Delaware waterfront.
+      </p>
+      <p>
+        <a class="analysis-maplink" href={densityHref}>Explore the density on the interactive map &rarr;</a>
+      </p>
+
+      <figure class="finding-figure">
+        <img
+          src="/images/Figure%203.5.png"
+          alt="Line chart of median age over time in the surrounding neighborhoods of South Street and East Passyunk, 1970 to 2020."
+          loading="lazy"
+          decoding="async"
+        />
+        <figcaption>
+          <span class="finding-fig-title">
+            Figure 3.5. Median age of surrounding neighborhoods of South Street and East Passyunk.
+          </span>
+          <span class="finding-fig-subtitle">
+            South Street's median age rose from 30.2 to 39.3 across the full window, climbing in
+            nearly every decade.
+          </span>
+          <span class="finding-source">
+            Source: Author's calculations from U.S. Census Bureau decennial census data and American
+            Community Survey 5-Year Estimates. 2010 and 2020 values drawn from ACS Table B01002. 1970
+            through 2000 values estimated by linear interpolation within the median bracket from NHGIS
+            detailed age tables (Table B57 for 1970 and 1980; Table CW3 for 1990 and 2000); the 1970
+            and 1980 estimates carry slightly wider source brackets and should be read as
+            approximations. South Street values aggregate 9 tracts (9.02, 10.01, 10.02, 11.02, 15, 16,
+            17, 18, 25); East Passyunk values aggregate 6 tracts (23, 24, 27.01, 28.01, 28.02, 29).
+            Median age weighted by population.
+          </span>
+        </figcaption>
+      </figure>
+    </section>
+
+    <!-- TRANSITION -->
+    <section class="finding-section">
+      <p class="finding-body">
+        A corridor below critical mass has three responses. It can contract its retail into housing,
+        do nothing and let the doom loop continue, or make structural changes that let it evolve. The
+        rest of this page lays out the third path.
+      </p>
+    </section>
+
+    <!-- THE PRESCRIPTION (lead) -->
+    <section class="finding-section mode-solution">
+      <p class="finding-kicker">The prescription</p>
+      <p class="finding-body">
+        This is a four-part package. Each step moves the needle on its own; none alone is enough.
+        Without the full package, South Street faces one of two failures: the paradox keeps widening
+        until residents abandon the corridor, or residential conversion turns it into just another
+        residential street and the cultural identity disappears along the way. The package threads the
+        needle between reinvention and preservation.
+      </p>
+    </section>
+
+    <!-- PROPOSAL 1 -->
+    <section class="finding-section mode-solution" id="proposal-1">
+      <p class="finding-kicker">The prescription &middot; Proposal 1</p>
+      <h2 class="text-2xl font-semibold tracking-tight text-stone-900">
+        Designate a Pennsylvania Creative District and Adopt a Cultural Corridor Overlay
+      </h2>
+      <div class="finding-statblock">
+        <div class="finding-stat-items">
+          <div class="finding-stat-item">
+            <span class="finding-stat-num">$50K per year</span>
+            <span class="finding-stat-label">Creative District matched grant funding, up to 5 years</span>
+          </div>
+          <div class="finding-stat-item">
+            <span class="finding-stat-num">90%+</span>
+            <span class="finding-stat-label">of stakeholders described recovery as a return to South Street's arts and entertainment past</span>
+          </div>
+        </div>
+      </div>
+      <p class="finding-body">
+        The first step pairs two instruments: a Pennsylvania Creative District designation at the
+        state level and a South Street Cultural Corridor Overlay at the city level. The state
+        designation, run by the Pennsylvania Council on the Arts, brings recognition, technical
+        assistance, and up to $50,000 per year for five years in matched grant funding. The city
+        overlay, drafted into Chapter 14-500 of Philadelphia's zoning code, brings the enforceable
+        land-use rules the state designation does not. Together they give South Street a marketable
+        cultural identity and the legal guardrails for business attraction.
+      </p>
+      <p class="finding-body">
+        Identity protection comes first because it sets the conditions for everything else. Without
+        it, the capital, zoning, and street-level moves that follow risk producing a corridor that
+        recovers economically but loses the character that made it a corridor for all Philadelphians.
+        South Broad Street's Avenue of the Arts shows the risk: with no zoning protection for the
+        arts, the University of the Arts bankruptcy in 2024 turned buildings like Hamilton Hall and
+        the Arts Bank into apartments.
+      </p>
+      <p class="finding-body">
+        The overlay aims to bring back the legacy uses South Street has lost since the late 1990s:
+        comedy clubs, jazz clubs, small ticket venues, art studios, and pop-ups. Austin, Seattle, and
+        the Pittsburgh Cultural District layered similar tools onto cultural areas to protect them
+        from displacement. Unlike most Chapter 14-500 overlays, which add height caps and
+        prohibitions, this one lowers regulatory friction: by-right approval for cultural uses,
+        floor-area bonuses for adaptive reuse of historic entertainment buildings, and other
+        incentives. It would apply to South Street frontages from Front to 12th Street.
+      </p>
+
+      <div class="analysis-table-wrap">
+        <table class="analysis-table">
+          <caption class="finding-table-caption">
+            Table 7.1. South Street Cultural Corridor Overlay incentives by policy dimension
+            synthesized from similar overlays adoptable under existing Philadelphia city authority.
+          </caption>
+          <thead>
+            <tr>
+              <th scope="col">Dimension</th>
+              <th scope="col">What the overlay unlocks</th>
+              <th scope="col">Modeled on</th>
+            </tr>
+          </thead>
+          <tbody>
+            {overlayRows.map((row) => (
+              <tr>
+                <th scope="row">{row.dim}</th>
+                <td>{row.unlocks}</td>
+                <td>{row.model}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+      <p class="finding-source finding-source--table">
+        Source: Author's synthesis of Austin Density Bonus Creative Spaces (Ord. 20241010-034) and
+        Sound Assessment Ordinance (Ord. 20240912-005); Seattle Pike/Pine Conservation Overlay (SMC
+        23.73); Chicago Pedestrian Street designation (Sec. 17-3-0500) and Neighborhood Opportunity
+        Fund; Pennsylvania Council on the Arts Creative Districts program; Pennsylvania Local Economic
+        Revitalization Tax Assistance Act (Act 76 of 1977).
+      </p>
+    </section>
+
+    <!-- PROPOSAL 2 -->
+    <section class="finding-section mode-solution" id="proposal-2">
+      <p class="finding-kicker">The prescription &middot; Proposal 2</p>
+      <h2 class="text-2xl font-semibold tracking-tight text-stone-900">
+        Establish a South Street Revitalization Corporation
+      </h2>
+      <div class="finding-statblock">
+        <div class="finding-stat-items">
+          <div class="finding-stat-item">
+            <span class="finding-stat-num">$3M to $5M</span>
+            <span class="finding-stat-label">philanthropic seed capital across the first 24 months</span>
+          </div>
+          <div class="finding-stat-item">
+            <span class="finding-stat-num">10</span>
+            <span class="finding-stat-label">properties PARC owns on East Passyunk, the model</span>
+          </div>
+        </div>
+      </div>
+      <p class="finding-body">
+        The second proposal is to establish a South Street Revitalization Corporation, a mission-driven
+        nonprofit built to acquire property, deploy capital, and administer the grants the Creative
+        District designation unlocks. East Passyunk's PARC is the closest local precedent. It owns ten
+        properties along the avenue, including public parks, retail, and rental tenants, and funds the
+        daily sanitation work the BID's budget cannot reach on its own. The SSRC adapts that operating
+        logic to South Street's scale and conditions, which requires a balance sheet large enough to
+        take on long-vacant storefronts and a remit broad enough to handle the grant flows the Creative
+        District designation triggers.
+      </p>
+      <p class="finding-body">
+        The SSRC would mirror PARC's legal form: a Pennsylvania 501(c)(3) parent on top, with
+        property-holding LLCs underneath that hold title to each building, governed by a small
+        fiduciary board, an annual audit, and staff with urban planning experience. The corporation
+        could also add a creative co-op layer, where business owners and residents co-own portions of
+        the real-estate portfolio. That distributes upside to the businesses that choose South Street
+        and creates a second source of capital beyond grants and philanthropy.
+      </p>
+      <p class="finding-body">
+        The SSRC addresses the corridor's real estate market failure directly. The Storefront
+        Improvement Program caps at $10,000 per property, a fraction of the $30,000 to $150,000
+        rehabilitation most spaces require, and that capital gap is the largest reason South Street's
+        worst buildings stay unleased. A PARC-style steward can also reshape the tenant mix, vetting
+        for the operators the corridor needs to raise visitor frequency and prospecting from waitlists
+        like the one for the Bok Building near East Passyunk.
+      </p>
+      <p class="finding-body">
+        The SSRC puts mission-driven ownership and patient capital behind a corridor that has been
+        underinvested for decades. With it, South Street gets the institutional muscle to take on
+        absent owners and restore its worst buildings while stewarding the Creative District vision.
+        But a revitalization corporation cannot buy enough property to fix a 30% vacancy rate on its
+        own. The corridor also needs interventions that pull private capital back in, which is what the
+        next proposal does.
+      </p>
+    </section>
+
+    <!-- PROPOSAL 3 -->
+    <section class="finding-section mode-solution" id="proposal-3">
+      <p class="finding-kicker">The prescription &middot; Proposal 3</p>
+      <h2 class="text-2xl font-semibold tracking-tight text-stone-900">
+        Upzone the Corridor to CMX-3 with Pedestrian Design Standards
+      </h2>
+      <div class="finding-statblock">
+        <div class="finding-stat-items">
+          <div class="finding-stat-item">
+            <span class="finding-stat-num">5 zones to 1</span>
+            <span class="finding-stat-label">replace the patchwork with one uniform code, Front to 12th</span>
+          </div>
+        </div>
+      </div>
+      <p class="finding-body">
+        The third proposal upzones the entire corridor to CMX-3, replacing the patchwork of five zones
+        with one uniform code from Front to 12th Street. East Passyunk is the local precedent, running
+        a single CMX-2.5 across nearly its whole corridor. That predictability is what tenants,
+        lenders, and neighbors need to lower the risk of a capital commitment, and since CMX-3 is
+        already South Street's single largest zone, the proposal extends what exists rather than
+        introducing something new.
+      </p>
+      <p class="finding-body">
+        The upzone fixes two problems. First, housing supply: South Street already runs below a
+        healthy residential density, the younger generation who once powered the corridor cannot
+        afford to live nearby, and the rental stock has barely moved in 50 years. CMX-3 lifts the
+        height and density limits that have kept new rental housing from getting built. Second, the
+        zoning code itself: five base zones across 11 blocks mean the same business is by-right at one
+        address and routed through the variance process two doors down. Uniform CMX-3 removes that
+        obstacle and lets small businesses get up and running faster.
+      </p>
+      <p class="finding-body">
+        Single-stair reform is a complementary state-level ask, used by cities including Seattle, New
+        York, and Honolulu. Pennsylvania today requires two stairs above three floors, which eats most
+        of the floor plate on the narrow lots that make up most of South Street's historic buildings.
+        Without reform, the CMX-3 height allowance cannot translate into real added units without
+        knocking down multiple buildings. Paired with the Cultural Corridor Overlay, the upzone
+        arrives as character-protecting density: the upzone makes density possible, the overlay
+        decides what kind, and the SSRC keeps it that way over time.
+      </p>
+    </section>
+
+    <!-- PROPOSAL 4 -->
+    <section class="finding-section mode-solution" id="proposal-4">
+      <p class="finding-kicker">The prescription &middot; Proposal 4</p>
+      <h2 class="text-2xl font-semibold tracking-tight text-stone-900">
+        Pedestrian Plaza Pilot at the 300 Block
+      </h2>
+      <div class="finding-statblock">
+        <div class="finding-stat-items">
+          <div class="finding-stat-item">
+            <span class="finding-stat-num">+38%</span>
+            <span class="finding-stat-label">average sales lift for businesses during West Walnut's car-free hours</span>
+          </div>
+          <div class="finding-stat-item">
+            <span class="finding-stat-num">170,000</span>
+            <span class="finding-stat-label">visitors West Walnut drew</span>
+          </div>
+        </div>
+      </div>
+      <p class="finding-body">
+        The fourth proposal is the corridor's most ambitious move: a pedestrian plaza on the 300
+        block, its worst stretch, built on capital infrastructure rather than police barricades. It is
+        a major undertaking, but one with a big payoff that solves several of the corridor's problems
+        at once. Automated retractable bollards would close the block to cars to start from roughly 7pm
+        to 1am, Thursday
+        through Sunday, with planters, lighting, and built-in seating that invite people to stay. If it
+        works, the plaza extends west across the 300 to 600 blocks, on the model of Larimer Square in
+        Denver and Stone Street in Lower Manhattan, with Baltimore's Fells Point as the precedent for
+        phased evening closures.
+      </p>
+      <p class="finding-body">
+        Philadelphia's West Walnut program shows the payoff: over 170,000 visitors and a 38% average
+        lift in participating-business sales during car-free hours. More than 10 interviewees supported
+        pedestrianization but said South Street's past closures failed in execution, relying on
+        labor-intensive police barricades that made the corridor feel like a crime scene. Those
+        closures are also expensive, running roughly $1.3 to $2 million a year in direct labor, which
+        would exceed the one-time cost of installing bollards within a few years.
+      </p>
+      <p class="finding-body">
+        The intervention concentrates where the corridor struggles most. The 300 to 600 blocks carry
+        the worst vacancy and the worst pedestrian conditions on the field survey, and three problems
+        stack there. Late-night cars, ATVs, dirt bikes, and cruising create a safety and noise
+        environment that drives residents away. The corridor has no built-in public space, unlike East
+        Passyunk's mini-parks and triangular intersections. And every time South Street closes for a
+        fair, it is packed, which is the foot traffic the corridor otherwise lacks showing up whenever
+        the cars come off. A failing center splits South Street in two, and pedestrianization re-knits
+        it and signals a place to stay rather than a street to pass through.
+      </p>
+    </section>
+
+    <!-- THE PACKAGE -->
+    <section class="finding-section analysis-package" id="package">
+      <p class="finding-kicker">The package</p>
+      <h2 class="text-2xl font-semibold tracking-tight text-stone-900">How the Four Fit Together</h2>
+      <p class="analysis-package-recap">
+        Each move fixes one problem and strengthens the others. None works alone.
+      </p>
+      <p class="finding-body">
+        No single proposal solves South Street on its own. The four work as an integrated package,
+        each carrying the primary load on one structural problem while playing a supporting role on
+        the others.
+      </p>
+
+      <div class="analysis-table-wrap">
+        <table class="analysis-table">
+          <caption class="finding-table-caption">
+            Table 7.2. The four proposals mapped against South Street's three structural problems.
+          </caption>
+          <thead>
+            <tr>
+              <th scope="col">Proposal</th>
+              <th scope="col">Governance Gridlock</th>
+              <th scope="col">Dormant Real Estate Ownership</th>
+              <th scope="col">Declining Pedestrian Demand</th>
+            </tr>
+          </thead>
+          <tbody>
+            {packageRows.map((row) => (
+              <tr>
+                <th scope="row">{row.proposal}</th>
+                {row.cells.map((c) => (
+                  <td>
+                    <span class="vh">{c.dir === 'up' ? 'increases ' : 'decreases '}</span>
+                    <span class={`dir-${c.dir}`} aria-hidden="true">{c.dir === 'up' ? '↑' : '↓'}</span> {c.label}
+                  </td>
+                ))}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+      <p class="finding-source finding-source--table">Source: Author's synthesis.</p>
+    </section>
+
+    <!-- OTHER LEVERS -->
+    <section class="finding-section" id="other-levers">
+      <p class="finding-kicker">Beyond the package</p>
+      <h2 class="text-2xl font-semibold tracking-tight text-stone-900">
+        Other Levers Interviewees Raised
+      </h2>
+      <p class="finding-body">
+        The four proposals are a package, not the whole toolkit. Interviewees raised longer-horizon
+        ideas worth recording, the kind that take years and partners the corridor does not yet have.
+      </p>
+      <ul class="finding-stats">
+        <li><strong>Streetscape activation.</strong> Beyond the 300 to 600 blocks, the corridor needs planters, public seating, fountains, and programming that give people a reason to stop and stay, not empty closures that make the street feel worse.</li>
+        <li><strong>Recover the upside of appreciation.</strong> When an overlay or upzone lifts values, the gain flows to whoever owns the land. A land value tax or a density bonus tied to the CMX-3 upzone could return a share to the public realm, as Chicago does through its downtown density bonus.</li>
+        <li><strong>Make vacancy cost something.</strong> A vacancy fee tied to the remapping would make sitting on a dead storefront cost more than filling it, though some interviewees warned it can push owners toward any willing tenant rather than the right one.</li>
+        <li><strong>Refactor the Storefront Improvement Program.</strong> Brokers and corridor managers said the city's grant should put larger dollars into fewer projects, since the current cap falls far short of what a real build-out costs.</li>
+        <li><strong>Activate empty storefronts with pop-ups.</strong> Short, flexible leases let a business test the corridor and let a landlord light a dark window in weeks, and the ones that work often convert to permanent tenants. San Francisco's Vacant to Vibrant program is the model.</li>
+      </ul>
+    </section>
+
+    <!-- FUTURE OPPORTUNITY -->
+    <section class="analysis-future" aria-label="Future opportunity">
+      <p class="finding-kicker analysis-future-kicker">Future opportunity</p>
+      <h2 class="analysis-future-title">South Street's largest opportunity is the waterfront.</h2>
+      <p class="finding-body">
+        Connecting South Street to the river is the lever interviewees returned to most, and it may be
+        the corridor's largest opportunity. The corridor cannot manufacture residents fast enough to
+        reach the density retail needs, but it can import foot traffic. Today South Street is cut off
+        from the Delaware by eight lanes of traffic, four on I-95 and four more on Columbus Boulevard.
+        On the riverfront side, several projects are already adding foot traffic to the area: a park
+        cap over Penn's Landing, a protected riverfront trail, and a battery-electric transit line
+        under study. A new bridge will extend the 1990s South Street Pedestrian Bridge over Columbus
+        Boulevard, finally carrying walkers all the way to the river. What is missing is the corridor
+        reaching back to meet these projects: redesign the aging pathway from Front Street to the new
+        crossing, and add an eastbound bike lane, channeling waterfront foot and bike traffic onto
+        South Street rather than leaving it stranded across the highway.
+      </p>
+
+      <figure class="finding-figure">
+        <img
+          src="/images/Figure%207.1.png"
+          alt="Two photographs of the South Street pedestrian bridge over I-95: looking east from the bridge cap and looking west across the bridge toward the Penn's Landing arch."
+          loading="lazy"
+          decoding="async"
+        />
+        <figcaption>
+          <span class="finding-fig-title">Figure 7.1. The South Street Pedestrian Bridge.</span>
+          <span class="finding-fig-subtitle">
+            Left: South Street looking east from the bridge cap over I-95. Right: View west across the
+            bridge. The Penn's Landing arch in the foreground marks where the new planned extension
+            bridge will merge to carry pedestrians over Columbus Boulevard.
+          </span>
+          <span class="finding-source">Source: Author's photographs, 2026.</span>
+        </figcaption>
+      </figure>
+    </section>
+
+    <!-- CLOSING SYNTHESIS + HANDOFF -->
+    <section class="finding-section">
+      <h2 class="finding-section-heading text-2xl font-semibold tracking-tight text-stone-900">
+        What This Adds Up To
+      </h2>
+      <p class="finding-body">
+        The market that pulled South Street back twice is not coming this time on its own. Three
+        structural problems hold the corridor in place, and the four-part package is built to release
+        each one while protecting what made South Street matter. None of the four solves the corridor
+        alone, but together they address all three problems and chart a path that balances reinvention
+        with preservation. Left alone, South Street stays frozen. With intervention, it can build
+        itself new again.
+      </p>
+      <ul class="finding-handoff-list">
+        <li>See the evidence behind this diagnosis on <a href="/findings">Findings</a>.</li>
+        <li>Trace the corridor's rise and fall on <a href="/history">History</a>.</li>
+        <li>
+          Explore the parcel-level data on the <a href="/map">Map</a> and
+          <a href="/data">Data</a> tabs.
+        </li>
+        <li>
+          Read the full case in the
+          <a href="/thesis.pdf" target="_blank" rel="noopener">thesis PDF</a>.
+        </li>
+      </ul>
+    </section>
+  </div>
 </Layout>
+
+<style>
+  /* One unified width. The shared Layout <main> caps content at a 1104px box, so
+     this must be narrower than that to bind. 56rem (896px) gives a comfortable
+     reading column centered in the viewport with generous equal margins.
+     Everything (text, bullets, stat blocks, figures, captions, the table, the
+     handoff) shares this width; small-screen gutters come from the <main> px-6. */
+  .finding-wrap {
+    max-width: 56rem; /* 896px, narrower than the main's 1104px box so it binds */
+    margin-inline: auto; /* centered in the viewport with generous equal margins */
+  }
+
+  /* Hero: a small muted kicker over a large dominant title. */
+  .finding-hero-title {
+    margin: 0.35rem 0 0;
+    font-size: clamp(2rem, 5vw, 2.6rem);
+    line-height: 1.1;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    color: #1c1917; /* stone-900 */
+  }
+  /* Thesis statement: a touch larger than the dek, in the body text color. */
+  .finding-thesis {
+    margin: 0.7rem 0 0;
+    font-size: 1.2rem;
+    line-height: 1.45;
+    font-weight: 500;
+    color: #44403c; /* stone-700, the body text color */
+  }
+
+  /* The argument: a distinct panel setting out the central thesis. */
+  .finding-argument {
+    margin-top: 3rem;
+    padding: 1.5rem 1.75rem;
+    background: #f5f5f4; /* stone-100, lightly shaded off the page */
+    border-left: 4px solid #1c1917; /* stone-900 accent */
+    border-radius: 6px;
+  }
+  .finding-argument-kicker {
+    margin: 0 0 0.55rem;
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: #78716c; /* stone-500 */
+  }
+  .finding-argument-text {
+    margin: 0;
+    font-size: 1.05rem;
+    line-height: 1.65;
+    color: #292524; /* stone-800 */
+  }
+  .finding-byline {
+    margin: 0.55rem 0 0;
+    font-size: 0.85rem;
+    font-style: italic;
+    color: #78716c; /* stone-500 */
+  }
+
+  /* Section rhythm: a thin rule sets each section apart, like the History page. */
+  .finding-section {
+    margin-top: 3rem;
+    padding-top: 2rem;
+    border-top: 1px solid #e7e5e4; /* stone-200 */
+  }
+
+  /* Major section headings get a subtle underline for a structured look. */
+  .finding-section-heading {
+    margin-bottom: 0.4rem;
+    padding-bottom: 0.6rem;
+    border-bottom: 1px solid #e7e5e4; /* stone-200 */
+  }
+
+  .finding-kicker {
+    margin: 0 0 0.2rem;
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: #78716c; /* stone-500 */
+  }
+
+  .finding-body {
+    margin: 1rem 0 0;
+    color: #44403c; /* stone-700 */
+    font-size: 0.98rem;
+    line-height: 1.65;
+  }
+
+  /* Stat / lead bullets: bold lead, regular after. */
+  .finding-stats {
+    margin: 1.2rem 0 0;
+    padding: 0;
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+  .finding-stats li {
+    position: relative;
+    padding-left: 1.1rem;
+    color: #44403c; /* stone-700 */
+    font-size: 0.98rem;
+    line-height: 1.55;
+  }
+  .finding-stats li::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0.6em;
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: #a8a29e; /* stone-400 */
+  }
+  .finding-stats li strong {
+    color: #1c1917; /* stone-900 */
+  }
+
+  /* On-this-page jump-link nav. */
+  .finding-toc {
+    margin-top: 3rem;
+    padding-top: 2rem;
+    border-top: 1px solid #e7e5e4; /* stone-200 */
+  }
+  .finding-toc-label {
+    display: block;
+    margin-bottom: 0.6rem;
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: #78716c; /* stone-500 */
+  }
+  .finding-toc-list {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem 1.5rem;
+  }
+  .finding-toc-list a {
+    color: #57534e; /* stone-600 */
+    font-size: 0.9rem;
+    text-decoration: none;
+  }
+  .finding-toc-list a:hover {
+    color: #1c1917; /* stone-900 */
+    text-decoration: underline;
+    text-underline-offset: 2px;
+  }
+
+  /* Big-number stat block under each section title. */
+  .finding-statblock {
+    margin: 1.25rem 0 0;
+  }
+  .finding-stat-items {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.5rem 3rem;
+    align-items: flex-start;
+  }
+  .finding-stat-item {
+    display: flex;
+    flex-direction: column;
+  }
+  .finding-stat-num {
+    /* Responsive so long values like "276 vs 400" or "5 zones to 1" shrink to
+       fit their column instead of overflowing or wrapping awkwardly. */
+    font-size: clamp(1.6rem, 6vw, 2.75rem);
+    line-height: 1.05;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    color: #1c1917; /* stone-900 */
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+  }
+  .finding-stat-label {
+    margin-top: 0.4rem;
+    max-width: 24ch;
+    font-size: 0.8rem;
+    line-height: 1.3;
+    color: #78716c; /* stone-500 */
+  }
+
+  /* Interview pull-quotes: larger, accented, set off from the prose. */
+  .finding-quote {
+    margin: 1.75rem 0 0;
+    padding: 0.1rem 0 0.1rem 1.25rem;
+    border-left: 3px solid #8b1a1a; /* site accent red */
+  }
+  .finding-quote p {
+    margin: 0;
+    font-size: 1.4rem;
+    line-height: 1.3;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    color: #1c1917; /* stone-900 */
+  }
+  .finding-quote cite {
+    display: block;
+    margin-top: 0.5rem;
+    font-size: 0.8rem;
+    font-style: normal;
+    color: #78716c; /* stone-500 */
+  }
+
+  /* Figures fill the full width of the column. */
+  .finding-figure {
+    margin: 1.75rem 0 0;
+  }
+  .finding-figure img {
+    display: block;
+    width: 100%;
+    height: auto; /* fills the column, never exceeds it */
+    border: 1px solid #e7e5e4; /* stone-200 */
+    border-radius: 6px;
+  }
+  /* Three-line caption: bold Figure title, subtitle, muted Source line. */
+  .finding-figure figcaption {
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+    margin-top: 0.65rem;
+    line-height: 1.45;
+  }
+  .finding-fig-title {
+    font-size: 0.88rem;
+    font-weight: 600;
+    color: #1c1917; /* stone-900 */
+  }
+  .finding-fig-subtitle {
+    font-size: 0.85rem;
+    color: #57534e; /* stone-600 */
+  }
+  .finding-source {
+    font-size: 0.75rem;
+    color: #a8a29e; /* stone-400 */
+  }
+  .finding-source--table {
+    margin: 0.55rem 0 0;
+    line-height: 1.45;
+  }
+
+  /* Comparison/data tables: match the Findings table tokens. The wide prose
+     tables here (7.1, 7.2) are left-aligned and wrap rather than the numeric
+     nowrap/right-align Findings uses for its narrow comparison. */
+  .analysis-table-wrap {
+    margin-top: 1.5rem;
+    overflow-x: auto;
+  }
+  .analysis-table {
+    border-collapse: collapse;
+    width: 100%;
+    font-size: 0.85rem;
+  }
+  .analysis-table th,
+  .analysis-table td {
+    padding: 0.6rem 0.8rem;
+    border-bottom: 1px solid #e7e5e4; /* stone-200 */
+    text-align: left;
+    vertical-align: top;
+    line-height: 1.45;
+    overflow-wrap: anywhere; /* let long tokens break so the table fits narrow screens */
+  }
+  /* First column (labels): a sensible minimum so its words wrap on normal lines
+     instead of breaking character by character. */
+  .analysis-table th:first-child,
+  .analysis-table td:first-child {
+    min-width: 8.5rem;
+    overflow-wrap: normal;
+  }
+  .analysis-table thead th {
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    font-weight: 700;
+    color: #78716c; /* stone-500 */
+    background: #fafaf9; /* stone-50 */
+  }
+  .analysis-table tbody th {
+    font-weight: 600;
+    color: #1c1917; /* stone-900 */
+  }
+  .analysis-table td {
+    color: #44403c; /* stone-700 */
+  }
+  .analysis-table tbody tr:last-child th,
+  .analysis-table tbody tr:last-child td {
+    border-bottom: 0;
+  }
+  /* Reuse the Findings caption styling on the analysis tables. */
+  .finding-table-caption {
+    text-align: left;
+    margin-bottom: 0.6rem;
+    font-size: 0.82rem;
+    color: #78716c; /* stone-500 */
+  }
+
+  /* Density CTA: a prominent filled button (same href as the homepage ticket). */
+  .analysis-maplink {
+    display: inline-block;
+    margin-top: 1.5rem;
+    padding: 0.7rem 1.3rem;
+    border: 1px solid transparent;
+    border-radius: 6px;
+    background: #1c1917; /* stone-900, black */
+    color: #fafaf9; /* stone-50 */
+    font-size: 0.95rem;
+    font-weight: 600;
+    text-decoration: none;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.25);
+    transition:
+      background-color 0.12s ease,
+      box-shadow 0.12s ease;
+  }
+  .analysis-maplink:hover {
+    background: #292524; /* stone-800 */
+    box-shadow: 0 5px 14px rgba(0, 0, 0, 0.3);
+  }
+  .analysis-maplink:focus-visible {
+    outline: 2px solid #1c1917;
+    outline-offset: 2px;
+  }
+
+  /* Placeholder for a figure whose image is not yet in public/images. */
+  .analysis-figure-missing {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 180px;
+    padding: 2rem;
+    border: 1px dashed #d6d3d1; /* stone-300 */
+    border-radius: 6px;
+    background: #fafaf9; /* stone-50 */
+    color: #a8a29e; /* stone-400 */
+    font-size: 0.85rem;
+    font-style: italic;
+    text-align: center;
+  }
+
+  /* Closing handoff. */
+  .finding-handoff-list {
+    margin: 1.1rem 0 0;
+    padding: 0;
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 0.65rem;
+  }
+  .finding-handoff-list li {
+    position: relative;
+    padding-left: 1.1rem;
+    color: #44403c; /* stone-700 */
+    font-size: 0.98rem;
+    line-height: 1.55;
+  }
+  .finding-handoff-list li::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0.62em;
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: #a8a29e; /* stone-400 */
+  }
+  .finding-handoff-list a {
+    color: #1c1917; /* stone-900 */
+    font-weight: 500;
+    text-decoration: underline;
+    text-underline-offset: 2px;
+  }
+  .finding-handoff-list a:hover {
+    color: #57534e; /* stone-600 */
+  }
+
+  /* Diagnosis vs prescription: two scoped accent modes that harmonize with the
+     palette. Applied only to each group's kicker and stat numbers, tasteful, with
+     all other type, spacing, and layout left identical to Findings. */
+  /* Stat numbers stay black and bold everywhere; only the kicker labels carry
+     the diagnosis (clay) vs prescription (green) accent for section contrast. */
+  .mode-problem .finding-kicker {
+    color: #9c4f3f; /* muted clay-red, the "problem" accent */
+  }
+  .mode-solution .finding-kicker {
+    color: #4f7a52; /* muted green, the "solution" accent */
+  }
+
+  /* Four-part solution cards: the lively headline of the executive summary. */
+  .analysis-solution-cards {
+    margin: 1.25rem 0 0.5rem;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0.75rem;
+  }
+  @media (max-width: 640px) {
+    .analysis-solution-cards {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+  .analysis-solution-card {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+    padding: 1rem 1rem 1.1rem;
+    border: 1px solid #d6e4d2; /* soft green border */
+    border-top: 4px solid #4f7a52; /* solution green accent */
+    border-radius: 8px;
+    background: #f3f8f1; /* faint green tint so it pops off the page */
+    text-decoration: none;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+    transition:
+      transform 0.12s ease,
+      box-shadow 0.12s ease,
+      background-color 0.12s ease;
+  }
+  .analysis-solution-card:hover {
+    transform: translateY(-2px);
+    background: #ecf4e9;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  }
+  .analysis-solution-card:focus-visible {
+    outline: 2px solid #4f7a52;
+    outline-offset: 2px;
+  }
+  .analysis-solution-num {
+    font-size: 1.9rem;
+    line-height: 1;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    color: #4f7a52; /* solution green */
+    font-variant-numeric: tabular-nums;
+  }
+  .analysis-solution-title {
+    font-size: 0.9rem;
+    font-weight: 600;
+    line-height: 1.25;
+    color: #1c1917; /* stone-900 */
+  }
+
+  /* Comparison stat pair (Problem 2): a large ">" between the two numbers. */
+  .analysis-stat-compare {
+    align-items: flex-start;
+  }
+  .analysis-stat-gt {
+    font-size: clamp(1.6rem, 6vw, 2.75rem);
+    line-height: 1.05;
+    font-weight: 700;
+    color: #1c1917; /* stone-900 */
+    align-self: flex-start;
+  }
+
+  /* THE PACKAGE: a distinct card that recaps the whole page. */
+  .analysis-package {
+    margin-top: 3rem;
+    padding: 1.75rem 2rem;
+    border: 1px solid #d6d3d1; /* stone-300, overrides the section top rule */
+    border-radius: 8px;
+    background: #f6f5f2; /* subtle warm shade off the page */
+  }
+  .analysis-package-recap {
+    margin: 0.5rem 0 0;
+    font-size: 1.05rem;
+    font-weight: 600;
+    line-height: 1.4;
+    color: #1c1917; /* stone-900 */
+  }
+
+  /* Table 7.2 direction arrows: up = green increase, down = red decrease.
+     Larger and bolder so the direction reads at a glance. */
+  .dir-up,
+  .dir-down {
+    font-size: 1.3rem;
+    font-weight: 800;
+    line-height: 1;
+    vertical-align: -0.1em;
+  }
+  .dir-up {
+    color: #3f7a3f; /* green */
+  }
+  .dir-down {
+    color: #a4453a; /* red */
+  }
+  /* Visually-hidden text so the arrow direction is still read by screen readers. */
+  .vh {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    margin: -1px;
+    padding: 0;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+  }
+
+  /* FUTURE OPPORTUNITY: the prominent forward-looking close to the prescription. */
+  .analysis-future {
+    margin-top: 3rem;
+    padding: 1.75rem 2rem 2rem;
+    background: #eef4ec; /* faint green-tinted shade */
+    border-left: 4px solid #4f7a52; /* solution green accent */
+    border-radius: 8px;
+  }
+  .analysis-future-kicker {
+    color: #4f7a52; /* solution green */
+  }
+  .analysis-future-title {
+    margin: 0.3rem 0 0;
+    font-size: clamp(1.5rem, 4vw, 1.95rem);
+    line-height: 1.15;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+    color: #1c1917; /* stone-900 */
+  }
+
+  /* Anchor targets leave breathing room when jumped to. */
+  [id^='problem-'],
+  [id^='proposal-'],
+  #package,
+  #other-levers {
+    scroll-margin-top: 1.5rem;
+  }
+</style>
