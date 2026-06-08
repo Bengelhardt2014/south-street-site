@@ -1,0 +1,469 @@
+---
+import Layout from '../layouts/Layout.astro';
+
+// Downloadable datasets (files live in public/data).
+const downloads: { title: string; desc: string; format: string; href: string }[] = [
+  {
+    title: 'South Street Fieldwork Data',
+    desc: 'Parcel- and block-level field-survey data, with condition, vacancy, tenant, and OPA-enrichment fields.',
+    format: 'XLSX',
+    href: '/data/south-street-fieldwork-data.xlsx',
+  },
+  {
+    title: 'Corridor demographics, 1970 to 2020',
+    desc: 'Population, age, income, and housing for the neighborhoods around both corridors, with a data dictionary and methodology.',
+    format: 'XLSX',
+    href: '/data/corridor-demographics-1970-2020.xlsx',
+  },
+  {
+    title: 'Vacancy and vibrancy analysis',
+    desc: 'The cyclical corridor-health curve and vacancy bellwether, with full sources.',
+    format: 'XLSX',
+    href: '/data/south-street-vacancy-vibrancy-analysis.xlsx',
+  },
+  {
+    title: 'Critical mass summary',
+    desc: 'The catchment population and density behind the 276 vs 400 benchmark.',
+    format: 'CSV',
+    href: '/data/corridor-critical-mass-summary.csv',
+  },
+  {
+    title: 'Building-level parcel data',
+    desc: 'The flat, analysis-ready parcel dataset, owner names removed.',
+    format: 'CSV',
+    href: '/data/building-level-parcel-data.csv',
+  },
+];
+---
+
+<Layout title="About · Saving South Street">
+  <div class="finding-wrap">
+    <!-- HERO -->
+    <section>
+      <p class="finding-kicker">About</p>
+      <h1 class="finding-hero-title">About This Project</h1>
+      <p class="finding-byline">An urban planning thesis by Brandon K. Engelhardt | 2026</p>
+      <p class="mt-2 text-sm">
+        <a
+          href="/thesis.pdf"
+          target="_blank"
+          rel="noopener"
+          class="text-stone-500 underline underline-offset-2 hover:text-stone-800"
+        >Read the full thesis (PDF)</a>
+      </p>
+    </section>
+
+    <!-- HOW THE STUDY WAS DONE -->
+    <section class="finding-section">
+      <p class="finding-kicker">Methods</p>
+      <h2 class="text-2xl font-semibold tracking-tight text-stone-900">How the study was done</h2>
+      <div class="finding-statblock">
+        <div class="finding-stat-items">
+          <div class="finding-stat-item">
+            <span class="finding-stat-num">519</span>
+            <span class="finding-stat-label">parcels walked across both corridors</span>
+          </div>
+          <div class="finding-stat-item">
+            <span class="finding-stat-num">17</span>
+            <span class="finding-stat-label">stakeholder interviews</span>
+          </div>
+          <div class="finding-stat-item">
+            <span class="finding-stat-num">30+</span>
+            <span class="finding-stat-label">fields coded per parcel</span>
+          </div>
+        </div>
+      </div>
+      <p class="finding-body">
+        The Philadelphia City Planning Commission set the precedent for this kind of fieldwork with its
+        Philadelphia Shops surveys in 1989, 1996, and 2004, walking the city's commercial corridors
+        with clipboards and pencils. This study did the same forty years later, with an iPad and a
+        pointer finger, because no municipal system captures parcel-level business tenancy at the
+        granularity this analysis needed.
+      </p>
+      <p class="finding-body">
+        Fieldwork covered 519 parcels across both corridors in March and April 2026. South Street's
+        271 parcels were walked five times, on weekday mornings, Friday afternoons, and a Saturday
+        midday; East Passyunk's were walked three times. Each parcel was pre-loaded from Philadelphia's
+        Atlas tool, triangulated with OpenDataPhilly and Google Maps, and coded on the spot across
+        roughly 30 fields. The four anchor variables were vacancy status, structural condition,
+        storefront condition, and business category, with separate trips dedicated to block-level
+        streetscape, walking conditions, and quality of life.
+      </p>
+      <p class="finding-body">
+        The field survey was joined to public records to build the full picture: Office of Property
+        Assessment data on sales, values, and year built; License and Inspections violation history;
+        Census and American Community Survey demographics back to 1970; and the PCPC Philadelphia Shops
+        inventories for the historical vacancy baseline. Each variable's definition lives in the source
+        line of the figure or table where it appears.
+      </p>
+      <p class="finding-body">
+        Fieldwork was paired with 17 scheduled interviews across six categories of corridor actor:
+        business-district leaders, civic-association presidents, two City Council offices, the
+        Department of Commerce, business owners, and a retail brokerage. Interviews ran 30 to 60
+        minutes, in person, over Zoom, and by phone. Each transcript was coded into themes, with AI
+        assistance, and shared back with the interviewee for confirmation. Recurring concerns, absentee
+        landlords, smoke shops, and low housing density, shaped the diagnosis. To protect the people
+        who spoke candidly, this site refers to them by role rather than by name.
+      </p>
+      <p class="finding-body">
+        A few limitations are worth naming. The study leans toward South Street, with less depth on
+        East Passyunk and on the corridor's pre-1960s history. The four proposals are vision-based
+        recommendations, not financial models, and each still needs a dedicated return-on-investment
+        analysis. The study also had no direct visitation data, such as Placer.ai mobility data, so
+        demand was triangulated from tenant mix, field survey, and interviews rather than measured
+        directly. As a single-researcher project by someone who lives within the corridor's catchment,
+        it carries a resident's perspective, which opened doors but also brings its own framing.
+      </p>
+    </section>
+
+    <!-- ABOUT THE AUTHOR -->
+    <section class="finding-section">
+      <p class="finding-kicker">About the author</p>
+      <h2 class="text-2xl font-semibold tracking-tight text-stone-900">About the author</h2>
+      <div class="about-author">
+        <img
+          class="about-author-photo"
+          src="/images/brandon.jpg"
+          alt="Brandon Engelhardt, the author of this study."
+          loading="lazy"
+          decoding="async"
+        />
+        <div class="about-author-body">
+          <p class="finding-body about-author-text">
+            Brandon Engelhardt is the author of this study and a Master of Regional and City Planning
+            graduate of Drexel University. A Pottstown, Pennsylvania native and University of
+            Pennsylvania graduate, he spent more than a decade in technology, including over seven
+            years working with public sector clients. His planning work focuses on pro-growth public
+            policy that strengthens Philadelphia's business competitiveness, supports new business
+            creation, expands higher-wage opportunities, and improves the city's work/live/play
+            balance. Brandon serves on the board of the Society Hill Civic Association, runs Join, or
+            Die! Tours through Society Hill and Old City, and is an Irish Setter aficionado.
+          </p>
+          <p class="about-author-link-row">
+            <a
+              class="about-inline-link"
+              href="https://www.linkedin.com/in/brandonengelhardt"
+              target="_blank"
+              rel="noopener"
+            >Connect on LinkedIn</a>
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- DATA AND DOWNLOADS -->
+    <section class="finding-section">
+      <p class="finding-kicker">Data</p>
+      <h2 class="text-2xl font-semibold tracking-tight text-stone-900">Data and downloads</h2>
+      <p class="finding-body">
+        The data behind this study is open to download and reuse. Interviewee contact information has
+        been removed to protect the people who spoke for it.
+      </p>
+      <ul class="about-downloads">
+        {downloads.map((d) => (
+          <li class="about-download">
+            <span class="about-download-info">
+              <span class="about-download-title">{d.title}</span>
+              <span class="about-download-desc">{d.desc}</span>
+            </span>
+            <a class="about-download-link" href={d.href} download>Download {d.format}</a>
+          </li>
+        ))}
+      </ul>
+    </section>
+
+    <!-- A NOTE ON AI -->
+    <section class="finding-argument" aria-label="A note on AI">
+      <p class="finding-argument-kicker">A note on AI</p>
+      <p class="finding-argument-text">
+        This website is a condensed, interactive companion to the thesis, not a replacement for it. AI
+        tools helped summarize the thesis, adapt it into these web pages, and build the interactive
+        features. Across many iterations, the work was steered to preserve the author's own words,
+        voice, and argument, and every page was reviewed and edited by hand. The complete, fully human
+        work, with the full analysis, methods, and citations, is the thesis itself.
+      </p>
+      <a class="analysis-maplink" href="/thesis.pdf" target="_blank" rel="noopener">
+        Download the full thesis (PDF)
+      </a>
+    </section>
+
+    <!-- ACKNOWLEDGMENTS -->
+    <section class="finding-section">
+      <p class="finding-kicker">Acknowledgments</p>
+      <h2 class="text-2xl font-semibold tracking-tight text-stone-900">Acknowledgments</h2>
+      <p class="finding-body">
+        Thanks to my thesis advisors at Drexel, and to the corridor stakeholders who gave their time
+        and candor in interviews. Their insight shaped both the diagnosis and the proposals.
+      </p>
+    </section>
+
+    <!-- HOW TO CITE -->
+    <section class="finding-section">
+      <p class="finding-kicker">How to cite</p>
+      <h2 class="text-2xl font-semibold tracking-tight text-stone-900">How to cite</h2>
+      <p class="about-citation">
+        Engelhardt, Brandon K. "Saving South Street." Master's thesis, Drexel University, 2026.
+      </p>
+    </section>
+
+    <!-- CLOSING -->
+    <p class="about-updated">Last updated June 2026.</p>
+  </div>
+</Layout>
+
+<style>
+  /* One unified width, mirroring the Findings and Policy Analysis pages. */
+  .finding-wrap {
+    max-width: 56rem; /* 896px, narrower than the main's 1104px box so it binds */
+    margin-inline: auto;
+  }
+
+  /* Hero: a small muted kicker over a large dominant title. */
+  .finding-hero-title {
+    margin: 0.35rem 0 0;
+    font-size: clamp(2rem, 5vw, 2.6rem);
+    line-height: 1.1;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    color: #1c1917; /* stone-900 */
+  }
+  .finding-thesis {
+    margin: 0.7rem 0 0;
+    font-size: 1.2rem;
+    line-height: 1.45;
+    font-weight: 500;
+    color: #44403c; /* stone-700 */
+  }
+  .finding-byline {
+    margin: 0.55rem 0 0;
+    font-size: 0.85rem;
+    font-style: italic;
+    color: #78716c; /* stone-500 */
+  }
+
+  /* Section rhythm: a thin rule sets each section apart. */
+  .finding-section {
+    margin-top: 3rem;
+    padding-top: 2rem;
+    border-top: 1px solid #e7e5e4; /* stone-200 */
+  }
+
+  .finding-kicker {
+    margin: 0 0 0.2rem;
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: #78716c; /* stone-500 */
+  }
+
+  .finding-body {
+    margin: 1rem 0 0;
+    color: #44403c; /* stone-700 */
+    font-size: 0.98rem;
+    line-height: 1.65;
+  }
+
+  /* Big-number stat block (black and bold). */
+  .finding-statblock {
+    margin: 1.25rem 0 0;
+  }
+  .finding-stat-items {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.5rem 3rem;
+    align-items: flex-start;
+  }
+  .finding-stat-item {
+    display: flex;
+    flex-direction: column;
+  }
+  .finding-stat-num {
+    font-size: clamp(1.6rem, 6vw, 2.75rem);
+    line-height: 1.05;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    color: #1c1917; /* stone-900, black */
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+  }
+  .finding-stat-label {
+    margin-top: 0.4rem;
+    max-width: 24ch;
+    font-size: 0.8rem;
+    line-height: 1.3;
+    color: #78716c; /* stone-500 */
+  }
+
+  /* Callout panel (A note on AI), matching the argument panel on the other pages. */
+  .finding-argument {
+    margin-top: 3rem;
+    padding: 1.5rem 1.75rem;
+    background: #f5f5f4; /* stone-100 */
+    border-left: 4px solid #1c1917; /* stone-900 accent */
+    border-radius: 6px;
+  }
+  .finding-argument-kicker {
+    margin: 0 0 0.55rem;
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: #78716c; /* stone-500 */
+  }
+  .finding-argument-text {
+    margin: 0;
+    font-size: 1.05rem;
+    line-height: 1.65;
+    color: #292524; /* stone-800 */
+  }
+
+  /* Prominent black download button (same treatment as the density button). */
+  .analysis-maplink {
+    display: inline-block;
+    margin-top: 1.25rem;
+    padding: 0.7rem 1.3rem;
+    border: 1px solid transparent;
+    border-radius: 6px;
+    background: #1c1917; /* stone-900, black */
+    color: #fafaf9; /* stone-50 */
+    font-size: 0.95rem;
+    font-weight: 600;
+    text-decoration: none;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.25);
+    transition:
+      background-color 0.12s ease,
+      box-shadow 0.12s ease;
+  }
+  .analysis-maplink:hover {
+    background: #292524; /* stone-800 */
+    box-shadow: 0 5px 14px rgba(0, 0, 0, 0.3);
+  }
+  .analysis-maplink:focus-visible {
+    outline: 2px solid #1c1917;
+    outline-offset: 2px;
+  }
+
+  /* Author block: a small rounded headshot beside the text. */
+  .about-author {
+    display: flex;
+    align-items: flex-start;
+    gap: 1.5rem;
+    margin-top: 1.25rem;
+  }
+  .about-author-photo {
+    flex-shrink: 0;
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 1px solid #e7e5e4; /* stone-200 */
+  }
+  .about-author-body {
+    min-width: 0;
+  }
+  .about-author-text {
+    margin-top: 0;
+  }
+  .about-author-link-row {
+    margin: 0.85rem 0 0;
+  }
+  @media (max-width: 480px) {
+    .about-author {
+      flex-direction: column;
+    }
+  }
+
+  .about-inline-link {
+    color: #1c1917; /* stone-900 */
+    font-weight: 500;
+    text-decoration: underline;
+    text-underline-offset: 2px;
+  }
+  .about-inline-link:hover {
+    color: #57534e; /* stone-600 */
+  }
+
+  /* Downloads list */
+  .about-downloads {
+    margin: 1.5rem 0 0;
+    padding: 0;
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+  .about-download {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.6rem 1.25rem;
+    padding: 1rem 1.1rem;
+    border: 1px solid #e7e5e4; /* stone-200 */
+    border-radius: 8px;
+    background: #fafaf9; /* stone-50 */
+  }
+  .about-download-info {
+    display: block;
+    flex: 1 1 22rem;
+    min-width: 0;
+  }
+  .about-download-title {
+    display: block;
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: #1c1917; /* stone-900 */
+  }
+  .about-download-desc {
+    display: block;
+    margin-top: 0.2rem;
+    font-size: 0.85rem;
+    line-height: 1.4;
+    color: #57534e; /* stone-600 */
+  }
+  .about-download-link {
+    flex-shrink: 0;
+    display: inline-block;
+    padding: 0.45rem 0.95rem;
+    border: 1px solid #1c1917; /* stone-900 */
+    border-radius: 6px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: #1c1917; /* stone-900 */
+    text-decoration: none;
+    white-space: nowrap;
+    transition:
+      background-color 0.12s ease,
+      color 0.12s ease;
+  }
+  .about-download-link:hover {
+    background: #1c1917; /* stone-900 */
+    color: #fafaf9; /* stone-50 */
+  }
+  .about-download-link:focus-visible {
+    outline: 2px solid #1c1917;
+    outline-offset: 2px;
+  }
+
+  /* Citation block */
+  .about-citation {
+    margin: 1.25rem 0 0;
+    padding: 1rem 1.25rem;
+    background: #f5f5f4; /* stone-100 */
+    border: 1px solid #e7e5e4; /* stone-200 */
+    border-radius: 8px;
+    font-size: 0.95rem;
+    line-height: 1.5;
+    color: #1c1917; /* stone-900 */
+  }
+
+  /* Last-updated line */
+  .about-updated {
+    margin: 3rem 0 0;
+    padding-top: 1.5rem;
+    border-top: 1px solid #e7e5e4; /* stone-200 */
+    font-size: 0.8rem;
+    color: #a8a29e; /* stone-400 */
+  }
+</style>

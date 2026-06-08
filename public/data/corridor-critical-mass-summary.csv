@@ -1,0 +1,3 @@
+corridor,catchment_population,n_tracts,corridor_retail_sqft,n_cmx_parcels_selected,n_retail_parcels,residents_per_2000sqft,threshold,status,deficit_vs_threshold
+South Street,46201,15,334593.8,238,217,276.2,400,below threshold,123.8
+East Passyunk,25487,6,210584.6,185,171,242.1,400,below threshold,157.9
