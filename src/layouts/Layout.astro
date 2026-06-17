@@ -3,10 +3,19 @@ import '../styles/global.css';
 
 interface Props {
   title?: string;
+  description?: string;
   fullBleed?: boolean;
 }
 
-const { title = 'Saving South Street', fullBleed = false } = Astro.props;
+const {
+  title = 'Saving South Street',
+  description = 'A four-part strategy to re-stabilize a historic cultural corridor.',
+  fullBleed = false,
+} = Astro.props;
+
+const siteUrl = 'https://www.savingsouthstreet.org';
+const ogImage = `${siteUrl}/images/og-image.png`;
+const canonicalUrl = new URL(Astro.url.pathname, siteUrl).href;
 
 const navLinks = [
   { href: '/summary', label: 'Summary' },
@@ -33,6 +42,25 @@ const currentPath = Astro.url.pathname.replace(/\/$/, '') || '/';
       rel="stylesheet"
     />
     <title>{title}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonicalUrl} />
+
+    <!-- Open Graph (LinkedIn, iMessage, Facebook, Slack, etc.) -->
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Saving South Street" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonicalUrl} />
+    <meta property="og:image" content={ogImage} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="Saving South Street" />
+
+    <!-- Twitter / X Card -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={ogImage} />
   </head>
   <body class="bg-stone-50 text-stone-900 antialiased">
     <header id="site-header" class="bg-stone-900 text-stone-50">
