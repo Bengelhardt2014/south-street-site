@@ -81,6 +81,8 @@ def derive_vacancy_state(vacant: str | None, vacancy_type: str | None,
         return "short_term"
     if vacancy_type == "Long-Term Vacancy":
         return "long_term"
+    if vacancy_type == "Seasonal Closure":
+        return "seasonal_closure"
     if vacant == "No" and not operator_type:
         return "non_commercial"
     if vacant == "No":

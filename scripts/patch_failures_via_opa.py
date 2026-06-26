@@ -39,6 +39,7 @@ def derive_vacancy_state(vacant, vacancy_type, operator_type):
     if vacancy_type == "Under Renovation": return "under_renovation"
     if vacancy_type == "Short-Term / Turnover": return "short_term"
     if vacancy_type == "Long-Term Vacancy": return "long_term"
+    if vacancy_type == "Seasonal Closure": return "seasonal_closure"
     if vacant == "No" and not operator_type: return "non_commercial"
     if vacant == "No": return "active"
     return "long_term"

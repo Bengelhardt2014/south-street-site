@@ -1434,6 +1434,10 @@ import Layout from '../layouts/Layout.astro';
       background-color: #e0b020;
       color: #1c1917;
     }
+    .popup-pill--seasonal_closure {
+      background-color: #C8892B;
+      color: #ffffff;
+    }
     .popup-section {
       display: flex;
       flex-direction: column;
@@ -1485,6 +1489,7 @@ import Layout from '../layouts/Layout.astro';
       under_renovation: '#e0b020',
       short_term: '#c8632c',
       long_term: '#8b1a1a',
+      seasonal_closure: '#C8892B',
       non_commercial: '#a8a29e',
     };
 
@@ -1568,14 +1573,15 @@ import Layout from '../layouts/Layout.astro';
     };
 
     // -------------------- Business mix filter options --------------------
-    // 4 commercial vacancy states. The 5th internal value 'non_commercial'
+    // 5 commercial vacancy states. The 6th internal value 'non_commercial'
     // (135 residential/civic parcels) is not filterable — that layer is
     // zoom-controlled (visible at zoom >= 18) and treated as background context.
     const VACANCY_OPTIONS: { value: string; label: string; color: string }[] = [
-      { value: 'active',           label: 'Occupied',             color: '#4a7c2e' },
-      { value: 'short_term',       label: 'Short-term turnover',  color: '#c8632c' },
-      { value: 'under_renovation', label: 'Under renovation',     color: '#e0b020' },
-      { value: 'long_term',        label: 'Long-term vacant',     color: '#8b1a1a' },
+      { value: 'active',            label: 'Occupied',             color: '#4a7c2e' },
+      { value: 'short_term',        label: 'Short-term turnover',  color: '#c8632c' },
+      { value: 'under_renovation',  label: 'Under renovation',     color: '#e0b020' },
+      { value: 'seasonal_closure',  label: 'Seasonal closure',     color: '#C8892B' },
+      { value: 'long_term',         label: 'Long-term vacant',     color: '#8b1a1a' },
     ];
 
     const PEAK_OPTIONS: { value: number; label: string }[] = [
@@ -1758,6 +1764,7 @@ import Layout from '../layouts/Layout.astro';
           return (
             p.vacancy_state === 'short_term' ||
             p.vacancy_state === 'under_renovation' ||
+            p.vacancy_state === 'seasonal_closure' ||
             p.vacancy_state === 'long_term'
           );
         case 'outdoor_rate':
@@ -2364,6 +2371,7 @@ import Layout from '../layouts/Layout.astro';
           if (
             p.vacancy_state === 'short_term' ||
             p.vacancy_state === 'under_renovation' ||
+            p.vacancy_state === 'seasonal_closure' ||
             p.vacancy_state === 'long_term'
           ) {
             b.vacant_count++;
@@ -3337,7 +3345,8 @@ import Layout from '../layouts/Layout.astro';
       const isVacant =
         p.vacancy_state === 'short_term' ||
         p.vacancy_state === 'long_term' ||
-        p.vacancy_state === 'under_renovation';
+        p.vacancy_state === 'under_renovation' ||
+        p.vacancy_state === 'seasonal_closure';
 
       // ---------- Header block ----------
       const header: string[] = [];
@@ -4167,7 +4176,7 @@ import Layout from '../layouts/Layout.astro';
       demand: {
         corridor: 'south-street',
         zoomAdjust: 0,
-        vacancy: ['short_term', 'under_renovation', 'long_term'],
+        vacancy: ['short_term', 'under_renovation', 'seasonal_closure', 'long_term'],
         category: [],
         ownership: [],
         outdoorOnly: false,
