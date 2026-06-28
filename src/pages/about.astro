@@ -52,14 +52,51 @@ const downloads: { title: string; desc: string; format: string; href: string }[]
         >Read the full thesis (PDF)</a>
       </p>
 
-      <!-- SITE NAVIGATION TUTORIAL -->
-      <div class="mt-8 text-center">
-        <h2 class="text-2xl font-semibold tracking-tight text-stone-900">Site navigation tutorial</h2>
-        <div class="mx-auto mt-4 w-full max-w-[720px]">
-          <div style="position: relative; padding-bottom: 66.54343807763401%; height: 0;"><iframe src="https://www.loom.com/embed/68033412344e442bb0d96939e7f8e3d3" frameborder="0" webkitallowfullscreen mozallowfullscreen allowfullscreen style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;"></iframe></div>
+    </section>
+
+    <!-- ABOUT THE AUTHOR -->
+    <section class="finding-section">
+      <p class="finding-kicker">About the author</p>
+      <h2 class="text-2xl font-semibold tracking-tight text-stone-900">About the author</h2>
+      <div class="about-author">
+        <img
+          class="about-author-photo"
+          src="/images/brandon.jpg"
+          alt="Brandon Engelhardt, the author of this study."
+          loading="lazy"
+          decoding="async"
+        />
+        <div class="about-author-body">
+          <p class="finding-body about-author-text">
+            Brandon Engelhardt is the author of this study and a Master of Science in Urban Planning
+            graduate of Drexel University. A Pottstown, Pennsylvania native and University of
+            Pennsylvania graduate, he spent more than a decade in technology, including over seven
+            years working with public sector clients. His planning work focuses on pro-growth public
+            policy that strengthens Philadelphia's business competitiveness, supports new business
+            creation, expands higher-wage opportunities, and improves the city's work/live/play
+            balance. Brandon serves on the board of the Society Hill Civic Association, runs Join, or
+            Die! Tours through Society Hill and Old City, and is an Irish Setter aficionado.
+          </p>
+          <p class="about-author-link-row">
+            <a
+              class="about-inline-link"
+              href="https://www.linkedin.com/in/brandonengelhardt"
+              target="_blank"
+              rel="noopener"
+            >Connect on LinkedIn</a>
+            <button id="contact-email-btn" class="about-inline-link about-email-btn" type="button">Email Brandon</button>
+          </p>
         </div>
       </div>
     </section>
+
+    <!-- SITE NAVIGATION TUTORIAL -->
+    <div class="mt-8 text-center">
+      <h2 class="text-2xl font-semibold tracking-tight text-stone-900">Site navigation tutorial</h2>
+      <div class="mx-auto mt-4 w-full max-w-[720px]">
+        <div style="position: relative; padding-bottom: 66.54343807763401%; height: 0;"><iframe src="https://www.loom.com/embed/68033412344e442bb0d96939e7f8e3d3" frameborder="0" webkitallowfullscreen mozallowfullscreen allowfullscreen style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;"></iframe></div>
+      </div>
+    </div>
 
     <!-- HOW THE STUDY WAS DONE -->
     <section class="finding-section">
@@ -122,41 +159,6 @@ const downloads: { title: string; desc: string; format: string; href: string }[]
         directly. As a single-researcher project by someone who lives within the corridor's catchment,
         it carries a resident's perspective, which opened doors but also brings its own framing.
       </p>
-    </section>
-
-    <!-- ABOUT THE AUTHOR -->
-    <section class="finding-section">
-      <p class="finding-kicker">About the author</p>
-      <h2 class="text-2xl font-semibold tracking-tight text-stone-900">About the author</h2>
-      <div class="about-author">
-        <img
-          class="about-author-photo"
-          src="/images/brandon.jpg"
-          alt="Brandon Engelhardt, the author of this study."
-          loading="lazy"
-          decoding="async"
-        />
-        <div class="about-author-body">
-          <p class="finding-body about-author-text">
-            Brandon Engelhardt is the author of this study and a Master of Science in Urban Planning
-            graduate of Drexel University. A Pottstown, Pennsylvania native and University of
-            Pennsylvania graduate, he spent more than a decade in technology, including over seven
-            years working with public sector clients. His planning work focuses on pro-growth public
-            policy that strengthens Philadelphia's business competitiveness, supports new business
-            creation, expands higher-wage opportunities, and improves the city's work/live/play
-            balance. Brandon serves on the board of the Society Hill Civic Association, runs Join, or
-            Die! Tours through Society Hill and Old City, and is an Irish Setter aficionado.
-          </p>
-          <p class="about-author-link-row">
-            <a
-              class="about-inline-link"
-              href="https://www.linkedin.com/in/brandonengelhardt"
-              target="_blank"
-              rel="noopener"
-            >Connect on LinkedIn</a>
-          </p>
-        </div>
-      </div>
     </section>
 
     <!-- DATA AND DOWNLOADS -->
@@ -375,6 +377,10 @@ const downloads: { title: string; desc: string; format: string; href: string }[]
   }
   .about-author-link-row {
     margin: 0.85rem 0 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem 1.25rem;
+    align-items: center;
   }
   @media (max-width: 480px) {
     .about-author {
@@ -390,6 +396,15 @@ const downloads: { title: string; desc: string; format: string; href: string }[]
   }
   .about-inline-link:hover {
     color: #57534e; /* stone-600 */
+  }
+
+  .about-email-btn {
+    background: none;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    font-size: inherit;
+    font-family: inherit;
   }
 
   /* Downloads list */
@@ -487,3 +502,45 @@ const downloads: { title: string; desc: string; format: string; href: string }[]
     .finding-stat-label { font-size: 0.78rem; }
   }
 </style>
+
+<script>
+  (function () {
+    const encoded = 'YmtlMzRAZHJleGVsLmVkdQ==';
+    function decode() {
+      return atob(encoded);
+    }
+
+    const btn = document.getElementById('contact-email-btn');
+    if (!btn) return;
+
+    btn.addEventListener('click', function () {
+      window.location.href = 'mailto:' + decode();
+    });
+
+    btn.addEventListener('contextmenu', function (e) {
+      e.preventDefault();
+      navigator.clipboard.writeText(decode()).then(function () {
+        showToast(btn);
+      });
+    });
+
+    function showToast(anchor) {
+      const existing = document.getElementById('email-copy-toast');
+      if (existing) existing.remove();
+
+      const toast = document.createElement('span');
+      toast.id = 'email-copy-toast';
+      toast.textContent = 'Email copied';
+      toast.style.cssText =
+        'position:fixed;background:#1c1917;color:#fafaf9;font-size:0.78rem;' +
+        'padding:0.3rem 0.7rem;border-radius:4px;pointer-events:none;z-index:9999;';
+
+      const rect = anchor.getBoundingClientRect();
+      toast.style.top = (rect.bottom + 6) + 'px';
+      toast.style.left = rect.left + 'px';
+
+      document.body.appendChild(toast);
+      setTimeout(function () { toast.remove(); }, 2000);
+    }
+  })();
+</script>
